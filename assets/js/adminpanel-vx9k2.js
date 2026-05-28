@@ -1,326 +1,187 @@
 const SUPABASE_URL = "https://wenwseckngextivnulqy.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndlbndzZWNrbmdleHRpdm51bHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NDQwODIsImV4cCI6MjA5NTUyMDA4Mn0.vhH_AbPB0Hs9yehPUOWRR7XLn_ei--g4efy8u-X9aok";
 const ALLOWED_ADMIN_EMAIL = "prudhvi@varadanexus.com";
-
 const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const authMessage = document.getElementById("auth-message");
-const adminMessage = document.getElementById("admin-message");
-const loginPanel = document.getElementById("login-panel");
-const dashboard = document.getElementById("dashboard");
-
-const stateLabels = {
-  "all-india": "All India", "andhra-pradesh": "Andhra Pradesh", telangana: "Telangana", "tamil-nadu": "Tamil Nadu",
-  karnataka: "Karnataka", maharashtra: "Maharashtra", delhi: "Delhi", kerala: "Kerala", "other-states": "Other States",
-};
-
+const $ = (id) => document.getElementById(id);
 const refs = {
-  complianceForm: document.getElementById("compliance-form"), teamForm: document.getElementById("team-form"), careerForm: document.getElementById("career-form"), settingsForm: document.getElementById("settings-form"),
-  complianceSubmit: document.getElementById("compliance-submit"), teamSubmit: document.getElementById("team-submit"), careerSubmit: document.getElementById("career-submit"),
-  complianceClear: document.getElementById("compliance-clear"), teamClear: document.getElementById("team-clear"), careerClear: document.getElementById("career-clear"),
-  tImageFile: document.getElementById("t-image-file"), tImage: document.getElementById("t-image"), tImagePreview: document.getElementById("t-image-preview"), tTags: document.getElementById("t-tags"), tTagsPreview: document.getElementById("t-tags-preview"),
-  compliancePreview: document.getElementById("compliance-live-preview"),
-  teamPreview: document.getElementById("team-live-preview"),
-  careerPreview: document.getElementById("career-live-preview"),
-  settingsPreview: document.getElementById("settings-live-preview"),
+  loginForm: $("login-form"), logoutBtn: $("logout-btn"), authMsg: $("auth-message"), adminMsg: $("admin-message"),
+  loginPanel: $("login-panel"), dashboard: $("dashboard"),
+  complianceForm: $("compliance-form"), teamForm: $("team-form"), careerForm: $("career-form"), settingsForm: $("settings-form"),
+  complianceList: $("compliance-list"), teamList: $("team-list"), careersList: $("careers-list"),
+  complianceSearch: $("compliance-search"), teamSearch: $("team-search"), careersSearch: $("careers-search"),
+  complianceSubmit: $("compliance-submit"), teamSubmit: $("team-submit"), careerSubmit: $("career-submit"),
+  complianceClear: $("compliance-clear"), teamClear: $("team-clear"), careerClear: $("career-clear"),
+  tImageFile: $("t-image-file"), tImage: $("t-image"), tImagePreview: $("t-image-preview"),
+  compliancePreview: $("compliance-live-preview"), teamPreview: $("team-live-preview"), careerPreview: $("career-live-preview"), settingsPreview: $("settings-live-preview"),
+  toast: $("admin-toast"),
 };
 
-let teamPreviewImageSrc = "";
+let teamImageObjectUrl = "";
+let complianceData = [], teamData = [], careersData = [];
+const stateLabels = {"all-india":"All India","andhra-pradesh":"Andhra Pradesh",telangana:"Telangana","tamil-nadu":"Tamil Nadu",karnataka:"Karnataka",maharashtra:"Maharashtra",delhi:"Delhi",kerala:"Kerala","other-states":"Other States"};
 
-function msg(el, m, err = false) { if (!el) return; el.textContent = m; el.style.color = err ? "#b91c1c" : "#334155"; }
-const setAuthMessage = (m, e = false) => msg(authMessage, m, e);
-const setAdminMessage = (m, e = false) => msg(adminMessage, m, e);
+const esc = (v) => String(v ?? "").replace(/[&<>'"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c]));
+const badge = (ok) => `<span class="trust-chip" style="background:${ok?"#ecfdf5":"#fee2e2"};color:${ok?"#166534":"#991b1b"}">${ok?"Active":"Inactive"}</span>`;
+const rel = (iso) => {
+  if (!iso) return "";
+  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (!isFinite(s) || s < 0) return "";
+  if (s < 60) return `Updated ${s}s ago`;
+  if (s < 3600) return `Updated ${Math.floor(s/60)}m ago`;
+  if (s < 86400) return `Updated ${Math.floor(s/3600)}h ago`;
+  return `Updated ${Math.floor(s/86400)}d ago`;
+};
 
-function setViewAuthenticated(on) { if (!loginPanel || !dashboard) return; loginPanel.classList.toggle("hidden", on); dashboard.classList.toggle("hidden", !on); }
+function toast(msg, ok = true) {
+  if (!refs.toast) return;
+  refs.toast.textContent = msg;
+  refs.toast.className = `fixed bottom-4 right-4 z-[9999] rounded-lg px-4 py-3 text-sm font-medium shadow-lg ${ok ? "bg-emerald-600 text-white" : "bg-red-600 text-white"}`;
+  refs.toast.classList.remove("hidden");
+  setTimeout(() => refs.toast.classList.add("hidden"), 3000);
+}
+const setMsg = (el, m, err=false)=>{ if(!el) return; el.textContent=m; el.style.color=err?"#b91c1c":"#334155"; toast(m, !err); };
 
-function switchTab(tab) {
-  document.querySelectorAll(".tab-panel").forEach((p) => p.classList.add("hidden"));
-  document.querySelectorAll(".tab-btn").forEach((b) => { b.classList.remove("btn-primary"); b.classList.add("btn-secondary"); });
-  document.getElementById(`tab-${tab}`)?.classList.remove("hidden");
-  const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`); if (btn) { btn.classList.remove("btn-secondary"); btn.classList.add("btn-primary"); }
+function busy(btn, on, text) { if (!btn) return; if (on) { btn.dataset.prev = btn.textContent; btn.textContent = text; btn.disabled = true; btn.style.opacity = ".7"; } else { btn.textContent = btn.dataset.prev || btn.textContent; btn.disabled = false; btn.style.opacity = ""; } }
+
+function setAuth(on){ refs.loginPanel?.classList.toggle("hidden", on); refs.dashboard?.classList.toggle("hidden", !on); }
+
+function switchTab(tab){ document.querySelectorAll(".tab-panel").forEach(p=>p.classList.add("hidden")); document.querySelectorAll(".tab-btn").forEach(b=>{b.classList.remove("btn-primary");b.classList.add("btn-secondary");}); $(`tab-${tab}`)?.classList.remove("hidden"); const b=document.querySelector(`.tab-btn[data-tab='${tab}']`); if(b){b.classList.add("btn-primary");b.classList.remove("btn-secondary");}}
+
+function reorder(list, id, dir){ const idx=list.findIndex(x=>x.id===id); if(idx<0) return null; const swap=idx+dir; if(swap<0||swap>=list.length) return null; return [list[idx], list[swap]]; }
+async function applyReorder(table, list, id, dir){ const pair=reorder(list,id,dir); if(!pair) return; const [a,b]=pair; const ao=a.display_order??0, bo=b.display_order??0; const {error:e1}=await supabaseClient.from(table).update({display_order:bo}).eq("id",a.id); if(e1) throw e1; const {error:e2}=await supabaseClient.from(table).update({display_order:ao}).eq("id",b.id); if(e2) throw e2; }
+
+async function optimizeImage(file){
+  const img = await new Promise((res, rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=URL.createObjectURL(file); });
+  const maxW=1200,maxH=1200; let {width:w,height:h}=img; const r=Math.min(maxW/w,maxH/h,1); w=Math.round(w*r); h=Math.round(h*r);
+  const c=document.createElement("canvas"); c.width=w; c.height=h; const ctx=c.getContext("2d"); ctx.drawImage(img,0,0,w,h);
+  const blob = await new Promise((res)=>c.toBlob(res,"image/webp",0.75));
+  if(!blob) throw new Error("Optimization failed");
+  return new File([blob], `${Date.now()}-optimized.webp`, {type:"image/webp"});
 }
 
-function activeBadge(v) { return `<span class="trust-chip" style="background:${v ? "#ecfdf5" : "#fee2e2"};color:${v ? "#166534" : "#991b1b"};">${v ? "Active" : "Inactive"}</span>`; }
-function esc(v) {
-  return String(v ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+async function uploadTeamImageIfSelected(){
+  const file = refs.tImageFile?.files?.[0]; if(!file) return refs.tImage?.value?.trim() || "";
+  let f=file;
+  try { f = await optimizeImage(file); } catch(e){ setMsg(refs.adminMsg, "Image optimization failed. Uploading original file.", true); }
+  busy(refs.teamSubmit,true,"Uploading...");
+  try {
+    const path = `${Date.now()}-${f.name.replace(/\s+/g,"-")}`;
+    const {error}=await supabaseClient.storage.from("team-images").upload(path,f,{upsert:true});
+    if(error) throw new Error("Image upload failed. Check Supabase Storage bucket and policies.");
+    const {data}=supabaseClient.storage.from("team-images").getPublicUrl(path);
+    return data?.publicUrl || "";
+  } finally { busy(refs.teamSubmit,false); }
 }
 
-function updateCompliancePreview() {
-  if (!refs.compliancePreview) return;
-  const title = esc(document.getElementById("c-title")?.value || "Untitled compliance item");
-  const category = esc(document.getElementById("c-category")?.value || "Category");
-  const stateKey = document.getElementById("c-state")?.value || "";
-  const state = esc(stateLabels[stateKey] || stateKey || "State");
-  const due = esc(document.getElementById("c-due-date")?.value || "As notified");
-  const freq = esc(document.getElementById("c-frequency")?.value || "-");
-  const applicable = esc(document.getElementById("c-applicable")?.value || "-");
-  const description = esc(document.getElementById("c-description")?.value || "-");
-  const status = esc(document.getElementById("c-status")?.value || "Indicative");
-  const active = document.getElementById("c-active")?.checked ?? true;
-  refs.compliancePreview.innerHTML = `<article class="calendar-card"><span class="calendar-date">${due}</span><span class="trust-chip ml-2">${status}</span><h3 class="mt-3 font-bold text-navy">${title}</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> ${category}</p><p class="subtitle text-sm"><strong>State applicability:</strong> ${state}</p><p class="subtitle text-sm"><strong>Frequency:</strong> ${freq}</p><p class="subtitle text-sm"><strong>Applicable to:</strong> ${applicable}</p><p class="subtitle text-sm"><strong>Description:</strong> ${description}</p><div class="mt-2">${activeBadge(active)}</div></article>`;
+function previewCompliance(){ if(!refs.compliancePreview) return; refs.compliancePreview.innerHTML = `<article class='calendar-card'><span class='calendar-date'>${esc($("c-due-date")?.value||"As notified")}</span><span class='trust-chip ml-2'>${esc($("c-status")?.value||"Indicative")}</span><h3 class='mt-3 font-bold text-navy'>${esc($("c-title")?.value||"Untitled")}</h3><p class='subtitle text-sm mt-2'><strong>Category:</strong> ${esc($("c-category")?.value||"-")}</p><p class='subtitle text-sm'><strong>State:</strong> ${esc(stateLabels[$("c-state")?.value] || $("c-state")?.value || "-")}</p><p class='subtitle text-sm'><strong>Frequency:</strong> ${esc($("c-frequency")?.value||"-")}</p><p class='subtitle text-sm'><strong>Applicable to:</strong> ${esc($("c-applicable")?.value||"-")}</p><p class='subtitle text-sm'><strong>Description:</strong> ${esc($("c-description")?.value||"-")}</p><div class='mt-2'>${badge($("c-active")?.checked ?? true)}</div></article>`; }
+function previewTeam(){ if(!refs.teamPreview) return; const n=$("t-name")?.value||"Team Member"; const initials=esc(n.split(" ").map(x=>x[0]).slice(0,2).join("").toUpperCase()||"TM"); const src = teamImageObjectUrl || refs.tImage?.value || ""; const tags=(($("t-tags")?.value)||"").split(",").map(t=>t.trim()).filter(Boolean).map(t=>`<span class='trust-chip'>${esc(t)}</span>`).join(" "); refs.teamPreview.innerHTML=`<article class='team-card'>${src?`<img src='${esc(src)}' class='h-14 w-14 rounded-full border border-slate-200 object-cover'/>`:`<div class='profile-initial'>${initials}</div>`}<h3 class='mt-4 font-bold text-navy text-xl'>${esc(n)}</h3><p class='text-sm font-semibold text-gold mt-1'>${esc($("t-designation")?.value||"Designation")}</p><p class='subtitle text-sm mt-2'>${esc($("t-bio")?.value||"-")}</p><div class='mt-3 flex flex-wrap gap-2'>${tags || "<span class='trust-chip'>Tag</span>"}</div><div class='mt-2'>${badge($("t-active")?.checked ?? true)}</div></article>`; }
+function previewCareer(){ if(!refs.careerPreview) return; const intern=$("j-intern")?.checked; refs.careerPreview.innerHTML=`<article class='service-card'><h3 class='font-bold text-navy'>${esc($("j-title")?.value||"Career opening")}</h3><p class='subtitle text-sm mt-2'>${esc($("j-description")?.value||"-")}</p><p class='subtitle text-sm mt-2'><strong>Requirements:</strong> ${esc($("j-requirements")?.value||"-")}</p><p class='text-xs mt-3 text-navy font-semibold'>Experience: ${esc($("j-exp")?.value||"-")}</p><p class='text-xs text-gold font-semibold'>Type: ${esc($("j-type")?.value||"-")}</p><p class='text-xs text-navy font-semibold'>Location: ${esc($("j-location")?.value||"-")}</p><div class='mt-2 flex gap-2'><span class='trust-chip'>${intern?"Internship":"Job"}</span>${badge($("j-active")?.checked ?? true)}</div></article>`; }
+function previewSettings(){ if(!refs.settingsPreview) return; refs.settingsPreview.innerHTML=`<div class='subtitle text-sm'><p><strong>Phone:</strong> ${esc($("s-phone")?.value||"-")}</p><p><strong>Email:</strong> ${esc($("s-email")?.value||"-")}</p><p><strong>WhatsApp:</strong> ${esc($("s-whatsapp")?.value||"-")}</p><p><strong>Address:</strong> ${esc($("s-address")?.value||"-")}</p><p><strong>Map Link:</strong> ${esc($("s-map")?.value||"-")}</p><p><strong>Footer Text:</strong> ${esc($("s-footer")?.value||"-")}</p></div>`; }
+
+function resetCompliance(){ refs.complianceForm?.reset(); $("compliance-id").value=""; refs.complianceSubmit.textContent="Save Compliance Item"; previewCompliance(); }
+function resetTeam(){ refs.teamForm?.reset(); $("team-id").value=""; refs.teamSubmit.textContent="Save Team Member"; teamImageObjectUrl=""; if(refs.tImagePreview) refs.tImagePreview.style.display="none"; previewTeam(); }
+function resetCareer(){ refs.careerForm?.reset(); $("career-id").value=""; refs.careerSubmit.textContent="Save Career Opening"; previewCareer(); }
+
+function rowMeta(r){ return `<div class='text-xs mt-2'>${r.created_at?`Created: ${new Date(r.created_at).toLocaleString()}`:""}${r.updated_at?`<br/>Updated: ${new Date(r.updated_at).toLocaleString()} (${rel(r.updated_at)})`:""}</div>`; }
+
+function renderRows(type, rows){
+  const cfg = {
+    compliance: {container: refs.complianceList, search: refs.complianceSearch?.value?.toLowerCase()||"", matches:(r)=>`${r.title} ${r.category} ${r.description} ${r.state}`.toLowerCase(), sort:(a,b)=>(a.display_order??0)-(b.display_order??0)},
+    team: {container: refs.teamList, search: refs.teamSearch?.value?.toLowerCase()||"", matches:(r)=>`${r.name} ${r.designation} ${Array.isArray(r.tags)?r.tags.join(" "):r.tags||""} ${r.bio}`.toLowerCase(), sort:(a,b)=>(a.display_order??0)-(b.display_order??0)},
+    careers: {container: refs.careersList, search: refs.careersSearch?.value?.toLowerCase()||"", matches:(r)=>`${r.title} ${r.employment_type} ${r.description} ${r.requirements}`.toLowerCase(), sort:(a,b)=>(a.display_order??0)-(b.display_order??0)},
+  }[type];
+  if(!cfg?.container) return;
+  cfg.container.innerHTML="";
+  rows.filter(r=>cfg.matches(r).includes(cfg.search)).sort(cfg.sort).forEach((r)=>{
+    const el=document.createElement("div"); el.className="card p-3 flex items-start justify-between gap-2";
+    const main = type==="team"
+      ? `${r.image_url?`<img src='${esc(r.image_url)}' class='h-10 w-10 rounded-full object-cover inline-block mr-2'/>`:""}<strong>${esc(r.name||"-")}</strong><br/>${esc(r.designation||"-")}<br/>${esc(Array.isArray(r.tags)?r.tags.join(", "):(r.tags||""))}<br/>${badge(r.is_active!==false)}`
+      : type==="compliance"
+      ? `<strong>${esc(r.title||"-")}</strong><br/>${esc(r.category||"-")} • ${esc(stateLabels[r.state]||r.state||"-")} • ${esc(r.status||"-")}<br/>${badge(r.is_active!==false)}`
+      : `<strong>${esc(r.title||"-")}</strong><br/>${esc(r.employment_type||"-")} • ${esc(r.experience_level||"-")} • ${r.is_internship?"Internship":"Job"}<br/>${badge(r.is_active!==false)}`;
+    el.innerHTML=`<div class='text-sm subtitle'>${main}${rowMeta(r)}</div><div class='flex flex-col gap-2'><button class='btn-secondary' data-a='up'>↑</button><button class='btn-secondary' data-a='down'>↓</button><button class='btn-secondary' data-a='edit'>Edit</button><button class='btn-secondary' data-a='del'>Delete</button></div>`;
+    const btn=(a)=>el.querySelector(`[data-a='${a}']`);
+    btn("edit").onclick=()=>editRow(type,r);
+    btn("del").onclick=()=>deleteRow(type,r.id,btn("del"));
+    btn("up").onclick=()=>moveRow(type,r.id,-1,btn("up"));
+    btn("down").onclick=()=>moveRow(type,r.id,1,btn("down"));
+    cfg.container.appendChild(el);
+  });
 }
 
-function updateTeamPreview() {
-  if (!refs.teamPreview) return;
-  const nameRaw = document.getElementById("t-name")?.value || "Team Member";
-  const name = esc(nameRaw);
-  const designation = esc(document.getElementById("t-designation")?.value || "Designation");
-  const bio = esc(document.getElementById("t-bio")?.value || "Bio preview will appear here.");
-  const tags = (document.getElementById("t-tags")?.value || "").split(",").map((t) => t.trim()).filter(Boolean);
-  const tagHtml = tags.length ? tags.map((t) => `<span class="trust-chip">${esc(t)}</span>`).join(" ") : "<span class='trust-chip'>Tag</span>";
-  const active = document.getElementById("t-active")?.checked ?? true;
-  const imageUrl = refs.tImage?.value?.trim() || "";
-  const imgSrc = teamPreviewImageSrc || imageUrl;
-  const initials = esc(nameRaw.split(" ").map((x) => x[0]).slice(0, 2).join("").toUpperCase() || "TM");
-  const avatar = imgSrc ? `<img src="${esc(imgSrc)}" alt="${name}" class="h-14 w-14 rounded-full border border-slate-200 object-cover"/>` : `<div class="profile-initial">${initials}</div>`;
-  refs.teamPreview.innerHTML = `<article class="team-card">${avatar}<h3 class="mt-4 font-bold text-navy text-xl">${name}</h3><p class="text-sm font-semibold text-gold mt-1">${designation}</p><p class="subtitle text-sm mt-2">${bio}</p><div class="mt-3 flex flex-wrap gap-2">${tagHtml}</div><div class="mt-2">${activeBadge(active)}</div></article>`;
+function editRow(type,r){
+  if(type==="compliance"){ $("compliance-id").value=r.id||""; $("c-title").value=r.title||""; $("c-category").value=r.category||""; $("c-state").value=r.state||""; $("c-due-date").value=r.due_date||""; $("c-frequency").value=r.frequency||""; $("c-applicable").value=r.applicable_to||""; $("c-description").value=r.description||""; $("c-status").value=r.status||"Indicative"; $("c-source").value=r.source_url||""; $("c-national").checked=!!r.is_national; $("c-active").checked=r.is_active!==false; refs.complianceSubmit.textContent="Update Compliance Item"; previewCompliance(); }
+  if(type==="team"){ $("team-id").value=r.id||""; $("t-name").value=r.name||""; $("t-designation").value=r.designation||""; $("t-bio").value=r.bio||""; $("t-image").value=r.image_url||""; $("t-tags").value=Array.isArray(r.tags)?r.tags.join(", "):(r.tags||""); $("t-order").value=r.display_order||""; $("t-active").checked=r.is_active!==false; teamImageObjectUrl=r.image_url||""; refs.teamSubmit.textContent="Update Team Member"; previewTeam(); }
+  if(type==="careers"){ $("career-id").value=r.id||""; $("j-title").value=r.title||""; $("j-type").value=r.employment_type||"Full-time"; $("j-exp").value=r.experience_level||"Fresher"; $("j-location").value=r.location||""; $("j-description").value=r.description||""; $("j-requirements").value=r.requirements||""; $("j-intern").checked=!!r.is_internship; $("j-active").checked=r.is_active!==false; refs.careerSubmit.textContent="Update Career Opening"; previewCareer(); }
 }
 
-function updateCareerPreview() {
-  if (!refs.careerPreview) return;
-  const title = esc(document.getElementById("j-title")?.value || "Career Opening");
-  const type = esc(document.getElementById("j-type")?.value || "Full-time");
-  const exp = esc(document.getElementById("j-exp")?.value || "Fresher");
-  const location = esc(document.getElementById("j-location")?.value || "Location");
-  const description = esc(document.getElementById("j-description")?.value || "Description preview.");
-  const requirements = esc(document.getElementById("j-requirements")?.value || "Requirements preview.");
-  const isIntern = document.getElementById("j-intern")?.checked;
-  const active = document.getElementById("j-active")?.checked ?? true;
-  refs.careerPreview.innerHTML = `<article class="service-card"><h3 class="font-bold text-navy">${title}</h3><p class="subtitle text-sm mt-2">${description}</p><p class="subtitle text-sm mt-2"><strong>Requirements:</strong> ${requirements}</p><p class="text-xs mt-3 text-navy font-semibold">Experience: ${exp}</p><p class="text-xs text-gold font-semibold">Type: ${type}</p><p class="text-xs text-navy font-semibold">Location: ${location}</p><div class="mt-2 flex gap-2"><span class="trust-chip">${isIntern ? "Internship" : "Job"}</span>${activeBadge(active)}</div></article>`;
+async function deleteRow(type,id,btn){
+  const table = type==="team"?"team_members":type==="careers"?"career_openings":"compliance_calendar";
+  busy(btn,true,"Deleting...");
+  try{ const {error}=await supabaseClient.from(table).delete().eq("id",id); if(error) throw error; await loadAll(); setMsg(refs.adminMsg,"Deleted successfully."); }
+  catch(e){ setMsg(refs.adminMsg,e.message,true); }
+  finally{ busy(btn,false); }
 }
 
-function updateSettingsPreview() {
-  if (!refs.settingsPreview) return;
-  const phone = esc(document.getElementById("s-phone")?.value || "-");
-  const email = esc(document.getElementById("s-email")?.value || "-");
-  const wa = esc(document.getElementById("s-whatsapp")?.value || "-");
-  const address = esc(document.getElementById("s-address")?.value || "-");
-  const map = esc(document.getElementById("s-map")?.value || "-");
-  const footer = esc(document.getElementById("s-footer")?.value || "-");
-  refs.settingsPreview.innerHTML = `<div class="subtitle text-sm"><p><strong>Phone:</strong> ${phone}</p><p><strong>Email:</strong> ${email}</p><p><strong>WhatsApp:</strong> ${wa}</p><p><strong>Address:</strong> ${address}</p><p><strong>Map Link:</strong> ${map}</p><p><strong>Footer Text:</strong> ${footer}</p></div>`;
+async function moveRow(type,id,dir,btn){
+  const table = type==="team"?"team_members":type==="careers"?"career_openings":"compliance_calendar";
+  const data = type==="team"?teamData:type==="careers"?careersData:complianceData;
+  busy(btn,true,dir<0?"Moving Up...":"Moving Down...");
+  try{ await applyReorder(table,[...data].sort((a,b)=>(a.display_order??0)-(b.display_order??0)),id,dir); await loadAll(); }
+  catch(e){ setMsg(refs.adminMsg,e.message,true); }
+  finally{ busy(btn,false); }
 }
 
-function renderRecord(container, html, onEdit, onDelete) {
-  const item = document.createElement("div");
-  item.className = "card p-3 flex items-start justify-between gap-3";
-  item.innerHTML = `<div class="text-sm subtitle">${html}</div><div class="flex gap-2"><button class="btn-secondary">Edit</button><button class="btn-secondary">Delete</button></div>`;
-  const [editBtn, delBtn] = item.querySelectorAll("button");
-  editBtn.onclick = onEdit; delBtn.onclick = onDelete;
-  container.appendChild(item);
-}
+async function loadCompliance(){ const {data,error}=await supabaseClient.from("compliance_calendar").select("*"); if(error) throw error; complianceData=data||[]; renderRows("compliance",complianceData); }
+async function loadTeam(){ const {data,error}=await supabaseClient.from("team_members").select("*"); if(error) throw error; teamData=data||[]; renderRows("team",teamData); }
+async function loadCareers(){ const {data,error}=await supabaseClient.from("career_openings").select("*"); if(error) throw error; careersData=data||[]; renderRows("careers",careersData); }
+async function loadSettings(){ const {data,error}=await supabaseClient.from("site_settings").select("*").limit(1).maybeSingle(); if(error) throw error; if(data){ $("s-id").value=data.id||""; $("s-phone").value=data.phone||""; $("s-email").value=data.email||""; $("s-whatsapp").value=data.whatsapp||""; $("s-address").value=data.address||""; $("s-map").value=data.map_link||""; $("s-footer").value=data.footer_text||""; } previewSettings(); }
+async function loadAll(){ await Promise.all([loadCompliance(),loadTeam(),loadCareers(),loadSettings()]); }
 
-function resetComplianceForm() { refs.complianceForm?.reset(); document.getElementById("compliance-id").value = ""; refs.complianceSubmit.textContent = "Save Compliance Item"; }
-function resetTeamForm() { refs.teamForm?.reset(); document.getElementById("team-id").value = ""; refs.teamSubmit.textContent = "Save Team Member"; if (refs.tImagePreview) refs.tImagePreview.style.display = "none"; refs.tTagsPreview.textContent = ""; teamPreviewImageSrc = ""; updateTeamPreview(); }
-function resetCareerForm() { refs.careerForm?.reset(); document.getElementById("career-id").value = ""; refs.careerSubmit.textContent = "Save Career Opening"; updateCareerPreview(); }
+async function saveCompliance(e){ e.preventDefault(); if(refs.complianceSubmit.disabled) return; const id=$("compliance-id").value; busy(refs.complianceSubmit,true,id?"Updating...":"Saving..."); try{ const payload={title:$("c-title").value,category:$("c-category").value,state:$("c-state").value,due_date:$("c-due-date").value,frequency:$("c-frequency").value,applicable_to:$("c-applicable").value,description:$("c-description").value,status:$("c-status").value,source_url:$("c-source").value,is_national:$("c-national").checked,is_active:$("c-active").checked}; const {error}=id?await supabaseClient.from("compliance_calendar").update(payload).eq("id",id):await supabaseClient.from("compliance_calendar").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,id?"Compliance updated.":"Compliance added."); resetCompliance(); await loadCompliance(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.complianceSubmit,false);} }
 
-async function uploadTeamImageIfSelected() {
-  const file = refs.tImageFile?.files?.[0];
-  if (!file) return refs.tImage?.value?.trim() || "";
-  const session = (await supabaseClient.auth.getSession()).data.session;
-  if (!session) throw new Error("You must be logged in to upload images.");
-  const filePath = `${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
-  const { error } = await supabaseClient.storage.from("team-images").upload(filePath, file, { upsert: true });
-  if (error) throw new Error("Image upload failed. Check Supabase Storage bucket and policies.");
-  const { data } = supabaseClient.storage.from("team-images").getPublicUrl(filePath);
-  return data?.publicUrl || "";
-}
+async function saveTeam(e){ e.preventDefault(); if(refs.teamSubmit.disabled) return; const id=$("team-id").value; busy(refs.teamSubmit,true,id?"Updating...":"Saving..."); try{ const tagsArray=(($("t-tags").value)||"").split(",").map(t=>t.trim()).filter(Boolean); const uploaded=await uploadTeamImageIfSelected(); const payload={name:$("t-name").value,designation:$("t-designation").value,bio:$("t-bio").value,image_url:uploaded || $("t-image").value,tags:tagsArray,display_order:Number($("t-order").value||0),is_active:$("t-active").checked}; const {error}=id?await supabaseClient.from("team_members").update(payload).eq("id",id):await supabaseClient.from("team_members").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,id?"Team member updated.":"Team member added."); resetTeam(); await loadTeam(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.teamSubmit,false);} }
 
-async function ensureAdminSession() {
-  if (!supabaseClient) return;
-  const { data, error } = await supabaseClient.auth.getSession();
-  if (error) return setAuthMessage(error.message, true);
-  const session = data?.session;
-  if (!session) return setViewAuthenticated(false);
-  if (session.user?.email?.toLowerCase() !== ALLOWED_ADMIN_EMAIL.toLowerCase()) {
-    await supabaseClient.auth.signOut();
-    setAuthMessage("Access denied. Only allowed admin email can log in.", true);
-    return setViewAuthenticated(false);
-  }
-  setViewAuthenticated(true);
-  switchTab("compliance");
-  await Promise.all([loadComplianceItems(), loadTeamMembers(), loadCareers(), loadSiteSettings()]);
-}
+async function saveCareer(e){ e.preventDefault(); if(refs.careerSubmit.disabled) return; const id=$("career-id").value; busy(refs.careerSubmit,true,id?"Updating...":"Saving..."); try{ const payload={title:$("j-title").value,employment_type:$("j-type").value,experience_level:$("j-exp").value,location:$("j-location").value,description:$("j-description").value,requirements:$("j-requirements").value,is_internship:$("j-intern").checked,is_active:$("j-active").checked}; const {error}=id?await supabaseClient.from("career_openings").update(payload).eq("id",id):await supabaseClient.from("career_openings").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,id?"Career updated.":"Career added."); resetCareer(); await loadCareers(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.careerSubmit,false);} }
 
-async function handleLogin(e) {
-  e.preventDefault();
-  const email = document.getElementById("admin-email")?.value?.trim().toLowerCase();
-  const password = document.getElementById("admin-password")?.value;
-  if (email !== ALLOWED_ADMIN_EMAIL.toLowerCase()) return setAuthMessage("Access denied. Unauthorized admin email.", true);
-  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-  if (error) return setAuthMessage(error.message, true);
-  setAuthMessage("Login successful.");
-  await ensureAdminSession();
-}
+async function saveSettings(e){ e.preventDefault(); const btn=refs.settingsForm?.querySelector("button[type='submit']"); busy(btn,true,"Saving..."); try{ const id=$("s-id").value; const payload={phone:$("s-phone").value,email:$("s-email").value,whatsapp:$("s-whatsapp").value,address:$("s-address").value,map_link:$("s-map").value,footer_text:$("s-footer").value}; const {error}=id?await supabaseClient.from("site_settings").update(payload).eq("id",id):await supabaseClient.from("site_settings").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,"Site settings saved."); await loadSettings(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(btn,false);} }
 
-async function handleLogout() { await supabaseClient.auth.signOut(); setViewAuthenticated(false); setAuthMessage("Logged out."); }
+async function ensureSession(){ const {data,error}=await supabaseClient.auth.getSession(); if(error) return setMsg(refs.authMsg,error.message,true); const s=data?.session; if(!s) return setAuth(false); if((s.user?.email||"").toLowerCase()!==ALLOWED_ADMIN_EMAIL.toLowerCase()){ await supabaseClient.auth.signOut(); setMsg(refs.authMsg,"Access denied. Unauthorized admin email.",true); return setAuth(false);} setAuth(true); switchTab("compliance"); await loadAll(); }
+async function login(e){ e.preventDefault(); const email=$("admin-email").value.trim().toLowerCase(); if(email!==ALLOWED_ADMIN_EMAIL.toLowerCase()) return setMsg(refs.authMsg,"Access denied. Unauthorized admin email.",true); const {error}=await supabaseClient.auth.signInWithPassword({email,password:$("admin-password").value}); if(error) return setMsg(refs.authMsg,error.message,true); setMsg(refs.authMsg,"Login successful."); await ensureSession(); }
+async function logout(){ await supabaseClient.auth.signOut(); setAuth(false); setMsg(refs.authMsg,"Logged out."); }
 
-async function loadComplianceItems() {
-  const container = document.getElementById("compliance-list"); if (!container) return;
-  container.innerHTML = "";
-  const { data, error } = await supabaseClient.from("compliance_calendar").select("*").order("id", { ascending: false });
-  if (error) return setAdminMessage(`Compliance load error: ${error.message}`, true);
-  (data || []).forEach((r) => renderRecord(container, `<strong>${r.title || "-"}</strong><br/>${r.category || "-"} • ${stateLabels[r.state] || r.state || "-"} • ${r.status || "-"}<br/>${activeBadge(r.is_active !== false)}`, () => {
-    document.getElementById("compliance-id").value = r.id || ""; document.getElementById("c-title").value = r.title || ""; document.getElementById("c-category").value = r.category || "";
-    document.getElementById("c-state").value = r.state || ""; document.getElementById("c-due-date").value = r.due_date || ""; document.getElementById("c-frequency").value = r.frequency || "";
-    document.getElementById("c-applicable").value = r.applicable_to || ""; document.getElementById("c-description").value = r.description || ""; document.getElementById("c-status").value = r.status || "Indicative";
-    document.getElementById("c-source").value = r.source_url || ""; document.getElementById("c-national").checked = !!r.is_national; document.getElementById("c-active").checked = r.is_active !== false;
-    refs.complianceSubmit.textContent = "Update Compliance Item";
-    updateCompliancePreview();
-  }, async () => {
-    const { error: delError } = await supabaseClient.from("compliance_calendar").delete().eq("id", r.id);
-    if (delError) return setAdminMessage(delError.message, true);
-    setAdminMessage("Compliance item deleted."); await loadComplianceItems();
-  }));
-}
+refs.loginForm?.addEventListener("submit",login);
+refs.logoutBtn?.addEventListener("click",logout);
+refs.complianceForm?.addEventListener("submit",saveCompliance);
+refs.teamForm?.addEventListener("submit",saveTeam);
+refs.careerForm?.addEventListener("submit",saveCareer);
+refs.settingsForm?.addEventListener("submit",saveSettings);
+refs.complianceClear?.addEventListener("click",resetCompliance);
+refs.teamClear?.addEventListener("click",resetTeam);
+refs.careerClear?.addEventListener("click",resetCareer);
 
-async function saveComplianceItem(e) {
-  e.preventDefault();
-  const id = document.getElementById("compliance-id").value;
-  const payload = {
-    title: document.getElementById("c-title").value, category: document.getElementById("c-category").value, state: document.getElementById("c-state").value,
-    due_date: document.getElementById("c-due-date").value, frequency: document.getElementById("c-frequency").value, applicable_to: document.getElementById("c-applicable").value,
-    description: document.getElementById("c-description").value, status: document.getElementById("c-status").value, source_url: document.getElementById("c-source").value,
-    is_national: document.getElementById("c-national").checked, is_active: document.getElementById("c-active").checked,
-  };
-  const { error } = id ? await supabaseClient.from("compliance_calendar").update(payload).eq("id", id) : await supabaseClient.from("compliance_calendar").insert([payload]);
-  if (error) return setAdminMessage(error.message, true);
-  setAdminMessage(id ? "Compliance item updated." : "Compliance item added."); resetComplianceForm(); await loadComplianceItems();
-}
+refs.complianceSearch?.addEventListener("input",()=>renderRows("compliance",complianceData));
+refs.teamSearch?.addEventListener("input",()=>renderRows("team",teamData));
+refs.careersSearch?.addEventListener("input",()=>renderRows("careers",careersData));
 
-async function loadTeamMembers() {
-  const container = document.getElementById("team-list"); if (!container) return;
-  container.innerHTML = "";
-  const { data, error } = await supabaseClient.from("team_members").select("*").order("display_order", { ascending: true });
-  if (error) return setAdminMessage(`Team load error: ${error.message}`, true);
-  (data || []).forEach((r) => renderRecord(container, `${r.image_url ? `<img src="${r.image_url}" alt="${r.name}" class="h-10 w-10 rounded-full object-cover inline-block mr-2"/>` : ""}<strong>${r.name || "-"}</strong><br/>${r.designation || "-"}<br/>${r.tags || ""}<br/>${activeBadge(r.is_active !== false)}`, () => {
-    document.getElementById("team-id").value = r.id || ""; document.getElementById("t-name").value = r.name || ""; document.getElementById("t-designation").value = r.designation || "";
-    document.getElementById("t-bio").value = r.bio || ""; document.getElementById("t-image").value = r.image_url || ""; document.getElementById("t-tags").value = Array.isArray(r.tags) ? r.tags.join(", ") : (r.tags || "");
-    document.getElementById("t-order").value = r.display_order || ""; document.getElementById("t-active").checked = r.is_active !== false;
-    refs.tTagsPreview.textContent = (r.tags || "").split(",").map((t) => t.trim()).filter(Boolean).join(" | ");
-    if (r.image_url && refs.tImagePreview) { refs.tImagePreview.src = r.image_url; refs.tImagePreview.style.display = "block"; }
-    teamPreviewImageSrc = r.image_url || "";
-    refs.teamSubmit.textContent = "Update Team Member";
-    updateTeamPreview();
-  }, async () => {
-    const { error: delError } = await supabaseClient.from("team_members").delete().eq("id", r.id);
-    if (delError) return setAdminMessage(delError.message, true);
-    setAdminMessage("Team member deleted."); await loadTeamMembers();
-  }));
-}
+$("c-state")?.addEventListener("change",(e)=>{$("c-national").checked=e.target.value==="all-india"; previewCompliance();});
+$("j-type")?.addEventListener("change",(e)=>{$("j-intern").checked=["Internship","Articleship"].includes(e.target.value); previewCareer();});
 
-async function saveTeamMember(e) {
-  e.preventDefault();
-  const id = document.getElementById("team-id").value;
-  const tagsArray = document
-    .getElementById("t-tags")
-    .value
-    .split(",")
-    .map((tag) => tag.trim())
-    .filter(Boolean);
-  let imageUrl = "";
-  try { imageUrl = await uploadTeamImageIfSelected(); }
-  catch (err) { return setAdminMessage(err.message, true); }
-  const payload = {
-    name: document.getElementById("t-name").value, designation: document.getElementById("t-designation").value, bio: document.getElementById("t-bio").value,
-    image_url: imageUrl || document.getElementById("t-image").value, tags: tagsArray,
-    display_order: Number(document.getElementById("t-order").value || 0), is_active: document.getElementById("t-active").checked,
-  };
-  const { error } = id ? await supabaseClient.from("team_members").update(payload).eq("id", id) : await supabaseClient.from("team_members").insert([payload]);
-  if (error) return setAdminMessage(error.message, true);
-  setAdminMessage(id ? "Team member updated." : "Team member added."); resetTeamForm(); await loadTeamMembers();
-}
+["c-title","c-category","c-due-date","c-frequency","c-applicable","c-description","c-status","c-active","c-source"].forEach(id=>$(id)?.addEventListener("input",previewCompliance));
+["t-name","t-designation","t-bio","t-image","t-tags","t-active"].forEach(id=>$(id)?.addEventListener("input",previewTeam));
+["j-title","j-exp","j-location","j-description","j-requirements","j-intern","j-active"].forEach(id=>$(id)?.addEventListener("input",previewCareer));
+["s-phone","s-email","s-whatsapp","s-address","s-map","s-footer"].forEach(id=>$(id)?.addEventListener("input",previewSettings));
 
-async function loadCareers() {
-  const container = document.getElementById("careers-list"); if (!container) return;
-  container.innerHTML = "";
-  const { data, error } = await supabaseClient.from("career_openings").select("*").order("id", { ascending: false });
-  if (error) return setAdminMessage(`Careers load error: ${error.message}`, true);
-  (data || []).forEach((r) => renderRecord(container, `<strong>${r.title || "-"}</strong><br/>${r.employment_type || "-"} • ${r.experience_level || "-"} • ${r.is_internship ? "Internship" : "Job"}<br/>${activeBadge(r.is_active !== false)}`, () => {
-    document.getElementById("career-id").value = r.id || ""; document.getElementById("j-title").value = r.title || ""; document.getElementById("j-type").value = r.employment_type || "Full-time";
-    document.getElementById("j-exp").value = r.experience_level || "Fresher"; document.getElementById("j-location").value = r.location || "";
-    document.getElementById("j-description").value = r.description || ""; document.getElementById("j-requirements").value = r.requirements || "";
-    document.getElementById("j-intern").checked = !!r.is_internship; document.getElementById("j-active").checked = r.is_active !== false;
-    refs.careerSubmit.textContent = "Update Career Opening";
-    updateCareerPreview();
-  }, async () => {
-    const { error: delError } = await supabaseClient.from("career_openings").delete().eq("id", r.id);
-    if (delError) return setAdminMessage(delError.message, true);
-    setAdminMessage("Career opening deleted."); await loadCareers();
-  }));
-}
-
-async function saveCareer(e) {
-  e.preventDefault();
-  const id = document.getElementById("career-id").value;
-  const type = document.getElementById("j-type").value;
-  const payload = {
-    title: document.getElementById("j-title").value, employment_type: type, experience_level: document.getElementById("j-exp").value, location: document.getElementById("j-location").value,
-    description: document.getElementById("j-description").value, requirements: document.getElementById("j-requirements").value,
-    is_internship: document.getElementById("j-intern").checked, is_active: document.getElementById("j-active").checked,
-  };
-  const { error } = id ? await supabaseClient.from("career_openings").update(payload).eq("id", id) : await supabaseClient.from("career_openings").insert([payload]);
-  if (error) return setAdminMessage(error.message, true);
-  setAdminMessage(id ? "Career opening updated." : "Career opening added."); resetCareerForm(); await loadCareers();
-}
-
-async function loadSiteSettings() {
-  const { data, error } = await supabaseClient.from("site_settings").select("*").limit(1).maybeSingle();
-  if (error) return setAdminMessage(`Settings load error: ${error.message}`, true);
-  if (!data) return;
-  document.getElementById("s-id").value = data.id || ""; document.getElementById("s-phone").value = data.phone || ""; document.getElementById("s-email").value = data.email || "";
-  document.getElementById("s-whatsapp").value = data.whatsapp || ""; document.getElementById("s-address").value = data.address || ""; document.getElementById("s-map").value = data.map_link || "";
-  document.getElementById("s-footer").value = data.footer_text || "";
-  updateSettingsPreview();
-}
-
-async function saveSiteSettings(e) {
-  e.preventDefault();
-  const id = document.getElementById("s-id").value;
-  const payload = {
-    phone: document.getElementById("s-phone").value, email: document.getElementById("s-email").value, whatsapp: document.getElementById("s-whatsapp").value,
-    address: document.getElementById("s-address").value, map_link: document.getElementById("s-map").value, footer_text: document.getElementById("s-footer").value,
-  };
-  const { error } = id ? await supabaseClient.from("site_settings").update(payload).eq("id", id) : await supabaseClient.from("site_settings").insert([payload]);
-  if (error) return setAdminMessage(error.message, true);
-  setAdminMessage("Site settings saved."); await loadSiteSettings();
-}
-
-document.getElementById("login-form")?.addEventListener("submit", handleLogin);
-document.getElementById("logout-btn")?.addEventListener("click", handleLogout);
-refs.complianceForm?.addEventListener("submit", saveComplianceItem);
-refs.teamForm?.addEventListener("submit", saveTeamMember);
-refs.careerForm?.addEventListener("submit", saveCareer);
-refs.settingsForm?.addEventListener("submit", saveSiteSettings);
-
-refs.complianceClear?.addEventListener("click", resetComplianceForm);
-refs.teamClear?.addEventListener("click", resetTeamForm);
-refs.careerClear?.addEventListener("click", resetCareerForm);
-
-document.getElementById("c-state")?.addEventListener("change", (e) => { document.getElementById("c-national").checked = e.target.value === "all-india"; updateCompliancePreview(); });
-document.getElementById("j-type")?.addEventListener("change", (e) => { document.getElementById("j-intern").checked = ["Internship", "Articleship"].includes(e.target.value); updateCareerPreview(); });
-refs.tTags?.addEventListener("input", () => { refs.tTagsPreview.textContent = (refs.tTags.value || "").split(",").map((t) => t.trim()).filter(Boolean).join(" | "); updateTeamPreview(); });
-refs.tImageFile?.addEventListener("change", () => {
-  const f = refs.tImageFile.files?.[0]; if (!f || !refs.tImagePreview) return;
-  const objectUrl = URL.createObjectURL(f);
-  refs.tImagePreview.src = objectUrl; refs.tImagePreview.style.display = "block";
-  teamPreviewImageSrc = objectUrl;
-  updateTeamPreview();
+refs.tImageFile?.addEventListener("change", async ()=>{
+  const f=refs.tImageFile.files?.[0]; if(!f) return;
+  try{ const opt=await optimizeImage(f); teamImageObjectUrl = URL.createObjectURL(opt); }
+  catch{ teamImageObjectUrl = URL.createObjectURL(f); }
+  if(refs.tImagePreview){ refs.tImagePreview.src=teamImageObjectUrl; refs.tImagePreview.style.display="block"; }
+  previewTeam();
 });
 
-["c-title","c-category","c-due-date","c-frequency","c-applicable","c-description","c-status","c-active","c-national","c-source"].forEach((id)=>document.getElementById(id)?.addEventListener("input", updateCompliancePreview));
-["t-name","t-designation","t-bio","t-image","t-active","t-order"].forEach((id)=>document.getElementById(id)?.addEventListener("input", updateTeamPreview));
-["j-title","j-exp","j-location","j-description","j-requirements","j-intern","j-active"].forEach((id)=>document.getElementById(id)?.addEventListener("input", updateCareerPreview));
-["s-phone","s-email","s-whatsapp","s-address","s-map","s-footer"].forEach((id)=>document.getElementById(id)?.addEventListener("input", updateSettingsPreview));
+document.querySelectorAll(".tab-btn").forEach((b)=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
 
-document.querySelectorAll(".tab-btn").forEach((btn) => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
-
-ensureAdminSession();
-updateCompliancePreview();
-updateTeamPreview();
-updateCareerPreview();
-updateSettingsPreview();
+previewCompliance(); previewTeam(); previewCareer(); previewSettings();
+ensureSession();
