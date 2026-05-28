@@ -54,6 +54,15 @@ const PublicData = (() => {
     const list = document.getElementById("team-dynamic-list");
     const loading = document.getElementById("team-loading");
     const empty = document.getElementById("team-empty");
+    const modal = document.getElementById("team-profile-modal");
+    const modalClose = document.getElementById("team-modal-close");
+    const modalImage = document.getElementById("team-modal-image");
+    const modalName = document.getElementById("team-modal-name");
+    const modalDesignation = document.getElementById("team-modal-designation");
+    const modalTags = document.getElementById("team-modal-tags");
+    const modalBio = document.getElementById("team-modal-bio");
+    const modalDescription = document.getElementById("team-modal-description");
+
     if (!list) return;
     if (!client) {
       if (loading) loading.textContent = "Configure public Supabase keys in assets/js/public-data.js";
@@ -62,7 +71,7 @@ const PublicData = (() => {
 
     const { data, error } = await client
       .from("team_members")
-      .select("*")
+      .select("id, name, designation, bio, profile_description, image_url, tags, display_order, is_active")
       .eq("is_active", true)
       .order("display_order", { ascending: true });
 
@@ -72,8 +81,10 @@ const PublicData = (() => {
       return;
     }
 
+    const esc = (v) => String(v ?? "").replace(/[&<>'"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[c]));
+
     list.innerHTML = data
-      .map((m) => {
+      .map((m, i) => {
         const initials = (m.name || "TM")
           .split(" ")
           .map((x) => x[0])
@@ -81,11 +92,58 @@ const PublicData = (() => {
           .join("")
           .toUpperCase();
         const image = m.image_url
-          ? `<img src="${m.image_url}" alt="${m.name}" class="h-16 w-16 rounded-full border border-slate-200 object-cover" />`
-          : `<div class="profile-initial">${initials}</div>`;
-        return `<article class="team-card lift reveal">${image}<h2 class="mt-4 font-bold text-navy text-xl">${m.name || ""}</h2><p class="text-sm font-semibold text-gold mt-1">${m.designation || ""}</p><p class="subtitle text-sm mt-2">${m.bio || ""}</p><div class="mt-3 flex flex-wrap gap-2">${chipList(m.tags)}</div></article>`;
+          ? `<img src="${m.image_url}" alt="${esc(m.name)}" class="h-20 w-20 rounded-2xl border border-[#d9c48a]/40 object-cover shadow-sm" />`
+          : `<div class="profile-initial h-20 w-20 rounded-2xl">${initials}</div>`;
+
+        return `<article class="team-card card lift reveal p-5 cursor-pointer border border-slate-200/80 hover:border-[#d9c48a]/60 transition" data-team-index="${i}">
+          <div class="flex items-start gap-4">${image}<div><h2 class="font-bold text-navy text-xl">${esc(m.name || "")}</h2><p class="text-sm font-semibold text-gold mt-1">${esc(m.designation || "")}</p></div></div>
+          <p class="subtitle text-sm mt-3 line-clamp-3">${esc(m.bio || "")}</p>
+          <div class="mt-3 flex flex-wrap gap-2">${chipList(m.tags)}</div>
+          <button class="btn-secondary mt-4 team-view-profile" type="button" data-team-index="${i}">View Profile</button>
+        </article>`;
       })
       .join("");
+
+    const openModal = (member) => {
+      if (!modal || !member) return;
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      if (modalImage) {
+        modalImage.src = member.image_url || "assets/images/logo.png";
+        modalImage.alt = member.name || "Team member";
+      }
+      if (modalName) modalName.textContent = member.name || "";
+      if (modalDesignation) modalDesignation.textContent = member.designation || "";
+      if (modalTags) modalTags.innerHTML = chipList(member.tags);
+      if (modalBio) modalBio.textContent = member.bio || "";
+      if (modalDescription) modalDescription.textContent = member.profile_description || member.bio || "";
+      document.body.style.overflow = "hidden";
+    };
+
+    const closeModal = () => {
+      if (!modal) return;
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      document.body.style.overflow = "";
+    };
+
+    list.querySelectorAll("[data-team-index]").forEach((el) => {
+      el.addEventListener("click", () => openModal(data[Number(el.getAttribute("data-team-index"))]));
+    });
+    list.querySelectorAll(".team-view-profile").forEach((el) => {
+      el.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openModal(data[Number(el.getAttribute("data-team-index"))]);
+      });
+    });
+
+    modalClose?.addEventListener("click", closeModal);
+    modal?.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeModal();
+    });
   }
 
   async function renderCareersPage() {

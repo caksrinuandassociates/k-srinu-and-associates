@@ -85,10 +85,22 @@
                 <input class="contact-input" id="t-image-file" type="file" accept="image/*" />
                 <input class="contact-input" id="t-image" placeholder="image_url" />
                 <img id="t-image-preview" class="h-14 w-14 rounded-full border border-slate-200 object-cover" alt="Preview" style="display:none" />
+                <div class="sm:col-span-2 card p-3">
+                  <p class="text-sm font-semibold text-navy">Image Crop Controls</p>
+                  <div class="mt-2 flex flex-wrap items-center gap-3 text-xs">
+                    <label>Horizontal <input id="t-crop-x" type="range" min="0" max="100" value="50" /></label>
+                    <label>Vertical <input id="t-crop-y" type="range" min="0" max="100" value="50" /></label>
+                    <label>Zoom <input id="t-crop-zoom" type="range" min="1" max="3" step="0.01" value="1" /></label>
+                  </div>
+                  <div class="mt-3 h-44 w-44 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+                    <img id="t-crop-preview" alt="Crop Preview" class="h-full w-full object-cover" style="transform-origin:center center;" />
+                  </div>
+                </div>
                 <input class="contact-input" id="t-tags" placeholder="tags (comma separated)" />
                 <p id="t-tags-preview" class="subtitle text-xs sm:col-span-2"></p>
                 <input class="contact-input" id="t-order" type="number" placeholder="display_order" />
                 <textarea class="contact-textarea sm:col-span-2" id="t-bio" rows="3" placeholder="bio"></textarea>
+                <textarea class="contact-textarea sm:col-span-2" id="t-profile-description" rows="3" placeholder="Detailed profile description for popup modal"></textarea>
                 <label class="text-sm"><input type="checkbox" id="t-active" checked /> is_active</label>
                 <div class="sm:col-span-2 flex gap-2"><button id="team-submit" class="btn-primary" type="submit">Save Team Member</button><button id="team-clear" class="btn-secondary" type="button">Clear</button></div>
               </form>

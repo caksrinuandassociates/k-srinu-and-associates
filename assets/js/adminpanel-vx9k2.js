@@ -14,11 +14,14 @@ const refs = {
   complianceClear: $("compliance-clear"), teamClear: $("team-clear"), careerClear: $("career-clear"),
   complianceImportBaseline: $("compliance-import-baseline"),
   tImageFile: $("t-image-file"), tImage: $("t-image"), tImagePreview: $("t-image-preview"),
+  tCropPreview: $("t-crop-preview"), tCropX: $("t-crop-x"), tCropY: $("t-crop-y"), tCropZoom: $("t-crop-zoom"),
   compliancePreview: $("compliance-live-preview"), teamPreview: $("team-live-preview"), careerPreview: $("career-live-preview"), settingsPreview: $("settings-live-preview"),
   toast: $("admin-toast"),
 };
 
 let teamImageObjectUrl = "";
+let teamCropSourceFile = null;
+let teamCropSourceUrl = "";
 let complianceData = [], teamData = [], careersData = [];
 const stateLabels = {"all-india":"All India","andhra-pradesh":"Andhra Pradesh",telangana:"Telangana","tamil-nadu":"Tamil Nadu",karnataka:"Karnataka",maharashtra:"Maharashtra",delhi:"Delhi",kerala:"Kerala","other-states":"Other States"};
 const BASELINE_COMPLIANCE_ITEMS = [
@@ -69,22 +72,61 @@ function switchTab(tab){ document.querySelectorAll(".tab-panel").forEach(p=>p.cl
 function reorder(list, id, dir){ const idx=list.findIndex(x=>x.id===id); if(idx<0) return null; const swap=idx+dir; if(swap<0||swap>=list.length) return null; return [list[idx], list[swap]]; }
 async function applyReorder(table, list, id, dir){ const pair=reorder(list,id,dir); if(!pair) return; const [a,b]=pair; const ao=a.display_order??0, bo=b.display_order??0; const {error:e1}=await supabaseClient.from(table).update({display_order:bo}).eq("id",a.id); if(e1) throw e1; const {error:e2}=await supabaseClient.from(table).update({display_order:ao}).eq("id",b.id); if(e2) throw e2; }
 
-async function optimizeImage(file){
-  const img = await new Promise((res, rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=URL.createObjectURL(file); });
-  const maxW=1200,maxH=1200; let {width:w,height:h}=img; const r=Math.min(maxW/w,maxH/h,1); w=Math.round(w*r); h=Math.round(h*r);
-  const c=document.createElement("canvas"); c.width=w; c.height=h; const ctx=c.getContext("2d"); ctx.drawImage(img,0,0,w,h);
-  const blob = await new Promise((res)=>c.toBlob(res,"image/webp",0.75));
-  if(!blob) throw new Error("Optimization failed");
-  return new File([blob], `${Date.now()}-optimized.webp`, {type:"image/webp"});
+function updateCropPreview(){
+  if (!refs.tCropPreview) return;
+  refs.tCropPreview.src = teamCropSourceUrl || teamImageObjectUrl || refs.tImage?.value || "";
+  const x = Number(refs.tCropX?.value ?? 50);
+  const y = Number(refs.tCropY?.value ?? 50);
+  const z = Number(refs.tCropZoom?.value ?? 1);
+  refs.tCropPreview.style.objectPosition = `${x}% ${y}%`;
+  refs.tCropPreview.style.transform = `scale(${z})`;
+}
+
+async function buildCroppedTeamImage(file){
+  if (!file) throw new Error("Please select an image before cropping.");
+  const imageBitmap = await createImageBitmap(file);
+  const canvas = document.createElement("canvas");
+  canvas.width = 600;
+  canvas.height = 600;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Image optimization failed.");
+
+  const srcW = imageBitmap.width;
+  const srcH = imageBitmap.height;
+  const base = Math.min(srcW, srcH);
+  const zoom = Math.max(1, Number(refs.tCropZoom?.value || 1));
+  const cropSize = Math.max(1, base / zoom);
+  const xPct = Math.min(100, Math.max(0, Number(refs.tCropX?.value || 50))) / 100;
+  const yPct = Math.min(100, Math.max(0, Number(refs.tCropY?.value || 50))) / 100;
+  const sx = Math.max(0, Math.min(srcW - cropSize, (srcW - cropSize) * xPct));
+  const sy = Math.max(0, Math.min(srcH - cropSize, (srcH - cropSize) * yPct));
+  ctx.drawImage(imageBitmap, sx, sy, cropSize, cropSize, 0, 0, 600, 600);
+
+  let q = 0.82;
+  let blob = await new Promise((res) => canvas.toBlob(res, "image/webp", q));
+  while (blob && blob.size > 250 * 1024 && q > 0.70) {
+    q = Math.max(0.70, q - 0.04);
+    blob = await new Promise((res) => canvas.toBlob(res, "image/webp", q));
+  }
+  if (!blob) throw new Error("Image optimization failed.");
+  const name = `team-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
+  return new File([blob], name, { type: "image/webp" });
 }
 
 async function uploadTeamImageIfSelected(){
-  const file = refs.tImageFile?.files?.[0]; if(!file) return refs.tImage?.value?.trim() || "";
-  let f=file;
-  try { f = await optimizeImage(file); } catch(e){ setMsg(refs.adminMsg, "Image optimization failed. Uploading original file.", true); }
+  const file = teamCropSourceFile || refs.tImageFile?.files?.[0];
+  if(!file) return refs.tImage?.value?.trim() || "";
+  let f;
+  try {
+    f = await buildCroppedTeamImage(file);
+  } catch(e){
+    const msg = e?.message || "Image optimization failed.";
+    setMsg(refs.adminMsg, msg, true);
+    throw e;
+  }
   busy(refs.teamSubmit,true,"Uploading...");
   try {
-    const path = `${Date.now()}-${f.name.replace(/\s+/g,"-")}`;
+    const path = f.name;
     const {error}=await supabaseClient.storage.from("team-images").upload(path,f,{upsert:true});
     if(error) throw new Error("Image upload failed. Check Supabase Storage bucket and policies.");
     const {data}=supabaseClient.storage.from("team-images").getPublicUrl(path);
@@ -93,12 +135,12 @@ async function uploadTeamImageIfSelected(){
 }
 
 function previewCompliance(){ if(!refs.compliancePreview) return; refs.compliancePreview.innerHTML = `<article class='calendar-card'><span class='calendar-date'>${esc($("c-due-date")?.value||"As notified")}</span><span class='trust-chip ml-2'>${esc($("c-status")?.value||"Indicative")}</span><h3 class='mt-3 font-bold text-navy'>${esc($("c-title")?.value||"Untitled")}</h3><p class='subtitle text-sm mt-2'><strong>Category:</strong> ${esc($("c-category")?.value||"-")}</p><p class='subtitle text-sm'><strong>State:</strong> ${esc(stateLabels[$("c-state")?.value] || $("c-state")?.value || "-")}</p><p class='subtitle text-sm'><strong>Frequency:</strong> ${esc($("c-frequency")?.value||"-")}</p><p class='subtitle text-sm'><strong>Applicable to:</strong> ${esc($("c-applicable")?.value||"-")}</p><p class='subtitle text-sm'><strong>Description:</strong> ${esc($("c-description")?.value||"-")}</p><div class='mt-2'>${badge($("c-active")?.checked ?? true)}</div></article>`; }
-function previewTeam(){ if(!refs.teamPreview) return; const n=$("t-name")?.value||"Team Member"; const initials=esc(n.split(" ").map(x=>x[0]).slice(0,2).join("").toUpperCase()||"TM"); const src = teamImageObjectUrl || refs.tImage?.value || ""; const tags=(($("t-tags")?.value)||"").split(",").map(t=>t.trim()).filter(Boolean).map(t=>`<span class='trust-chip'>${esc(t)}</span>`).join(" "); refs.teamPreview.innerHTML=`<article class='team-card'>${src?`<img src='${esc(src)}' class='h-14 w-14 rounded-full border border-slate-200 object-cover'/>`:`<div class='profile-initial'>${initials}</div>`}<h3 class='mt-4 font-bold text-navy text-xl'>${esc(n)}</h3><p class='text-sm font-semibold text-gold mt-1'>${esc($("t-designation")?.value||"Designation")}</p><p class='subtitle text-sm mt-2'>${esc($("t-bio")?.value||"-")}</p><div class='mt-3 flex flex-wrap gap-2'>${tags || "<span class='trust-chip'>Tag</span>"}</div><div class='mt-2'>${badge($("t-active")?.checked ?? true)}</div></article>`; }
+function previewTeam(){ if(!refs.teamPreview) return; const n=$("t-name")?.value||"Team Member"; const initials=esc(n.split(" ").map(x=>x[0]).slice(0,2).join("").toUpperCase()||"TM"); const src = teamImageObjectUrl || teamCropSourceUrl || refs.tImage?.value || ""; const tags=(($("t-tags")?.value)||"").split(",").map(t=>t.trim()).filter(Boolean).map(t=>`<span class='trust-chip'>${esc(t)}</span>`).join(" "); refs.teamPreview.innerHTML=`<article class='team-card'>${src?`<img src='${esc(src)}' class='h-14 w-14 rounded-full border border-slate-200 object-cover'/>`:`<div class='profile-initial'>${initials}</div>`}<h3 class='mt-4 font-bold text-navy text-xl'>${esc(n)}</h3><p class='text-sm font-semibold text-gold mt-1'>${esc($("t-designation")?.value||"Designation")}</p><p class='subtitle text-sm mt-2'>${esc($("t-bio")?.value||"-")}</p><p class='subtitle text-sm mt-2'><strong>Profile:</strong> ${esc($("t-profile-description")?.value||"-")}</p><div class='mt-3 flex flex-wrap gap-2'>${tags || "<span class='trust-chip'>Tag</span>"}</div><div class='mt-2'>${badge($("t-active")?.checked ?? true)}</div></article>`; }
 function previewCareer(){ if(!refs.careerPreview) return; const intern=$("j-intern")?.checked; refs.careerPreview.innerHTML=`<article class='service-card'><h3 class='font-bold text-navy'>${esc($("j-title")?.value||"Career opening")}</h3><p class='subtitle text-sm mt-2'>${esc($("j-description")?.value||"-")}</p><p class='subtitle text-sm mt-2'><strong>Requirements:</strong> ${esc($("j-requirements")?.value||"-")}</p><p class='text-xs mt-3 text-navy font-semibold'>Experience: ${esc($("j-exp")?.value||"-")}</p><p class='text-xs text-gold font-semibold'>Type: ${esc($("j-type")?.value||"-")}</p><p class='text-xs text-navy font-semibold'>Location: ${esc($("j-location")?.value||"-")}</p><div class='mt-2 flex gap-2'><span class='trust-chip'>${intern?"Internship":"Job"}</span>${badge($("j-active")?.checked ?? true)}</div></article>`; }
 function previewSettings(){ if(!refs.settingsPreview) return; refs.settingsPreview.innerHTML=`<div class='subtitle text-sm'><p><strong>Phone:</strong> ${esc($("s-phone")?.value||"-")}</p><p><strong>Email:</strong> ${esc($("s-email")?.value||"-")}</p><p><strong>WhatsApp:</strong> ${esc($("s-whatsapp")?.value||"-")}</p><p><strong>Address:</strong> ${esc($("s-address")?.value||"-")}</p><p><strong>Map Link:</strong> ${esc($("s-map")?.value||"-")}</p><p><strong>Footer Text:</strong> ${esc($("s-footer")?.value||"-")}</p></div>`; }
 
 function resetCompliance(){ refs.complianceForm?.reset(); $("compliance-id").value=""; refs.complianceSubmit.textContent="Save Compliance Item"; previewCompliance(); }
-function resetTeam(){ refs.teamForm?.reset(); $("team-id").value=""; refs.teamSubmit.textContent="Save Team Member"; teamImageObjectUrl=""; if(refs.tImagePreview) refs.tImagePreview.style.display="none"; previewTeam(); }
+function resetTeam(){ refs.teamForm?.reset(); $("team-id").value=""; refs.teamSubmit.textContent="Save Team Member"; teamImageObjectUrl=""; teamCropSourceFile = null; teamCropSourceUrl = ""; if(refs.tImagePreview) refs.tImagePreview.style.display="none"; if(refs.tCropPreview) refs.tCropPreview.src=""; if(refs.tCropX) refs.tCropX.value=50; if(refs.tCropY) refs.tCropY.value=50; if(refs.tCropZoom) refs.tCropZoom.value=1; previewTeam(); }
 function resetCareer(){ refs.careerForm?.reset(); $("career-id").value=""; refs.careerSubmit.textContent="Save Career Opening"; previewCareer(); }
 
 function rowMeta(r){ return `<div class='text-xs mt-2'>${r.created_at?`Created: ${new Date(r.created_at).toLocaleString()}`:""}${r.updated_at?`<br/>Updated: ${new Date(r.updated_at).toLocaleString()} (${rel(r.updated_at)})`:""}</div>`; }
@@ -118,7 +160,7 @@ function renderRows(type, rows){
   rows.filter(r=>cfg.matches(r).includes(cfg.search)).sort(cfg.sort).forEach((r)=>{
     const el=document.createElement("div"); el.className=`card p-3 flex items-start justify-between gap-2 ${type==="compliance"?"cursor-pointer transition hover:bg-slate-50 hover:border-slate-300":""}`;
     const main = type==="team"
-      ? `${r.image_url?`<img src='${esc(r.image_url)}' class='h-10 w-10 rounded-full object-cover inline-block mr-2'/>`:""}<strong>${esc(r.name||"-")}</strong><br/>${esc(r.designation||"-")}<br/>${esc(Array.isArray(r.tags)?r.tags.join(", "):(r.tags||""))}<br/>${badge(r.is_active!==false)}`
+      ? `${r.image_url?`<img src='${esc(r.image_url)}' class='h-10 w-10 rounded-full object-cover inline-block mr-2'/>`:""}<strong>${esc(r.name||"-")}</strong><br/>${esc(r.designation||"-")}<br/>${esc(Array.isArray(r.tags)?r.tags.join(", "):(r.tags||""))}<br/>${esc(r.profile_description||"")}<br/>${badge(r.is_active!==false)}`
       : type==="compliance"
       ? `<strong>${esc(r.title||"-")}</strong><br/>Category: ${esc(r.category||"-")} • State: ${esc(stateLabels[r.state]||r.state||"-")}<br/>Due: ${esc(r.due_date||"-")} • Frequency: ${esc(r.frequency||"-")}<br/>Status: ${esc(r.status||"-")} • ${badge(r.is_active!==false)}`
       : `<strong>${esc(r.title||"-")}</strong><br/>${esc(r.employment_type||"-")} • ${esc(r.experience_level||"-")} • ${r.is_internship?"Internship":"Job"}<br/>${badge(r.is_active!==false)}`;
@@ -137,7 +179,7 @@ function renderRows(type, rows){
 
 function editRow(type,r,scrollToForm=false){
   if(type==="compliance"){ $("compliance-id").value=r.id||""; $("c-title").value=r.title||""; $("c-category").value=r.category||""; $("c-state").value=r.state||""; $("c-due-date").value=r.due_date||""; $("c-frequency").value=r.frequency||""; $("c-applicable").value=r.applicable_to||""; $("c-description").value=r.description||""; $("c-status").value=r.status||"Indicative"; $("c-source").value=r.source_url||""; $("c-national").checked=!!r.is_national; $("c-active").checked=r.is_active!==false; refs.complianceSubmit.textContent="Update Compliance Item"; previewCompliance(); if (scrollToForm) refs.complianceForm?.scrollIntoView({behavior:"smooth", block:"start"}); }
-  if(type==="team"){ $("team-id").value=r.id||""; $("t-name").value=r.name||""; $("t-designation").value=r.designation||""; $("t-bio").value=r.bio||""; $("t-image").value=r.image_url||""; $("t-tags").value=Array.isArray(r.tags)?r.tags.join(", "):(r.tags||""); $("t-order").value=r.display_order||""; $("t-active").checked=r.is_active!==false; teamImageObjectUrl=r.image_url||""; refs.teamSubmit.textContent="Update Team Member"; previewTeam(); }
+  if(type==="team"){ $("team-id").value=r.id||""; $("t-name").value=r.name||""; $("t-designation").value=r.designation||""; $("t-bio").value=r.bio||""; $("t-profile-description").value=r.profile_description||""; $("t-image").value=r.image_url||""; $("t-tags").value=Array.isArray(r.tags)?r.tags.join(", "):(r.tags||""); $("t-order").value=r.display_order||""; $("t-active").checked=r.is_active!==false; teamImageObjectUrl=r.image_url||""; teamCropSourceUrl=r.image_url||""; updateCropPreview(); refs.teamSubmit.textContent="Update Team Member"; previewTeam(); }
   if(type==="careers"){ $("career-id").value=r.id||""; $("j-title").value=r.title||""; $("j-type").value=r.employment_type||"Full-time"; $("j-exp").value=r.experience_level||"Fresher"; $("j-location").value=r.location||""; $("j-description").value=r.description||""; $("j-requirements").value=r.requirements||""; $("j-intern").checked=!!r.is_internship; $("j-active").checked=r.is_active!==false; refs.careerSubmit.textContent="Update Career Opening"; previewCareer(); }
 }
 
@@ -169,7 +211,7 @@ async function loadCompliance(){
   complianceData=data||[];
   renderRows("compliance",complianceData);
 }
-async function loadTeam(){ const {data,error}=await supabaseClient.from("team_members").select("*"); if(error) throw error; teamData=data||[]; renderRows("team",teamData); }
+async function loadTeam(){ const {data,error}=await supabaseClient.from("team_members").select("id,name,designation,bio,profile_description,image_url,tags,display_order,is_active,created_at,updated_at"); if(error) throw error; teamData=data||[]; renderRows("team",teamData); }
 async function loadCareers(){ const {data,error}=await supabaseClient.from("career_openings").select("*"); if(error) throw error; careersData=data||[]; renderRows("careers",careersData); }
 async function loadSettings(){ const {data,error}=await supabaseClient.from("site_settings").select("*").limit(1).maybeSingle(); if(error) throw error; if(data){ $("s-id").value=data.id||""; $("s-phone").value=data.phone||""; $("s-email").value=data.email||""; $("s-whatsapp").value=data.whatsapp||""; $("s-address").value=data.address||""; $("s-map").value=data.map_link||""; $("s-footer").value=data.footer_text||""; } previewSettings(); }
 async function loadAll(){ await Promise.all([loadCompliance(),loadTeam(),loadCareers(),loadSettings()]); }
@@ -225,7 +267,7 @@ async function importBaselineComplianceItems(){
 
 async function saveCompliance(e){ e.preventDefault(); if(refs.complianceSubmit.disabled) return; const id=$("compliance-id").value; busy(refs.complianceSubmit,true,id?"Updating...":"Saving..."); try{ const payload={title:$("c-title").value,category:$("c-category").value,state:$("c-state").value,due_date:$("c-due-date").value,frequency:$("c-frequency").value,applicable_to:$("c-applicable").value,description:$("c-description").value,status:$("c-status").value,source_url:$("c-source").value,is_national:$("c-national").checked,is_active:$("c-active").checked}; const {error}=id?await supabaseClient.from("compliance_calendar").update(payload).eq("id",id):await supabaseClient.from("compliance_calendar").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,id?"Compliance updated.":"Compliance added."); resetCompliance(); await loadCompliance(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.complianceSubmit,false);} }
 
-async function saveTeam(e){ e.preventDefault(); if(refs.teamSubmit.disabled) return; const id=$("team-id").value; busy(refs.teamSubmit,true,id?"Updating...":"Saving..."); try{ const tagsArray=(($("t-tags").value)||"").split(",").map(t=>t.trim()).filter(Boolean); const uploaded=await uploadTeamImageIfSelected(); const payload={name:$("t-name").value,designation:$("t-designation").value,bio:$("t-bio").value,image_url:uploaded || $("t-image").value,tags:tagsArray,display_order:Number($("t-order").value||0),is_active:$("t-active").checked}; const {error}=id?await supabaseClient.from("team_members").update(payload).eq("id",id):await supabaseClient.from("team_members").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,id?"Team member updated.":"Team member added."); resetTeam(); await loadTeam(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.teamSubmit,false);} }
+async function saveTeam(e){ e.preventDefault(); if(refs.teamSubmit.disabled) return; const id=$("team-id").value; busy(refs.teamSubmit,true,id?"Updating...":"Saving..."); try{ const tagsArray=(($("t-tags").value)||"").split(",").map(t=>t.trim()).filter(Boolean); const uploaded=await uploadTeamImageIfSelected(); const payload={name:$("t-name").value,designation:$("t-designation").value,bio:$("t-bio").value,profile_description:$("t-profile-description").value,image_url:uploaded || $("t-image").value,tags:tagsArray,display_order:Number($("t-order").value||0),is_active:$("t-active").checked}; const {error}=id?await supabaseClient.from("team_members").update(payload).eq("id",id):await supabaseClient.from("team_members").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,id?"Team member updated.":"Team member added."); resetTeam(); await loadTeam(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.teamSubmit,false);} }
 
 async function saveCareer(e){ e.preventDefault(); if(refs.careerSubmit.disabled) return; const id=$("career-id").value; busy(refs.careerSubmit,true,id?"Updating...":"Saving..."); try{ const payload={title:$("j-title").value,employment_type:$("j-type").value,experience_level:$("j-exp").value,location:$("j-location").value,description:$("j-description").value,requirements:$("j-requirements").value,is_internship:$("j-intern").checked,is_active:$("j-active").checked}; const {error}=id?await supabaseClient.from("career_openings").update(payload).eq("id",id):await supabaseClient.from("career_openings").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,id?"Career updated.":"Career added."); resetCareer(); await loadCareers(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.careerSubmit,false);} }
 
@@ -254,17 +296,21 @@ $("c-state")?.addEventListener("change",(e)=>{$("c-national").checked=e.target.v
 $("j-type")?.addEventListener("change",(e)=>{$("j-intern").checked=["Internship","Articleship"].includes(e.target.value); previewCareer();});
 
 ["c-title","c-category","c-due-date","c-frequency","c-applicable","c-description","c-status","c-active","c-source"].forEach(id=>$(id)?.addEventListener("input",previewCompliance));
-["t-name","t-designation","t-bio","t-image","t-tags","t-active"].forEach(id=>$(id)?.addEventListener("input",previewTeam));
+["t-name","t-designation","t-bio","t-profile-description","t-image","t-tags","t-active"].forEach(id=>$(id)?.addEventListener("input",previewTeam));
 ["j-title","j-exp","j-location","j-description","j-requirements","j-intern","j-active"].forEach(id=>$(id)?.addEventListener("input",previewCareer));
 ["s-phone","s-email","s-whatsapp","s-address","s-map","s-footer"].forEach(id=>$(id)?.addEventListener("input",previewSettings));
 
 refs.tImageFile?.addEventListener("change", async ()=>{
   const f=refs.tImageFile.files?.[0]; if(!f) return;
-  try{ const opt=await optimizeImage(f); teamImageObjectUrl = URL.createObjectURL(opt); }
-  catch{ teamImageObjectUrl = URL.createObjectURL(f); }
+  teamCropSourceFile = f;
+  teamCropSourceUrl = URL.createObjectURL(f);
+  teamImageObjectUrl = teamCropSourceUrl;
+  updateCropPreview();
   if(refs.tImagePreview){ refs.tImagePreview.src=teamImageObjectUrl; refs.tImagePreview.style.display="block"; }
   previewTeam();
 });
+
+[refs.tCropX, refs.tCropY, refs.tCropZoom].forEach((el)=>el?.addEventListener("input", ()=>{ updateCropPreview(); previewTeam(); }));
 
 document.querySelectorAll(".tab-btn").forEach((b)=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
 
