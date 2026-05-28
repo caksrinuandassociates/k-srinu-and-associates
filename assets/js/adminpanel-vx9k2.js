@@ -12,6 +12,7 @@ const refs = {
   complianceSearch: $("compliance-search"), teamSearch: $("team-search"), careersSearch: $("careers-search"),
   complianceSubmit: $("compliance-submit"), teamSubmit: $("team-submit"), careerSubmit: $("career-submit"),
   complianceClear: $("compliance-clear"), teamClear: $("team-clear"), careerClear: $("career-clear"),
+  complianceImportBaseline: $("compliance-import-baseline"),
   tImageFile: $("t-image-file"), tImage: $("t-image"), tImagePreview: $("t-image-preview"),
   compliancePreview: $("compliance-live-preview"), teamPreview: $("team-live-preview"), careerPreview: $("career-live-preview"), settingsPreview: $("settings-live-preview"),
   toast: $("admin-toast"),
@@ -20,6 +21,23 @@ const refs = {
 let teamImageObjectUrl = "";
 let complianceData = [], teamData = [], careersData = [];
 const stateLabels = {"all-india":"All India","andhra-pradesh":"Andhra Pradesh",telangana:"Telangana","tamil-nadu":"Tamil Nadu",karnataka:"Karnataka",maharashtra:"Maharashtra",delhi:"Delhi",kerala:"Kerala","other-states":"Other States"};
+const BASELINE_COMPLIANCE_ITEMS = [
+  { title:"GST Return Filing", category:"GST", state:"all-india", due_date:"10th / 11th of Every Month", frequency:"Monthly", applicable_to:"Registered taxpayers (as applicable)", description:"Monthly GST return filing and reconciliation.", status:"Upcoming", source_url:"GST portal / notification reference placeholder.", is_national:true, is_active:true, display_order:1, unique_key:"gst-return-filing" },
+  { title:"GST Annual Return", category:"GST", state:"all-india", due_date:"31 Dec (typically)", frequency:"Annual", applicable_to:"Eligible GST entities", description:"Annual GST return and turnover-based applicability checks.", status:"Important", source_url:"GST annual return circular placeholder.", is_national:true, is_active:true, display_order:2, unique_key:"gst-annual-return" },
+  { title:"TDS Payment", category:"TDS", state:"all-india", due_date:"7th of Every Month", frequency:"Monthly", applicable_to:"TDS deductors", description:"Timely deposit of TDS deductions.", status:"Important", source_url:"Income Tax portal due date placeholder.", is_national:true, is_active:true, display_order:3, unique_key:"tds-payment" },
+  { title:"TDS Return Filing", category:"TDS", state:"all-india", due_date:"Quarterly", frequency:"Quarterly", applicable_to:"Employers / deductors", description:"Quarterly filing of TDS statements and validation.", status:"Upcoming", source_url:"Form-wise return schedule placeholder.", is_national:true, is_active:true, display_order:4, unique_key:"tds-return-filing" },
+  { title:"Income Tax Return Filing", category:"Income Tax", state:"all-india", due_date:"31 Jul / 31 Oct", frequency:"Annual", applicable_to:"Individuals, firms, companies", description:"Return filing by taxpayer class and audit applicability.", status:"Important", source_url:"CBDT due date extension placeholder.", is_national:true, is_active:true, display_order:5, unique_key:"income-tax-return-filing" },
+  { title:"Advance Tax", category:"Income Tax", state:"all-india", due_date:"15 Jun / 15 Sep / 15 Dec / 15 Mar", frequency:"Quarterly", applicable_to:"Eligible advance-tax assessees", description:"Quarterly installments as per mandated percentages.", status:"Upcoming", source_url:"Advance tax compliance reference placeholder.", is_national:true, is_active:true, display_order:6, unique_key:"advance-tax" },
+  { title:"Tax Audit Report", category:"Income Tax", state:"all-india", due_date:"30 Sep / 31 Oct (as notified)", frequency:"Annual", applicable_to:"Audit-eligible businesses/professionals", description:"Report upload before applicable return deadlines.", status:"Important", source_url:"Section 44AB / utility release placeholder.", is_national:true, is_active:true, display_order:7, unique_key:"tax-audit-report" },
+  { title:"ROC Annual Filing", category:"ROC", state:"all-india", due_date:"As per MCA Schedule", frequency:"Annual", applicable_to:"Companies and LLPs", description:"Annual forms, statements and statutory records filing.", status:"Indicative", source_url:"MCA filing calendar placeholder.", is_national:true, is_active:true, display_order:8, unique_key:"roc-annual-filing" },
+  { title:"Director KYC", category:"ROC", state:"all-india", due_date:"30 Sep (typical)", frequency:"Annual", applicable_to:"Directors with DIN", description:"Annual DIR-3 KYC filing and status validation.", status:"Important", source_url:"MCA KYC update placeholder.", is_national:true, is_active:true, display_order:9, unique_key:"director-kyc" },
+  { title:"MSME Compliance Reminders", category:"Business Compliance", state:"all-india", due_date:"Monthly / Quarterly / Annual", frequency:"Mixed", applicable_to:"MSMEs, startups, growing entities", description:"Monitor key registrations, returns and declaration timelines.", status:"Indicative", source_url:"Industry checklist placeholder.", is_national:true, is_active:true, display_order:10, unique_key:"msme-compliance-reminders" },
+  { title:"ESI Return", category:"Business Compliance", state:"all-india", due_date:"Half-yearly (commonly)", frequency:"Half-yearly", applicable_to:"ESI-registered employers", description:"Return filing and contribution reconciliation.", status:"Important", source_url:"ESIC compliance note placeholder.", is_national:true, is_active:true, display_order:11, unique_key:"esi-return" },
+  { title:"PF Payment", category:"Business Compliance", state:"all-india", due_date:"15th of Every Month", frequency:"Monthly", applicable_to:"EPF-covered establishments", description:"Monthly PF contribution payment and challan compliance.", status:"Upcoming", source_url:"EPFO due date placeholder.", is_national:true, is_active:true, display_order:12, unique_key:"pf-payment" },
+  { title:"Professional Tax Filing", category:"Professional Tax", state:"andhra-pradesh,telangana,tamil-nadu,karnataka,maharashtra,kerala,other-states", due_date:"State-wise Monthly/Periodical", frequency:"State-wise", applicable_to:"Employers / professionals under PT law", description:"State-wise PT payment and return compliance.", status:"Indicative", source_url:"State PT portal reference placeholder.", is_national:false, is_active:true, display_order:13, unique_key:"professional-tax-filing" },
+  { title:"Shops & Establishments Renewal", category:"Business Compliance", state:"andhra-pradesh,telangana,tamil-nadu,karnataka,maharashtra,delhi,kerala,other-states", due_date:"Annual / As per license", frequency:"Annual", applicable_to:"Commercial establishments", description:"Renewal/registration obligations under local shops act.", status:"Upcoming", source_url:"Labour department notice placeholder.", is_national:false, is_active:true, display_order:14, unique_key:"shops-establishments-renewal" },
+  { title:"Labour Welfare Fund", category:"Business Compliance", state:"karnataka,maharashtra,telangana,tamil-nadu,kerala,other-states", due_date:"Half-yearly / Annual (state specific)", frequency:"State specific", applicable_to:"Eligible employers and employees", description:"Welfare fund remittance and statutory deduction checks.", status:"Indicative", source_url:"State LWF circular placeholder.", is_national:false, is_active:true, display_order:15, unique_key:"labour-welfare-fund" },
+];
 
 const esc = (v) => String(v ?? "").replace(/[&<>'"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c]));
 const badge = (ok) => `<span class="trust-chip" style="background:${ok?"#ecfdf5":"#fee2e2"};color:${ok?"#166534":"#991b1b"}">${ok?"Active":"Inactive"}</span>`;
@@ -156,6 +174,55 @@ async function loadCareers(){ const {data,error}=await supabaseClient.from("care
 async function loadSettings(){ const {data,error}=await supabaseClient.from("site_settings").select("*").limit(1).maybeSingle(); if(error) throw error; if(data){ $("s-id").value=data.id||""; $("s-phone").value=data.phone||""; $("s-email").value=data.email||""; $("s-whatsapp").value=data.whatsapp||""; $("s-address").value=data.address||""; $("s-map").value=data.map_link||""; $("s-footer").value=data.footer_text||""; } previewSettings(); }
 async function loadAll(){ await Promise.all([loadCompliance(),loadTeam(),loadCareers(),loadSettings()]); }
 
+const normTitle = (v="") => String(v).trim().toLowerCase().replace(/\s+/g," ");
+async function importBaselineComplianceItems(){
+  const btn = refs.complianceImportBaseline;
+  busy(btn, true, "Importing...");
+  try {
+    const { data: existing, error: exErr } = await supabaseClient.from("compliance_calendar").select("id,title,unique_key");
+    if (exErr) throw exErr;
+
+    const titleSet = new Set((existing||[]).map((r)=>normTitle(r.title)));
+    const keySet = new Set((existing||[]).map((r)=>String(r.unique_key||"").trim().toLowerCase()).filter(Boolean));
+
+    const toInsert = [];
+    BASELINE_COMPLIANCE_ITEMS.forEach((item)=>{
+      const nTitle = normTitle(item.title);
+      const nKey = String(item.unique_key||"").trim().toLowerCase();
+      if (titleSet.has(nTitle) || (nKey && keySet.has(nKey))) return;
+      titleSet.add(nTitle);
+      if (nKey) keySet.add(nKey);
+      toInsert.push(item);
+    });
+
+    if (!toInsert.length) {
+      setMsg(refs.adminMsg, "No new baseline items to import");
+      await loadCompliance();
+      return;
+    }
+
+    let insertErr = null;
+    let insertedWithUniqueKey = true;
+    const { error: firstInsertErr } = await supabaseClient.from("compliance_calendar").insert(toInsert);
+    insertErr = firstInsertErr;
+
+    if (insertErr && /unique_key/i.test(insertErr.message || "")) {
+      insertedWithUniqueKey = false;
+      const withoutUnique = toInsert.map(({ unique_key, ...rest }) => rest);
+      const { error: retryErr } = await supabaseClient.from("compliance_calendar").insert(withoutUnique);
+      insertErr = retryErr;
+    }
+
+    if (insertErr) throw insertErr;
+    setMsg(refs.adminMsg, "Baseline items imported successfully");
+    await loadCompliance();
+  } catch (err) {
+    setMsg(refs.adminMsg, err.message || "Failed to import baseline items", true);
+  } finally {
+    busy(btn, false);
+  }
+}
+
 async function saveCompliance(e){ e.preventDefault(); if(refs.complianceSubmit.disabled) return; const id=$("compliance-id").value; busy(refs.complianceSubmit,true,id?"Updating...":"Saving..."); try{ const payload={title:$("c-title").value,category:$("c-category").value,state:$("c-state").value,due_date:$("c-due-date").value,frequency:$("c-frequency").value,applicable_to:$("c-applicable").value,description:$("c-description").value,status:$("c-status").value,source_url:$("c-source").value,is_national:$("c-national").checked,is_active:$("c-active").checked}; const {error}=id?await supabaseClient.from("compliance_calendar").update(payload).eq("id",id):await supabaseClient.from("compliance_calendar").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,id?"Compliance updated.":"Compliance added."); resetCompliance(); await loadCompliance(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.complianceSubmit,false);} }
 
 async function saveTeam(e){ e.preventDefault(); if(refs.teamSubmit.disabled) return; const id=$("team-id").value; busy(refs.teamSubmit,true,id?"Updating...":"Saving..."); try{ const tagsArray=(($("t-tags").value)||"").split(",").map(t=>t.trim()).filter(Boolean); const uploaded=await uploadTeamImageIfSelected(); const payload={name:$("t-name").value,designation:$("t-designation").value,bio:$("t-bio").value,image_url:uploaded || $("t-image").value,tags:tagsArray,display_order:Number($("t-order").value||0),is_active:$("t-active").checked}; const {error}=id?await supabaseClient.from("team_members").update(payload).eq("id",id):await supabaseClient.from("team_members").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,id?"Team member updated.":"Team member added."); resetTeam(); await loadTeam(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.teamSubmit,false);} }
@@ -175,6 +242,7 @@ refs.teamForm?.addEventListener("submit",saveTeam);
 refs.careerForm?.addEventListener("submit",saveCareer);
 refs.settingsForm?.addEventListener("submit",saveSettings);
 refs.complianceClear?.addEventListener("click",resetCompliance);
+refs.complianceImportBaseline?.addEventListener("click",importBaselineComplianceItems);
 refs.teamClear?.addEventListener("click",resetTeam);
 refs.careerClear?.addEventListener("click",resetCareer);
 
