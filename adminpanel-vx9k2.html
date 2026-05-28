@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Internal admin panel for K Srinu and Associates -->
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel | K Srinu and Associates</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { theme: { extend: { colors: { navy: "#0f2747", gold: "#b99746" } } } };
+    </script>
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
+  <body>
+    <main class="pt-10 pb-10 px-4 sm:px-6 lg:px-8">
+      <div class="container-premium">
+        <section id="login-panel" class="card p-6 sm:p-8 max-w-xl mx-auto">
+          <h1 class="heading-lg">Admin Login</h1>
+          <p class="subtitle mt-2 text-sm">Internal access only.</p>
+          <form id="login-form" class="mt-4 grid gap-3">
+            <input id="admin-email" class="contact-input" type="email" placeholder="Admin email" required />
+            <input id="admin-password" class="contact-input" type="password" placeholder="Password" required />
+            <button class="btn-primary" type="submit">Sign In</button>
+          </form>
+          <p id="auth-message" class="subtitle text-sm mt-3"></p>
+        </section>
+
+        <section id="dashboard" class="hidden">
+          <div class="card p-4 sm:p-6">
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+              <h2 class="heading-lg">Admin Dashboard</h2>
+              <button id="logout-btn" class="btn-secondary">Logout</button>
+            </div>
+
+            <div id="admin-tabs" class="mt-4 flex flex-wrap gap-2">
+              <button class="btn-primary tab-btn" data-tab="compliance">Compliance Calendar</button>
+              <button class="btn-secondary tab-btn" data-tab="team">Team Members</button>
+              <button class="btn-secondary tab-btn" data-tab="careers">Careers</button>
+              <button class="btn-secondary tab-btn" data-tab="settings">Site Settings</button>
+            </div>
+
+            <p id="admin-message" class="subtitle text-sm mt-3"></p>
+
+            <div id="tab-compliance" class="tab-panel mt-5">
+              <h3 class="font-bold text-navy text-lg">Compliance Calendar</h3>
+              <form id="compliance-form" class="mt-3 grid gap-3 sm:grid-cols-2">
+                <input type="hidden" id="compliance-id" />
+                <input class="contact-input" id="c-title" placeholder="title" required />
+                <input class="contact-input" id="c-category" placeholder="category" required />
+                <input class="contact-input" id="c-state" placeholder="state (comma separated)" required />
+                <input class="contact-input" id="c-due-date" placeholder="due_date" />
+                <input class="contact-input" id="c-frequency" placeholder="frequency" />
+                <input class="contact-input" id="c-applicable" placeholder="applicable_to" />
+                <input class="contact-input" id="c-status" placeholder="status" />
+                <input class="contact-input sm:col-span-2" id="c-source" placeholder="source_url" />
+                <textarea class="contact-textarea sm:col-span-2" id="c-description" rows="3" placeholder="description"></textarea>
+                <label class="text-sm"><input type="checkbox" id="c-national" /> is_national</label>
+                <label class="text-sm"><input type="checkbox" id="c-active" checked /> is_active</label>
+                <button class="btn-primary sm:col-span-2" type="submit">Save Compliance Item</button>
+              </form>
+              <div id="compliance-list" class="mt-4 grid gap-3"></div>
+            </div>
+
+            <div id="tab-team" class="tab-panel mt-5 hidden">
+              <h3 class="font-bold text-navy text-lg">Team Members</h3>
+              <form id="team-form" class="mt-3 grid gap-3 sm:grid-cols-2">
+                <input type="hidden" id="team-id" />
+                <input class="contact-input" id="t-name" placeholder="name" required />
+                <input class="contact-input" id="t-designation" placeholder="designation" required />
+                <input class="contact-input" id="t-image" placeholder="image_url" />
+                <input class="contact-input" id="t-tags" placeholder="tags (comma separated)" />
+                <input class="contact-input" id="t-order" type="number" placeholder="display_order" />
+                <textarea class="contact-textarea sm:col-span-2" id="t-bio" rows="3" placeholder="bio"></textarea>
+                <label class="text-sm"><input type="checkbox" id="t-active" checked /> is_active</label>
+                <button class="btn-primary sm:col-span-2" type="submit">Save Team Member</button>
+              </form>
+              <div id="team-list" class="mt-4 grid gap-3"></div>
+            </div>
+
+            <div id="tab-careers" class="tab-panel mt-5 hidden">
+              <h3 class="font-bold text-navy text-lg">Careers</h3>
+              <form id="career-form" class="mt-3 grid gap-3 sm:grid-cols-2">
+                <input type="hidden" id="career-id" />
+                <input class="contact-input" id="j-title" placeholder="title" required />
+                <input class="contact-input" id="j-type" placeholder="employment_type" />
+                <input class="contact-input" id="j-exp" placeholder="experience_level" />
+                <input class="contact-input" id="j-location" placeholder="location" />
+                <textarea class="contact-textarea sm:col-span-2" id="j-description" rows="3" placeholder="description"></textarea>
+                <textarea class="contact-textarea sm:col-span-2" id="j-requirements" rows="3" placeholder="requirements"></textarea>
+                <label class="text-sm"><input type="checkbox" id="j-intern" /> is_internship</label>
+                <label class="text-sm"><input type="checkbox" id="j-active" checked /> is_active</label>
+                <button class="btn-primary sm:col-span-2" type="submit">Save Career Opening</button>
+              </form>
+              <div id="careers-list" class="mt-4 grid gap-3"></div>
+            </div>
+
+            <div id="tab-settings" class="tab-panel mt-5 hidden">
+              <h3 class="font-bold text-navy text-lg">Site Settings</h3>
+              <form id="settings-form" class="mt-3 grid gap-3 sm:grid-cols-2">
+                <input type="hidden" id="s-id" />
+                <input class="contact-input" id="s-phone" placeholder="phone" />
+                <input class="contact-input" id="s-email" placeholder="email" />
+                <input class="contact-input" id="s-whatsapp" placeholder="whatsapp" />
+                <input class="contact-input" id="s-map" placeholder="map link" />
+                <input class="contact-input sm:col-span-2" id="s-footer" placeholder="footer text" />
+                <textarea class="contact-textarea sm:col-span-2" id="s-address" rows="3" placeholder="address"></textarea>
+                <button class="btn-primary sm:col-span-2" type="submit">Save Settings</button>
+              </form>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/adminpanel-vx9k2.js"></script>
+  </body>
+</html>
