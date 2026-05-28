@@ -122,31 +122,86 @@ const PublicData = (() => {
     const loading = document.getElementById("compliance-loading");
     const empty = document.getElementById("compliance-empty");
     if (!cardsContainer || !stateSelector || !filters.length) return;
-    if (!client) {
-      if (loading) loading.textContent = "Configure public Supabase keys in assets/js/public-data.js";
-      return;
-    }
 
-    const { data, error } = await client
-      .from("compliance_calendar")
-      .select("*")
-      .eq("is_active", true)
-      .order("display_order", { ascending: true, nullsFirst: false })
-      .order("due_date", { ascending: true });
+    const slugify = (value = "") =>
+      String(value)
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+    const normalizeCategory = (value = "") => slugify(value) || "business-compliance";
+
+    const parseStaticCards = () => {
+      return Array.from(cardsContainer.querySelectorAll("article.calendar-card")).map((card, index) => {
+        const title = card.querySelector("h3")?.textContent?.trim() || "Compliance Item";
+        const unique_key = card.dataset.uniqueKey || slugify(title) || `static-${index}`;
+        return {
+          unique_key,
+          title,
+          category: normalizeCategory(card.dataset.category || "business-compliance"),
+          state: card.dataset.state || "all-india",
+          due_date: card.querySelector(".calendar-date")?.textContent?.trim() || "As notified",
+          status: card.querySelector(".trust-chip")?.textContent?.trim() || "Indicative",
+          applicable_to: card.querySelectorAll("p")[2]?.textContent?.replace("Applicable to:", "").trim() || "N/A",
+          description: card.querySelectorAll("p")[3]?.textContent?.replace("Description:", "").trim() || "N/A",
+          source_url: card.querySelectorAll("p")[4]?.textContent?.replace("Source note:", "").trim() || "Reference placeholder",
+          is_active: true,
+          display_order: index,
+          _static: true,
+        };
+      });
+    };
+
+    const renderCards = (items) => {
+      cardsContainer.innerHTML = items
+        .map((item) => {
+          const state = item.state || (item.is_national ? "all-india" : "other-states");
+          const category = normalizeCategory(item.category);
+          return `<article class="calendar-card lift reveal" data-unique-key="${item.unique_key || slugify(item.title)}" data-category="${category}" data-state="${state}"><span class="calendar-date">${item.due_date || item.frequency || "As notified"}</span><span class="trust-chip ml-2">${item.status || "Indicative"}</span><h3 class="mt-3 font-bold text-navy">${item.title || ""}</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> ${item.category || "N/A"}</p><p class="subtitle text-sm"><strong>State applicability:</strong> ${state}</p><p class="subtitle text-sm"><strong>Applicable to:</strong> ${item.applicable_to || "N/A"}</p><p class="subtitle text-sm"><strong>Description:</strong> ${item.description || "N/A"}</p><p class="subtitle text-sm"><strong>Source note:</strong> ${item.source_url || "Reference placeholder"}</p></article>`;
+        })
+        .join("");
+    };
+
+    const staticItems = parseStaticCards();
+    let mergedItems = [...staticItems];
+
+    try {
+      if (client) {
+        const { data, error } = await client
+          .from("compliance_calendar")
+          .select("*")
+          .eq("is_active", true)
+          .order("display_order", { ascending: true, nullsFirst: false })
+          .order("due_date", { ascending: true });
+
+        if (!error && Array.isArray(data)) {
+          const map = new Map(staticItems.map((item) => [item.unique_key, item]));
+          data.forEach((record, idx) => {
+            const unique_key = record.unique_key || slugify(record.title) || `supabase-${record.id || idx}`;
+            map.set(unique_key, {
+              ...record,
+              unique_key,
+              category: normalizeCategory(record.category),
+              state: record.state || (record.is_national ? "all-india" : "other-states"),
+            });
+          });
+          mergedItems = Array.from(map.values()).sort((a, b) => {
+            const ao = Number.isFinite(a.display_order) ? a.display_order : 99999;
+            const bo = Number.isFinite(b.display_order) ? b.display_order : 99999;
+            if (ao !== bo) return ao - bo;
+            return String(a.title || "").localeCompare(String(b.title || ""));
+          });
+        }
+      }
+    } catch (_) {
+      // Graceful fallback: static cards remain the baseline.
+      mergedItems = [...staticItems];
+    }
 
     if (loading) loading.classList.add("hidden");
-    if (error || !data || data.length === 0) {
-      if (empty) empty.classList.remove("hidden");
-      cardsContainer.innerHTML = "";
-      return;
-    }
-
-    cardsContainer.innerHTML = data
-      .map((item) => {
-        const state = item.state || (item.is_national ? "all-india" : "other-states");
-        return `<article class="calendar-card lift reveal" data-category="${item.category || "business-compliance"}" data-state="${state}"><span class="calendar-date">${item.due_date || item.frequency || "As notified"}</span><span class="trust-chip ml-2">${item.status || "Indicative"}</span><h3 class="mt-3 font-bold text-navy">${item.title || ""}</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> ${item.category || "N/A"}</p><p class="subtitle text-sm"><strong>State applicability:</strong> ${state}</p><p class="subtitle text-sm"><strong>Applicable to:</strong> ${item.applicable_to || "N/A"}</p><p class="subtitle text-sm"><strong>Description:</strong> ${item.description || "N/A"}</p><p class="subtitle text-sm"><strong>Source note:</strong> ${item.source_url || "Reference placeholder"}</p></article>`;
-      })
-      .join("");
+    if (empty) empty.classList.add("hidden");
+    renderCards(mergedItems);
 
     let activeCategory = "all";
     const cards = () => cardsContainer.querySelectorAll("[data-category][data-state]");
