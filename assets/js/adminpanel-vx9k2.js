@@ -23,6 +23,9 @@ const refs = {
   submissionSearch: $("submission-search"), submissionStatusFilter: $("submission-status-filter"),
   contactSubmissionsList: $("contact-submissions-list"), careerSubmissionsList: $("career-submissions-list"),
   contactSubmissionsLoading: $("contact-submissions-loading"), careerSubmissionsLoading: $("career-submissions-loading"),
+  metricComplianceTotal: $("metric-compliance-total"), metricTeamActive: $("metric-team-active"), metricCareersActive: $("metric-careers-active"),
+  metricContactNew: $("metric-contact-new"), metricCareerNew: $("metric-career-new"),
+  qaAddCompliance: $("qa-add-compliance"), qaAddTeam: $("qa-add-team"), qaViewSubmissions: $("qa-view-submissions"), qaUpdateSettings: $("qa-update-settings"),
   toast: $("admin-toast"),
 };
 
@@ -236,6 +239,14 @@ async function loadSubmissions(){
 }
 async function loadAll(){ await Promise.all([loadCompliance(),loadTeam(),loadCareers(),loadSettings(),loadSubmissions()]); }
 
+function renderOverviewMetrics(){
+  if (refs.metricComplianceTotal) refs.metricComplianceTotal.textContent = String(complianceData.length || 0);
+  if (refs.metricTeamActive) refs.metricTeamActive.textContent = String((teamData || []).filter((r)=>r.is_active !== false).length);
+  if (refs.metricCareersActive) refs.metricCareersActive.textContent = String((careersData || []).filter((r)=>r.is_active !== false).length);
+  if (refs.metricContactNew) refs.metricContactNew.textContent = String((contactSubmissionsData || []).filter((r)=>String(r.status || "new").toLowerCase() === "new").length);
+  if (refs.metricCareerNew) refs.metricCareerNew.textContent = String((careerSubmissionsData || []).filter((r)=>String(r.status || "new").toLowerCase() === "new").length);
+}
+
 function renderSubmissions(){
   const q = (refs.submissionSearch?.value || "").toLowerCase();
   const status = refs.submissionStatusFilter?.value || "all";
@@ -348,7 +359,7 @@ async function saveCareer(e){ e.preventDefault(); if(refs.careerSubmit.disabled)
 
 async function saveSettings(e){ e.preventDefault(); const btn=refs.settingsForm?.querySelector("button[type='submit']"); busy(btn,true,"Saving..."); try{ const id=$("s-id").value; const payload={phone:$("s-phone").value,email:$("s-email").value,whatsapp:$("s-whatsapp").value,address:$("s-address").value,map_link:$("s-map").value,footer_text:$("s-footer").value}; const {error}=id?await supabaseClient.from("site_settings").update(payload).eq("id",id):await supabaseClient.from("site_settings").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,"Site settings saved."); await loadSettings(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(btn,false);} }
 
-async function ensureSession(){ const {data,error}=await supabaseClient.auth.getSession(); if(error) return setMsg(refs.authMsg,error.message,true); const s=data?.session; if(!s) return setAuth(false); const userEmail=(s.user?.email||"").toLowerCase(); const allowed=ALLOWED_ADMIN_EMAILS.map((e)=>String(e).toLowerCase()); if(!allowed.includes(userEmail)){ console.warn("Unauthorized admin attempt:", userEmail || "unknown"); await supabaseClient.auth.signOut(); setMsg(refs.authMsg,"Access denied. Unauthorized admin email.",true); return setAuth(false);} console.log("Admin login successful:", userEmail); setAuth(true); switchTab("compliance"); await loadAll(); }
+async function ensureSession(){ const {data,error}=await supabaseClient.auth.getSession(); if(error) return setMsg(refs.authMsg,error.message,true); const s=data?.session; if(!s) return setAuth(false); const userEmail=(s.user?.email||"").toLowerCase(); const allowed=ALLOWED_ADMIN_EMAILS.map((e)=>String(e).toLowerCase()); if(!allowed.includes(userEmail)){ console.warn("Unauthorized admin attempt:", userEmail || "unknown"); await supabaseClient.auth.signOut(); setMsg(refs.authMsg,"Access denied. Unauthorized admin email.",true); return setAuth(false);} console.log("Admin login successful:", userEmail); setAuth(true); switchTab("overview"); await loadAll(); renderOverviewMetrics(); }
 async function login(e){ e.preventDefault(); const email=$("admin-email").value.trim().toLowerCase(); const allowed=ALLOWED_ADMIN_EMAILS.map((e)=>String(e).toLowerCase()); if(!allowed.includes(email)){ console.warn("Unauthorized admin attempt:", email || "unknown"); return setMsg(refs.authMsg,"Access denied. Unauthorized admin email.",true);} const {error}=await supabaseClient.auth.signInWithPassword({email,password:$("admin-password").value}); if(error) return setMsg(refs.authMsg,error.message,true); setMsg(refs.authMsg,"Login successful."); await ensureSession(); }
 async function logout(){ await supabaseClient.auth.signOut(); setAuth(false); setMsg(refs.authMsg,"Logged out."); }
 
@@ -368,6 +379,10 @@ refs.teamSearch?.addEventListener("input",()=>renderRows("team",teamData));
 refs.careersSearch?.addEventListener("input",()=>renderRows("careers",careersData));
 refs.submissionSearch?.addEventListener("input",renderSubmissions);
 refs.submissionStatusFilter?.addEventListener("change",renderSubmissions);
+refs.qaAddCompliance?.addEventListener("click", ()=>{ switchTab("compliance"); refs.complianceForm?.scrollIntoView({behavior:"smooth", block:"start"}); $("c-title")?.focus(); });
+refs.qaAddTeam?.addEventListener("click", ()=>{ switchTab("team"); refs.teamForm?.scrollIntoView({behavior:"smooth", block:"start"}); $("t-name")?.focus(); });
+refs.qaViewSubmissions?.addEventListener("click", ()=>{ switchTab("submissions"); refs.submissionSearch?.focus(); });
+refs.qaUpdateSettings?.addEventListener("click", ()=>{ switchTab("settings"); refs.settingsForm?.scrollIntoView({behavior:"smooth", block:"start"}); $("s-phone")?.focus(); });
 
 $("c-state")?.addEventListener("change",(e)=>{$("c-national").checked=e.target.value==="all-india"; previewCompliance();});
 $("j-type")?.addEventListener("change",(e)=>{$("j-intern").checked=["Internship","Articleship"].includes(e.target.value); previewCareer();});
