@@ -93,25 +93,32 @@ function renderRows(type, rows){
   }[type];
   if(!cfg?.container) return;
   cfg.container.innerHTML="";
+  if (type === "compliance" && (!rows || rows.length === 0)) {
+    cfg.container.innerHTML = `<p class="subtitle text-sm">No compliance records found.</p>`;
+    return;
+  }
   rows.filter(r=>cfg.matches(r).includes(cfg.search)).sort(cfg.sort).forEach((r)=>{
-    const el=document.createElement("div"); el.className="card p-3 flex items-start justify-between gap-2";
+    const el=document.createElement("div"); el.className=`card p-3 flex items-start justify-between gap-2 ${type==="compliance"?"cursor-pointer transition hover:bg-slate-50 hover:border-slate-300":""}`;
     const main = type==="team"
       ? `${r.image_url?`<img src='${esc(r.image_url)}' class='h-10 w-10 rounded-full object-cover inline-block mr-2'/>`:""}<strong>${esc(r.name||"-")}</strong><br/>${esc(r.designation||"-")}<br/>${esc(Array.isArray(r.tags)?r.tags.join(", "):(r.tags||""))}<br/>${badge(r.is_active!==false)}`
       : type==="compliance"
-      ? `<strong>${esc(r.title||"-")}</strong><br/>${esc(r.category||"-")} • ${esc(stateLabels[r.state]||r.state||"-")} • ${esc(r.status||"-")}<br/>${badge(r.is_active!==false)}`
+      ? `<strong>${esc(r.title||"-")}</strong><br/>Category: ${esc(r.category||"-")} • State: ${esc(stateLabels[r.state]||r.state||"-")}<br/>Due: ${esc(r.due_date||"-")} • Frequency: ${esc(r.frequency||"-")}<br/>Status: ${esc(r.status||"-")} • ${badge(r.is_active!==false)}`
       : `<strong>${esc(r.title||"-")}</strong><br/>${esc(r.employment_type||"-")} • ${esc(r.experience_level||"-")} • ${r.is_internship?"Internship":"Job"}<br/>${badge(r.is_active!==false)}`;
     el.innerHTML=`<div class='text-sm subtitle'>${main}${rowMeta(r)}</div><div class='flex flex-col gap-2'><button class='btn-secondary' data-a='up'>↑</button><button class='btn-secondary' data-a='down'>↓</button><button class='btn-secondary' data-a='edit'>Edit</button><button class='btn-secondary' data-a='del'>Delete</button></div>`;
     const btn=(a)=>el.querySelector(`[data-a='${a}']`);
-    btn("edit").onclick=()=>editRow(type,r);
-    btn("del").onclick=()=>deleteRow(type,r.id,btn("del"));
-    btn("up").onclick=()=>moveRow(type,r.id,-1,btn("up"));
-    btn("down").onclick=()=>moveRow(type,r.id,1,btn("down"));
+    btn("edit").onclick=(e)=>{ e.stopPropagation(); editRow(type,r); };
+    btn("del").onclick=(e)=>{ e.stopPropagation(); deleteRow(type,r.id,btn("del")); };
+    btn("up").onclick=(e)=>{ e.stopPropagation(); moveRow(type,r.id,-1,btn("up")); };
+    btn("down").onclick=(e)=>{ e.stopPropagation(); moveRow(type,r.id,1,btn("down")); };
+    if (type === "compliance") {
+      el.onclick = () => editRow("compliance", r, true);
+    }
     cfg.container.appendChild(el);
   });
 }
 
-function editRow(type,r){
-  if(type==="compliance"){ $("compliance-id").value=r.id||""; $("c-title").value=r.title||""; $("c-category").value=r.category||""; $("c-state").value=r.state||""; $("c-due-date").value=r.due_date||""; $("c-frequency").value=r.frequency||""; $("c-applicable").value=r.applicable_to||""; $("c-description").value=r.description||""; $("c-status").value=r.status||"Indicative"; $("c-source").value=r.source_url||""; $("c-national").checked=!!r.is_national; $("c-active").checked=r.is_active!==false; refs.complianceSubmit.textContent="Update Compliance Item"; previewCompliance(); }
+function editRow(type,r,scrollToForm=false){
+  if(type==="compliance"){ $("compliance-id").value=r.id||""; $("c-title").value=r.title||""; $("c-category").value=r.category||""; $("c-state").value=r.state||""; $("c-due-date").value=r.due_date||""; $("c-frequency").value=r.frequency||""; $("c-applicable").value=r.applicable_to||""; $("c-description").value=r.description||""; $("c-status").value=r.status||"Indicative"; $("c-source").value=r.source_url||""; $("c-national").checked=!!r.is_national; $("c-active").checked=r.is_active!==false; refs.complianceSubmit.textContent="Update Compliance Item"; previewCompliance(); if (scrollToForm) refs.complianceForm?.scrollIntoView({behavior:"smooth", block:"start"}); }
   if(type==="team"){ $("team-id").value=r.id||""; $("t-name").value=r.name||""; $("t-designation").value=r.designation||""; $("t-bio").value=r.bio||""; $("t-image").value=r.image_url||""; $("t-tags").value=Array.isArray(r.tags)?r.tags.join(", "):(r.tags||""); $("t-order").value=r.display_order||""; $("t-active").checked=r.is_active!==false; teamImageObjectUrl=r.image_url||""; refs.teamSubmit.textContent="Update Team Member"; previewTeam(); }
   if(type==="careers"){ $("career-id").value=r.id||""; $("j-title").value=r.title||""; $("j-type").value=r.employment_type||"Full-time"; $("j-exp").value=r.experience_level||"Fresher"; $("j-location").value=r.location||""; $("j-description").value=r.description||""; $("j-requirements").value=r.requirements||""; $("j-intern").checked=!!r.is_internship; $("j-active").checked=r.is_active!==false; refs.careerSubmit.textContent="Update Career Opening"; previewCareer(); }
 }
@@ -133,7 +140,17 @@ async function moveRow(type,id,dir,btn){
   finally{ busy(btn,false); }
 }
 
-async function loadCompliance(){ const {data,error}=await supabaseClient.from("compliance_calendar").select("*"); if(error) throw error; complianceData=data||[]; renderRows("compliance",complianceData); }
+async function loadCompliance(){
+  if (refs.complianceList) refs.complianceList.innerHTML = `<p class="subtitle text-sm">Loading compliance records...</p>`;
+  const {data,error}=await supabaseClient.from("compliance_calendar").select("*");
+  if(error){
+    if (refs.complianceList) refs.complianceList.innerHTML = `<p class="subtitle text-sm">Unable to load compliance records.</p>`;
+    setMsg(refs.adminMsg, `Compliance load failed: ${error.message}`, true);
+    throw error;
+  }
+  complianceData=data||[];
+  renderRows("compliance",complianceData);
+}
 async function loadTeam(){ const {data,error}=await supabaseClient.from("team_members").select("*"); if(error) throw error; teamData=data||[]; renderRows("team",teamData); }
 async function loadCareers(){ const {data,error}=await supabaseClient.from("career_openings").select("*"); if(error) throw error; careersData=data||[]; renderRows("careers",careersData); }
 async function loadSettings(){ const {data,error}=await supabaseClient.from("site_settings").select("*").limit(1).maybeSingle(); if(error) throw error; if(data){ $("s-id").value=data.id||""; $("s-phone").value=data.phone||""; $("s-email").value=data.email||""; $("s-whatsapp").value=data.whatsapp||""; $("s-address").value=data.address||""; $("s-map").value=data.map_link||""; $("s-footer").value=data.footer_text||""; } previewSettings(); }
