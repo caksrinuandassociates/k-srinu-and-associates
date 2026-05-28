@@ -1,6 +1,6 @@
 const SUPABASE_URL = "https://wenwseckngextivnulqy.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndlbndzZWNrbmdleHRpdm51bHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NDQwODIsImV4cCI6MjA5NTUyMDA4Mn0.vhH_AbPB0Hs9yehPUOWRR7XLn_ei--g4efy8u-X9aok";
-const ALLOWED_ADMIN_EMAIL = "your-admin@email.com";
+const ALLOWED_ADMIN_EMAIL = "prudhvi@varadanexus.com";
 
 const authMessage = document.getElementById("auth-message");
 const adminMessage = document.getElementById("admin-message");
