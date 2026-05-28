@@ -1,6 +1,10 @@
 const SUPABASE_URL = "https://wenwseckngextivnulqy.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndlbndzZWNrbmdleHRpdm51bHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NDQwODIsImV4cCI6MjA5NTUyMDA4Mn0.vhH_AbPB0Hs9yehPUOWRR7XLn_ei--g4efy8u-X9aok";
-const ALLOWED_ADMIN_EMAIL = "prudhvi@varadanexus.com";
+// Add/remove admin emails here
+const ALLOWED_ADMIN_EMAILS = [
+  "prudhvi@varadanexus.com",
+  "secondadmin@email.com"
+];
 const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const $ = (id) => document.getElementById(id);
@@ -344,8 +348,8 @@ async function saveCareer(e){ e.preventDefault(); if(refs.careerSubmit.disabled)
 
 async function saveSettings(e){ e.preventDefault(); const btn=refs.settingsForm?.querySelector("button[type='submit']"); busy(btn,true,"Saving..."); try{ const id=$("s-id").value; const payload={phone:$("s-phone").value,email:$("s-email").value,whatsapp:$("s-whatsapp").value,address:$("s-address").value,map_link:$("s-map").value,footer_text:$("s-footer").value}; const {error}=id?await supabaseClient.from("site_settings").update(payload).eq("id",id):await supabaseClient.from("site_settings").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,"Site settings saved."); await loadSettings(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(btn,false);} }
 
-async function ensureSession(){ const {data,error}=await supabaseClient.auth.getSession(); if(error) return setMsg(refs.authMsg,error.message,true); const s=data?.session; if(!s) return setAuth(false); if((s.user?.email||"").toLowerCase()!==ALLOWED_ADMIN_EMAIL.toLowerCase()){ await supabaseClient.auth.signOut(); setMsg(refs.authMsg,"Access denied. Unauthorized admin email.",true); return setAuth(false);} setAuth(true); switchTab("compliance"); await loadAll(); }
-async function login(e){ e.preventDefault(); const email=$("admin-email").value.trim().toLowerCase(); if(email!==ALLOWED_ADMIN_EMAIL.toLowerCase()) return setMsg(refs.authMsg,"Access denied. Unauthorized admin email.",true); const {error}=await supabaseClient.auth.signInWithPassword({email,password:$("admin-password").value}); if(error) return setMsg(refs.authMsg,error.message,true); setMsg(refs.authMsg,"Login successful."); await ensureSession(); }
+async function ensureSession(){ const {data,error}=await supabaseClient.auth.getSession(); if(error) return setMsg(refs.authMsg,error.message,true); const s=data?.session; if(!s) return setAuth(false); const userEmail=(s.user?.email||"").toLowerCase(); const allowed=ALLOWED_ADMIN_EMAILS.map((e)=>String(e).toLowerCase()); if(!allowed.includes(userEmail)){ console.warn("Unauthorized admin attempt:", userEmail || "unknown"); await supabaseClient.auth.signOut(); setMsg(refs.authMsg,"Access denied. Unauthorized admin email.",true); return setAuth(false);} console.log("Admin login successful:", userEmail); setAuth(true); switchTab("compliance"); await loadAll(); }
+async function login(e){ e.preventDefault(); const email=$("admin-email").value.trim().toLowerCase(); const allowed=ALLOWED_ADMIN_EMAILS.map((e)=>String(e).toLowerCase()); if(!allowed.includes(email)){ console.warn("Unauthorized admin attempt:", email || "unknown"); return setMsg(refs.authMsg,"Access denied. Unauthorized admin email.",true);} const {error}=await supabaseClient.auth.signInWithPassword({email,password:$("admin-password").value}); if(error) return setMsg(refs.authMsg,error.message,true); setMsg(refs.authMsg,"Login successful."); await ensureSession(); }
 async function logout(){ await supabaseClient.auth.signOut(); setAuth(false); setMsg(refs.authMsg,"Logged out."); }
 
 refs.loginForm?.addEventListener("submit",login);
