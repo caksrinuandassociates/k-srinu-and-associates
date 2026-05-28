@@ -19,7 +19,13 @@ const refs = {
   complianceSubmit: document.getElementById("compliance-submit"), teamSubmit: document.getElementById("team-submit"), careerSubmit: document.getElementById("career-submit"),
   complianceClear: document.getElementById("compliance-clear"), teamClear: document.getElementById("team-clear"), careerClear: document.getElementById("career-clear"),
   tImageFile: document.getElementById("t-image-file"), tImage: document.getElementById("t-image"), tImagePreview: document.getElementById("t-image-preview"), tTags: document.getElementById("t-tags"), tTagsPreview: document.getElementById("t-tags-preview"),
+  compliancePreview: document.getElementById("compliance-live-preview"),
+  teamPreview: document.getElementById("team-live-preview"),
+  careerPreview: document.getElementById("career-live-preview"),
+  settingsPreview: document.getElementById("settings-live-preview"),
 };
+
+let teamPreviewImageSrc = "";
 
 function msg(el, m, err = false) { if (!el) return; el.textContent = m; el.style.color = err ? "#b91c1c" : "#334155"; }
 const setAuthMessage = (m, e = false) => msg(authMessage, m, e);
@@ -35,6 +41,69 @@ function switchTab(tab) {
 }
 
 function activeBadge(v) { return `<span class="trust-chip" style="background:${v ? "#ecfdf5" : "#fee2e2"};color:${v ? "#166534" : "#991b1b"};">${v ? "Active" : "Inactive"}</span>`; }
+function esc(v) {
+  return String(v ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function updateCompliancePreview() {
+  if (!refs.compliancePreview) return;
+  const title = esc(document.getElementById("c-title")?.value || "Untitled compliance item");
+  const category = esc(document.getElementById("c-category")?.value || "Category");
+  const stateKey = document.getElementById("c-state")?.value || "";
+  const state = esc(stateLabels[stateKey] || stateKey || "State");
+  const due = esc(document.getElementById("c-due-date")?.value || "As notified");
+  const freq = esc(document.getElementById("c-frequency")?.value || "-");
+  const applicable = esc(document.getElementById("c-applicable")?.value || "-");
+  const description = esc(document.getElementById("c-description")?.value || "-");
+  const status = esc(document.getElementById("c-status")?.value || "Indicative");
+  const active = document.getElementById("c-active")?.checked ?? true;
+  refs.compliancePreview.innerHTML = `<article class="calendar-card"><span class="calendar-date">${due}</span><span class="trust-chip ml-2">${status}</span><h3 class="mt-3 font-bold text-navy">${title}</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> ${category}</p><p class="subtitle text-sm"><strong>State applicability:</strong> ${state}</p><p class="subtitle text-sm"><strong>Frequency:</strong> ${freq}</p><p class="subtitle text-sm"><strong>Applicable to:</strong> ${applicable}</p><p class="subtitle text-sm"><strong>Description:</strong> ${description}</p><div class="mt-2">${activeBadge(active)}</div></article>`;
+}
+
+function updateTeamPreview() {
+  if (!refs.teamPreview) return;
+  const nameRaw = document.getElementById("t-name")?.value || "Team Member";
+  const name = esc(nameRaw);
+  const designation = esc(document.getElementById("t-designation")?.value || "Designation");
+  const bio = esc(document.getElementById("t-bio")?.value || "Bio preview will appear here.");
+  const tags = (document.getElementById("t-tags")?.value || "").split(",").map((t) => t.trim()).filter(Boolean);
+  const tagHtml = tags.length ? tags.map((t) => `<span class="trust-chip">${esc(t)}</span>`).join(" ") : "<span class='trust-chip'>Tag</span>";
+  const active = document.getElementById("t-active")?.checked ?? true;
+  const imageUrl = refs.tImage?.value?.trim() || "";
+  const imgSrc = teamPreviewImageSrc || imageUrl;
+  const initials = esc(nameRaw.split(" ").map((x) => x[0]).slice(0, 2).join("").toUpperCase() || "TM");
+  const avatar = imgSrc ? `<img src="${esc(imgSrc)}" alt="${name}" class="h-14 w-14 rounded-full border border-slate-200 object-cover"/>` : `<div class="profile-initial">${initials}</div>`;
+  refs.teamPreview.innerHTML = `<article class="team-card">${avatar}<h3 class="mt-4 font-bold text-navy text-xl">${name}</h3><p class="text-sm font-semibold text-gold mt-1">${designation}</p><p class="subtitle text-sm mt-2">${bio}</p><div class="mt-3 flex flex-wrap gap-2">${tagHtml}</div><div class="mt-2">${activeBadge(active)}</div></article>`;
+}
+
+function updateCareerPreview() {
+  if (!refs.careerPreview) return;
+  const title = esc(document.getElementById("j-title")?.value || "Career Opening");
+  const type = esc(document.getElementById("j-type")?.value || "Full-time");
+  const exp = esc(document.getElementById("j-exp")?.value || "Fresher");
+  const location = esc(document.getElementById("j-location")?.value || "Location");
+  const description = esc(document.getElementById("j-description")?.value || "Description preview.");
+  const requirements = esc(document.getElementById("j-requirements")?.value || "Requirements preview.");
+  const isIntern = document.getElementById("j-intern")?.checked;
+  const active = document.getElementById("j-active")?.checked ?? true;
+  refs.careerPreview.innerHTML = `<article class="service-card"><h3 class="font-bold text-navy">${title}</h3><p class="subtitle text-sm mt-2">${description}</p><p class="subtitle text-sm mt-2"><strong>Requirements:</strong> ${requirements}</p><p class="text-xs mt-3 text-navy font-semibold">Experience: ${exp}</p><p class="text-xs text-gold font-semibold">Type: ${type}</p><p class="text-xs text-navy font-semibold">Location: ${location}</p><div class="mt-2 flex gap-2"><span class="trust-chip">${isIntern ? "Internship" : "Job"}</span>${activeBadge(active)}</div></article>`;
+}
+
+function updateSettingsPreview() {
+  if (!refs.settingsPreview) return;
+  const phone = esc(document.getElementById("s-phone")?.value || "-");
+  const email = esc(document.getElementById("s-email")?.value || "-");
+  const wa = esc(document.getElementById("s-whatsapp")?.value || "-");
+  const address = esc(document.getElementById("s-address")?.value || "-");
+  const map = esc(document.getElementById("s-map")?.value || "-");
+  const footer = esc(document.getElementById("s-footer")?.value || "-");
+  refs.settingsPreview.innerHTML = `<div class="subtitle text-sm"><p><strong>Phone:</strong> ${phone}</p><p><strong>Email:</strong> ${email}</p><p><strong>WhatsApp:</strong> ${wa}</p><p><strong>Address:</strong> ${address}</p><p><strong>Map Link:</strong> ${map}</p><p><strong>Footer Text:</strong> ${footer}</p></div>`;
+}
 
 function renderRecord(container, html, onEdit, onDelete) {
   const item = document.createElement("div");
@@ -46,8 +115,8 @@ function renderRecord(container, html, onEdit, onDelete) {
 }
 
 function resetComplianceForm() { refs.complianceForm?.reset(); document.getElementById("compliance-id").value = ""; refs.complianceSubmit.textContent = "Save Compliance Item"; }
-function resetTeamForm() { refs.teamForm?.reset(); document.getElementById("team-id").value = ""; refs.teamSubmit.textContent = "Save Team Member"; if (refs.tImagePreview) refs.tImagePreview.style.display = "none"; refs.tTagsPreview.textContent = ""; }
-function resetCareerForm() { refs.careerForm?.reset(); document.getElementById("career-id").value = ""; refs.careerSubmit.textContent = "Save Career Opening"; }
+function resetTeamForm() { refs.teamForm?.reset(); document.getElementById("team-id").value = ""; refs.teamSubmit.textContent = "Save Team Member"; if (refs.tImagePreview) refs.tImagePreview.style.display = "none"; refs.tTagsPreview.textContent = ""; teamPreviewImageSrc = ""; updateTeamPreview(); }
+function resetCareerForm() { refs.careerForm?.reset(); document.getElementById("career-id").value = ""; refs.careerSubmit.textContent = "Save Career Opening"; updateCareerPreview(); }
 
 async function uploadTeamImageIfSelected() {
   const file = refs.tImageFile?.files?.[0];
@@ -101,6 +170,7 @@ async function loadComplianceItems() {
     document.getElementById("c-applicable").value = r.applicable_to || ""; document.getElementById("c-description").value = r.description || ""; document.getElementById("c-status").value = r.status || "Indicative";
     document.getElementById("c-source").value = r.source_url || ""; document.getElementById("c-national").checked = !!r.is_national; document.getElementById("c-active").checked = r.is_active !== false;
     refs.complianceSubmit.textContent = "Update Compliance Item";
+    updateCompliancePreview();
   }, async () => {
     const { error: delError } = await supabaseClient.from("compliance_calendar").delete().eq("id", r.id);
     if (delError) return setAdminMessage(delError.message, true);
@@ -133,7 +203,9 @@ async function loadTeamMembers() {
     document.getElementById("t-order").value = r.display_order || ""; document.getElementById("t-active").checked = r.is_active !== false;
     refs.tTagsPreview.textContent = (r.tags || "").split(",").map((t) => t.trim()).filter(Boolean).join(" | ");
     if (r.image_url && refs.tImagePreview) { refs.tImagePreview.src = r.image_url; refs.tImagePreview.style.display = "block"; }
+    teamPreviewImageSrc = r.image_url || "";
     refs.teamSubmit.textContent = "Update Team Member";
+    updateTeamPreview();
   }, async () => {
     const { error: delError } = await supabaseClient.from("team_members").delete().eq("id", r.id);
     if (delError) return setAdminMessage(delError.message, true);
@@ -174,6 +246,7 @@ async function loadCareers() {
     document.getElementById("j-description").value = r.description || ""; document.getElementById("j-requirements").value = r.requirements || "";
     document.getElementById("j-intern").checked = !!r.is_internship; document.getElementById("j-active").checked = r.is_active !== false;
     refs.careerSubmit.textContent = "Update Career Opening";
+    updateCareerPreview();
   }, async () => {
     const { error: delError } = await supabaseClient.from("career_openings").delete().eq("id", r.id);
     if (delError) return setAdminMessage(delError.message, true);
@@ -202,6 +275,7 @@ async function loadSiteSettings() {
   document.getElementById("s-id").value = data.id || ""; document.getElementById("s-phone").value = data.phone || ""; document.getElementById("s-email").value = data.email || "";
   document.getElementById("s-whatsapp").value = data.whatsapp || ""; document.getElementById("s-address").value = data.address || ""; document.getElementById("s-map").value = data.map_link || "";
   document.getElementById("s-footer").value = data.footer_text || "";
+  updateSettingsPreview();
 }
 
 async function saveSiteSettings(e) {
@@ -227,14 +301,26 @@ refs.complianceClear?.addEventListener("click", resetComplianceForm);
 refs.teamClear?.addEventListener("click", resetTeamForm);
 refs.careerClear?.addEventListener("click", resetCareerForm);
 
-document.getElementById("c-state")?.addEventListener("change", (e) => { document.getElementById("c-national").checked = e.target.value === "all-india"; });
-document.getElementById("j-type")?.addEventListener("change", (e) => { document.getElementById("j-intern").checked = ["Internship", "Articleship"].includes(e.target.value); });
-refs.tTags?.addEventListener("input", () => { refs.tTagsPreview.textContent = (refs.tTags.value || "").split(",").map((t) => t.trim()).filter(Boolean).join(" | "); });
+document.getElementById("c-state")?.addEventListener("change", (e) => { document.getElementById("c-national").checked = e.target.value === "all-india"; updateCompliancePreview(); });
+document.getElementById("j-type")?.addEventListener("change", (e) => { document.getElementById("j-intern").checked = ["Internship", "Articleship"].includes(e.target.value); updateCareerPreview(); });
+refs.tTags?.addEventListener("input", () => { refs.tTagsPreview.textContent = (refs.tTags.value || "").split(",").map((t) => t.trim()).filter(Boolean).join(" | "); updateTeamPreview(); });
 refs.tImageFile?.addEventListener("change", () => {
   const f = refs.tImageFile.files?.[0]; if (!f || !refs.tImagePreview) return;
-  refs.tImagePreview.src = URL.createObjectURL(f); refs.tImagePreview.style.display = "block";
+  const objectUrl = URL.createObjectURL(f);
+  refs.tImagePreview.src = objectUrl; refs.tImagePreview.style.display = "block";
+  teamPreviewImageSrc = objectUrl;
+  updateTeamPreview();
 });
+
+["c-title","c-category","c-due-date","c-frequency","c-applicable","c-description","c-status","c-active","c-national","c-source"].forEach((id)=>document.getElementById(id)?.addEventListener("input", updateCompliancePreview));
+["t-name","t-designation","t-bio","t-image","t-active","t-order"].forEach((id)=>document.getElementById(id)?.addEventListener("input", updateTeamPreview));
+["j-title","j-exp","j-location","j-description","j-requirements","j-intern","j-active"].forEach((id)=>document.getElementById(id)?.addEventListener("input", updateCareerPreview));
+["s-phone","s-email","s-whatsapp","s-address","s-map","s-footer"].forEach((id)=>document.getElementById(id)?.addEventListener("input", updateSettingsPreview));
 
 document.querySelectorAll(".tab-btn").forEach((btn) => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
 
 ensureAdminSession();
+updateCompliancePreview();
+updateTeamPreview();
+updateCareerPreview();
+updateSettingsPreview();
