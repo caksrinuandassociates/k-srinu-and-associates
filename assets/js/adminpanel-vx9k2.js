@@ -16,13 +16,16 @@ const refs = {
   tImageFile: $("t-image-file"), tImage: $("t-image"), tImagePreview: $("t-image-preview"),
   tCropPreview: $("t-crop-preview"), tCropX: $("t-crop-x"), tCropY: $("t-crop-y"), tCropZoom: $("t-crop-zoom"),
   compliancePreview: $("compliance-live-preview"), teamPreview: $("team-live-preview"), careerPreview: $("career-live-preview"), settingsPreview: $("settings-live-preview"),
+  submissionSearch: $("submission-search"), submissionStatusFilter: $("submission-status-filter"),
+  contactSubmissionsList: $("contact-submissions-list"), careerSubmissionsList: $("career-submissions-list"),
+  contactSubmissionsLoading: $("contact-submissions-loading"), careerSubmissionsLoading: $("career-submissions-loading"),
   toast: $("admin-toast"),
 };
 
 let teamImageObjectUrl = "";
 let teamCropSourceFile = null;
 let teamCropSourceUrl = "";
-let complianceData = [], teamData = [], careersData = [];
+let complianceData = [], teamData = [], careersData = [], contactSubmissionsData = [], careerSubmissionsData = [];
 const stateLabels = {"all-india":"All India","andhra-pradesh":"Andhra Pradesh",telangana:"Telangana","tamil-nadu":"Tamil Nadu",karnataka:"Karnataka",maharashtra:"Maharashtra",delhi:"Delhi",kerala:"Kerala","other-states":"Other States"};
 const BASELINE_COMPLIANCE_ITEMS = [
   { title:"GST Return Filing", category:"GST", state:"all-india", due_date:"10th / 11th of Every Month", frequency:"Monthly", applicable_to:"Registered taxpayers (as applicable)", description:"Monthly GST return filing and reconciliation.", status:"Upcoming", source_url:"GST portal / notification reference placeholder.", is_national:true, is_active:true, display_order:1, unique_key:"gst-return-filing" },
@@ -214,7 +217,75 @@ async function loadCompliance(){
 async function loadTeam(){ const {data,error}=await supabaseClient.from("team_members").select("id,name,designation,bio,profile_description,image_url,tags,display_order,is_active,created_at,updated_at"); if(error) throw error; teamData=data||[]; renderRows("team",teamData); }
 async function loadCareers(){ const {data,error}=await supabaseClient.from("career_openings").select("*"); if(error) throw error; careersData=data||[]; renderRows("careers",careersData); }
 async function loadSettings(){ const {data,error}=await supabaseClient.from("site_settings").select("*").limit(1).maybeSingle(); if(error) throw error; if(data){ $("s-id").value=data.id||""; $("s-phone").value=data.phone||""; $("s-email").value=data.email||""; $("s-whatsapp").value=data.whatsapp||""; $("s-address").value=data.address||""; $("s-map").value=data.map_link||""; $("s-footer").value=data.footer_text||""; } previewSettings(); }
-async function loadAll(){ await Promise.all([loadCompliance(),loadTeam(),loadCareers(),loadSettings()]); }
+async function loadSubmissions(){
+  if (refs.contactSubmissionsLoading) refs.contactSubmissionsLoading.classList.remove("hidden");
+  if (refs.careerSubmissionsLoading) refs.careerSubmissionsLoading.classList.remove("hidden");
+  const [contactRes, careerRes] = await Promise.all([
+    supabaseClient.from("contact_submissions").select("*").order("created_at", { ascending: false }),
+    supabaseClient.from("career_submissions").select("*").order("created_at", { ascending: false }),
+  ]);
+  if (contactRes.error) throw contactRes.error;
+  if (careerRes.error) throw careerRes.error;
+  contactSubmissionsData = contactRes.data || [];
+  careerSubmissionsData = careerRes.data || [];
+  renderSubmissions();
+}
+async function loadAll(){ await Promise.all([loadCompliance(),loadTeam(),loadCareers(),loadSettings(),loadSubmissions()]); }
+
+function renderSubmissions(){
+  const q = (refs.submissionSearch?.value || "").toLowerCase();
+  const status = refs.submissionStatusFilter?.value || "all";
+
+  const filterCommon = (r, messageField = "message") => {
+    const msg = String(r?.[messageField] || "");
+    const text = `${r?.name || ""} ${r?.email || ""} ${r?.phone || ""} ${msg}`.toLowerCase();
+    const sOk = status === "all" || String(r?.status || "new").toLowerCase() === status;
+    return text.includes(q) && sOk;
+  };
+
+  const card = (type, row) => {
+    const when = row.created_at ? new Date(row.created_at).toLocaleString() : "-";
+    const msg = type === "contact" ? (row.message || "") : (row.message || "");
+    const preview = msg.length > 120 ? `${msg.slice(0, 120)}...` : msg;
+    return `<details class='card p-3'><summary class='cursor-pointer list-none'><div class='flex items-start justify-between gap-3'><div class='subtitle text-sm'><strong>${esc(row.name||"-")}</strong><br/>${esc(row.email||"-")} • ${esc(row.phone||"-")}<br/><span class='text-xs'>${esc(when)} • Status: ${esc(row.status||"new")}</span><p class='mt-1 text-xs'>${esc(preview)}</p></div><div class='flex flex-wrap gap-2'><button class='btn-secondary' data-sub-act='new' data-sub-type='${type}' data-sub-id='${row.id}'>Mark New</button><button class='btn-secondary' data-sub-act='reviewed' data-sub-type='${type}' data-sub-id='${row.id}'>Reviewed</button><button class='btn-secondary' data-sub-act='contacted' data-sub-type='${type}' data-sub-id='${row.id}'>Contacted</button><button class='btn-secondary' data-sub-act='delete' data-sub-type='${type}' data-sub-id='${row.id}'>Delete</button></div></div></summary><div class='mt-3 subtitle text-sm'>${type === "career" ? `<p><strong>Position:</strong> ${esc(row.position||"-")}</p><p><strong>Experience:</strong> ${esc(row.experience||"-")}</p><p><strong>Resume Link:</strong> ${esc(row.resume_link||"-")}</p>` : `<p><strong>Service:</strong> ${esc(row.service||"-")}</p>`}<p class='mt-2'><strong>Message:</strong><br/>${esc(msg || "-")}</p></div></details>`;
+  };
+
+  const cRows = contactSubmissionsData.filter((r)=>filterCommon(r, "message"));
+  const jRows = careerSubmissionsData.filter((r)=>filterCommon(r, "message"));
+
+  if (refs.contactSubmissionsLoading) refs.contactSubmissionsLoading.classList.add("hidden");
+  if (refs.careerSubmissionsLoading) refs.careerSubmissionsLoading.classList.add("hidden");
+  if (refs.contactSubmissionsList) refs.contactSubmissionsList.innerHTML = cRows.length ? cRows.map((r)=>card("contact", r)).join("") : `<p class='subtitle text-sm'>No contact submissions found.</p>`;
+  if (refs.careerSubmissionsList) refs.careerSubmissionsList.innerHTML = jRows.length ? jRows.map((r)=>card("career", r)).join("") : `<p class='subtitle text-sm'>No career submissions found.</p>`;
+
+  [refs.contactSubmissionsList, refs.careerSubmissionsList].forEach((container)=>{
+    container?.querySelectorAll("[data-sub-act]").forEach((btn)=>{
+      btn.addEventListener("click", async (e)=>{
+        e.preventDefault();
+        const act = btn.getAttribute("data-sub-act");
+        const type = btn.getAttribute("data-sub-type");
+        const id = btn.getAttribute("data-sub-id");
+        const table = type === "contact" ? "contact_submissions" : "career_submissions";
+        busy(btn, true, act === "delete" ? "Deleting..." : "Updating...");
+        try {
+          if (act === "delete") {
+            const { error } = await supabaseClient.from(table).delete().eq("id", id);
+            if (error) throw error;
+          } else {
+            const { error } = await supabaseClient.from(table).update({ status: act }).eq("id", id);
+            if (error) throw error;
+          }
+          await loadSubmissions();
+          setMsg(refs.adminMsg, "Submission updated successfully");
+        } catch (err) {
+          setMsg(refs.adminMsg, err.message || "Failed to update submission", true);
+        } finally {
+          busy(btn, false);
+        }
+      });
+    });
+  });
+}
 
 const normTitle = (v="") => String(v).trim().toLowerCase().replace(/\s+/g," ");
 async function importBaselineComplianceItems(){
@@ -291,6 +362,8 @@ refs.careerClear?.addEventListener("click",resetCareer);
 refs.complianceSearch?.addEventListener("input",()=>renderRows("compliance",complianceData));
 refs.teamSearch?.addEventListener("input",()=>renderRows("team",teamData));
 refs.careersSearch?.addEventListener("input",()=>renderRows("careers",careersData));
+refs.submissionSearch?.addEventListener("input",renderSubmissions);
+refs.submissionStatusFilter?.addEventListener("change",renderSubmissions);
 
 $("c-state")?.addEventListener("change",(e)=>{$("c-national").checked=e.target.value==="all-india"; previewCompliance();});
 $("j-type")?.addEventListener("change",(e)=>{$("j-intern").checked=["Internship","Articleship"].includes(e.target.value); previewCareer();});
