@@ -26,13 +26,20 @@ const refs = {
   metricComplianceTotal: $("metric-compliance-total"), metricTeamActive: $("metric-team-active"), metricCareersActive: $("metric-careers-active"),
   metricContactNew: $("metric-contact-new"), metricCareerNew: $("metric-career-new"),
   qaAddCompliance: $("qa-add-compliance"), qaAddTeam: $("qa-add-team"), qaViewSubmissions: $("qa-view-submissions"), qaUpdateSettings: $("qa-update-settings"),
+  themeToggle: $("theme-toggle"),
+  badgeOverviewContactNew: $("badge-overview-contact-new"), badgeOverviewCareerNew: $("badge-overview-career-new"), badgeOverviewCareersActive: $("badge-overview-careers-active"),
+  badgeTabSubmissionsNew: $("badge-tab-submissions-new"), badgeTabCareersActive: $("badge-tab-careers-active"),
+  badgeSubmissionsNew: $("badge-submissions-new"), badgeSubmissionsReviewed: $("badge-submissions-reviewed"), badgeCareersActive: $("badge-careers-active"),
+  exportComplianceCsv: $("export-compliance-csv"), exportCareersCsv: $("export-careers-csv"), exportContactCsv: $("export-contact-csv"), exportCareerSubmissionsCsv: $("export-career-submissions-csv"),
   toast: $("admin-toast"),
 };
 
 let teamImageObjectUrl = "";
 let teamCropSourceFile = null;
 let teamCropSourceUrl = "";
+let previousTeamImageUrl = "";
 let complianceData = [], teamData = [], careersData = [], contactSubmissionsData = [], careerSubmissionsData = [];
+const ADMIN_THEME_KEY = "admin_console_theme";
 const stateLabels = {"all-india":"All India","andhra-pradesh":"Andhra Pradesh",telangana:"Telangana","tamil-nadu":"Tamil Nadu",karnataka:"Karnataka",maharashtra:"Maharashtra",delhi:"Delhi",kerala:"Kerala","other-states":"Other States"};
 const BASELINE_COMPLIANCE_ITEMS = [
   { title:"GST Return Filing", category:"GST", state:"all-india", due_date:"10th / 11th of Every Month", frequency:"Monthly", applicable_to:"Registered taxpayers (as applicable)", description:"Monthly GST return filing and reconciliation.", status:"Upcoming", source_url:"GST portal / notification reference placeholder.", is_national:true, is_active:true, display_order:1, unique_key:"gst-return-filing" },
@@ -74,6 +81,83 @@ function toast(msg, ok = true) {
 const setMsg = (el, m, err=false)=>{ if(!el) return; el.textContent=m; el.style.color=err?"#b91c1c":"#334155"; toast(m, !err); };
 
 function busy(btn, on, text) { if (!btn) return; if (on) { btn.dataset.prev = btn.textContent; btn.textContent = text; btn.disabled = true; btn.style.opacity = ".7"; } else { btn.textContent = btn.dataset.prev || btn.textContent; btn.disabled = false; btn.style.opacity = ""; } }
+const isValidDate = (v) => !!v && !isNaN(new Date(v).getTime());
+const toDateStart = (v) => { const d = new Date(v); d.setHours(0,0,0,0); return d; };
+
+function complianceDueBadgeText(dueDate){
+  if (!isValidDate(dueDate)) return "No fixed date";
+  const today = toDateStart(new Date());
+  const due = toDateStart(dueDate);
+  const diffDays = Math.ceil((due.getTime() - today.getTime()) / 86400000);
+  if (diffDays < 0) return "Overdue";
+  if (diffDays <= 7) return "Due Soon";
+  return "Upcoming";
+}
+
+function statusBadge(status){
+  const s = String(status || "").toLowerCase();
+  if (s === "overdue") return `<span class="admin-badge danger">Overdue</span>`;
+  if (s === "due soon") return `<span class="admin-badge warn">Due Soon</span>`;
+  if (s === "upcoming") return `<span class="admin-badge">Upcoming</span>`;
+  return `<span class="admin-badge secondary">No fixed date</span>`;
+}
+
+function setBadge(el, value, suffix = ""){
+  if(!el) return;
+  const n = Number(value || 0);
+  if(n > 0){
+    el.textContent = `${n}${suffix}`;
+    el.classList.remove("hidden");
+  } else {
+    el.textContent = `0${suffix}`;
+    el.classList.add("hidden");
+  }
+}
+
+function setTheme(mode){
+  const dark = mode === "dark";
+  document.body.classList.toggle("admin-dark", dark);
+  if (refs.themeToggle) refs.themeToggle.textContent = dark ? "Light" : "Dark";
+  localStorage.setItem(ADMIN_THEME_KEY, dark ? "dark" : "light");
+}
+
+function initTheme(){
+  const stored = localStorage.getItem(ADMIN_THEME_KEY);
+  setTheme(stored === "dark" ? "dark" : "light");
+}
+
+function toCsvValue(v){
+  const s = String(v ?? "");
+  if(/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+function downloadCsv(filename, rows){
+  if(!rows?.length){ setMsg(refs.adminMsg, "No data available to export.", true); return; }
+  const csv = rows.map((r)=>r.map(toCsvValue).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function getTeamStoragePath(url){
+  if(!url) return null;
+  try {
+    const u = new URL(url);
+    const marker = "/storage/v1/object/public/team-images/";
+    const idx = u.pathname.indexOf(marker);
+    if(idx === -1) return null;
+    const raw = u.pathname.slice(idx + marker.length);
+    if(!raw) return null;
+    return decodeURIComponent(raw);
+  } catch { return null; }
+}
 
 function setAuth(on){ refs.loginPanel?.classList.toggle("hidden", on); refs.dashboard?.classList.toggle("hidden", !on); }
 
@@ -172,7 +256,7 @@ function renderRows(type, rows){
     const main = type==="team"
       ? `${r.image_url?`<img src='${esc(r.image_url)}' class='h-10 w-10 rounded-full object-cover inline-block mr-2'/>`:""}<strong>${esc(r.name||"-")}</strong><br/>${esc(r.designation||"-")}<br/>${esc(Array.isArray(r.tags)?r.tags.join(", "):(r.tags||""))}<br/>${esc(r.profile_description||"")}<br/>${badge(r.is_active!==false)}`
       : type==="compliance"
-      ? `<strong>${esc(r.title||"-")}</strong><br/>Category: ${esc(r.category||"-")} • State: ${esc(stateLabels[r.state]||r.state||"-")}<br/>Due: ${esc(r.due_date||"-")} • Frequency: ${esc(r.frequency||"-")}<br/>Status: ${esc(r.status||"-")} • ${badge(r.is_active!==false)}`
+      ? `<strong>${esc(r.title||"-")}</strong><br/>Category: ${esc(r.category||"-")} • State: ${esc(stateLabels[r.state]||r.state||"-")}<br/>Due: ${esc(r.due_date||"-")} • Frequency: ${esc(r.frequency||"-")}<br/>Status: ${esc(r.status||"-")} • ${statusBadge(complianceDueBadgeText(r.due_date))} • ${badge(r.is_active!==false)}`
       : `<strong>${esc(r.title||"-")}</strong><br/>${esc(r.employment_type||"-")} • ${esc(r.experience_level||"-")} • ${r.is_internship?"Internship":"Job"}<br/>${badge(r.is_active!==false)}`;
     el.innerHTML=`<div class='text-sm subtitle'>${main}${rowMeta(r)}</div><div class='flex flex-col gap-2'><button class='btn-secondary' data-a='up'>↑</button><button class='btn-secondary' data-a='down'>↓</button><button class='btn-secondary' data-a='edit'>Edit</button><button class='btn-secondary' data-a='del'>Delete</button></div>`;
     const btn=(a)=>el.querySelector(`[data-a='${a}']`);
@@ -189,7 +273,7 @@ function renderRows(type, rows){
 
 function editRow(type,r,scrollToForm=false){
   if(type==="compliance"){ $("compliance-id").value=r.id||""; $("c-title").value=r.title||""; $("c-category").value=r.category||""; $("c-state").value=r.state||""; $("c-due-date").value=r.due_date||""; $("c-frequency").value=r.frequency||""; $("c-applicable").value=r.applicable_to||""; $("c-description").value=r.description||""; $("c-status").value=r.status||"Indicative"; $("c-source").value=r.source_url||""; $("c-national").checked=!!r.is_national; $("c-active").checked=r.is_active!==false; refs.complianceSubmit.textContent="Update Compliance Item"; previewCompliance(); if (scrollToForm) refs.complianceForm?.scrollIntoView({behavior:"smooth", block:"start"}); }
-  if(type==="team"){ $("team-id").value=r.id||""; $("t-name").value=r.name||""; $("t-designation").value=r.designation||""; $("t-bio").value=r.bio||""; $("t-profile-description").value=r.profile_description||""; $("t-image").value=r.image_url||""; $("t-tags").value=Array.isArray(r.tags)?r.tags.join(", "):(r.tags||""); $("t-order").value=r.display_order||""; $("t-active").checked=r.is_active!==false; teamImageObjectUrl=r.image_url||""; teamCropSourceUrl=r.image_url||""; updateCropPreview(); refs.teamSubmit.textContent="Update Team Member"; previewTeam(); }
+  if(type==="team"){ $("team-id").value=r.id||""; $("t-name").value=r.name||""; $("t-designation").value=r.designation||""; $("t-bio").value=r.bio||""; $("t-profile-description").value=r.profile_description||""; $("t-image").value=r.image_url||""; $("t-tags").value=Array.isArray(r.tags)?r.tags.join(", "):(r.tags||""); $("t-order").value=r.display_order||""; $("t-active").checked=r.is_active!==false; teamImageObjectUrl=r.image_url||""; previousTeamImageUrl=r.image_url||""; teamCropSourceUrl=r.image_url||""; updateCropPreview(); refs.teamSubmit.textContent="Update Team Member"; previewTeam(); }
   if(type==="careers"){ $("career-id").value=r.id||""; $("j-title").value=r.title||""; $("j-type").value=r.employment_type||"Full-time"; $("j-exp").value=r.experience_level||"Fresher"; $("j-location").value=r.location||""; $("j-description").value=r.description||""; $("j-requirements").value=r.requirements||""; $("j-intern").checked=!!r.is_internship; $("j-active").checked=r.is_active!==false; refs.careerSubmit.textContent="Update Career Opening"; previewCareer(); }
 }
 
@@ -240,11 +324,28 @@ async function loadSubmissions(){
 async function loadAll(){ await Promise.all([loadCompliance(),loadTeam(),loadCareers(),loadSettings(),loadSubmissions()]); }
 
 function renderOverviewMetrics(){
-  if (refs.metricComplianceTotal) refs.metricComplianceTotal.textContent = String(complianceData.length || 0);
-  if (refs.metricTeamActive) refs.metricTeamActive.textContent = String((teamData || []).filter((r)=>r.is_active !== false).length);
-  if (refs.metricCareersActive) refs.metricCareersActive.textContent = String((careersData || []).filter((r)=>r.is_active !== false).length);
-  if (refs.metricContactNew) refs.metricContactNew.textContent = String((contactSubmissionsData || []).filter((r)=>String(r.status || "new").toLowerCase() === "new").length);
-  if (refs.metricCareerNew) refs.metricCareerNew.textContent = String((careerSubmissionsData || []).filter((r)=>String(r.status || "new").toLowerCase() === "new").length);
+  const complianceTotal = complianceData.length || 0;
+  const teamActive = (teamData || []).filter((r)=>r.is_active !== false).length;
+  const careersActive = (careersData || []).filter((r)=>r.is_active !== false).length;
+  const contactNew = (contactSubmissionsData || []).filter((r)=>String(r.status || "new").toLowerCase() === "new").length;
+  const careerNew = (careerSubmissionsData || []).filter((r)=>String(r.status || "new").toLowerCase() === "new").length;
+  const reviewedTotal = [...contactSubmissionsData, ...careerSubmissionsData].filter((r)=>String(r.status || "").toLowerCase() === "reviewed").length;
+  const submissionsNew = contactNew + careerNew;
+
+  if (refs.metricComplianceTotal) refs.metricComplianceTotal.textContent = String(complianceTotal);
+  if (refs.metricTeamActive) refs.metricTeamActive.textContent = String(teamActive);
+  if (refs.metricCareersActive) refs.metricCareersActive.textContent = String(careersActive);
+  if (refs.metricContactNew) refs.metricContactNew.textContent = String(contactNew);
+  if (refs.metricCareerNew) refs.metricCareerNew.textContent = String(careerNew);
+
+  setBadge(refs.badgeOverviewCareersActive, careersActive);
+  setBadge(refs.badgeOverviewContactNew, contactNew);
+  setBadge(refs.badgeOverviewCareerNew, careerNew);
+  setBadge(refs.badgeTabCareersActive, careersActive);
+  setBadge(refs.badgeCareersActive, careersActive);
+  setBadge(refs.badgeTabSubmissionsNew, submissionsNew);
+  setBadge(refs.badgeSubmissionsNew, submissionsNew);
+  setBadge(refs.badgeSubmissionsReviewed, reviewedTotal, " reviewed");
 }
 
 function renderSubmissions(){
@@ -300,6 +401,7 @@ function renderSubmissions(){
       });
     });
   });
+  renderOverviewMetrics();
 }
 
 const normTitle = (v="") => String(v).trim().toLowerCase().replace(/\s+/g," ");
@@ -353,9 +455,9 @@ async function importBaselineComplianceItems(){
 
 async function saveCompliance(e){ e.preventDefault(); if(refs.complianceSubmit.disabled) return; const id=$("compliance-id").value; busy(refs.complianceSubmit,true,id?"Updating...":"Saving..."); try{ const payload={title:$("c-title").value,category:$("c-category").value,state:$("c-state").value,due_date:$("c-due-date").value,frequency:$("c-frequency").value,applicable_to:$("c-applicable").value,description:$("c-description").value,status:$("c-status").value,source_url:$("c-source").value,is_national:$("c-national").checked,is_active:$("c-active").checked}; const {error}=id?await supabaseClient.from("compliance_calendar").update(payload).eq("id",id):await supabaseClient.from("compliance_calendar").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,id?"Compliance updated.":"Compliance added."); resetCompliance(); await loadCompliance(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.complianceSubmit,false);} }
 
-async function saveTeam(e){ e.preventDefault(); if(refs.teamSubmit.disabled) return; const id=$("team-id").value; busy(refs.teamSubmit,true,id?"Updating...":"Saving..."); try{ const tagsArray=(($("t-tags").value)||"").split(",").map(t=>t.trim()).filter(Boolean); const uploaded=await uploadTeamImageIfSelected(); const payload={name:$("t-name").value,designation:$("t-designation").value,bio:$("t-bio").value,profile_description:$("t-profile-description").value,image_url:uploaded || $("t-image").value,tags:tagsArray,display_order:Number($("t-order").value||0),is_active:$("t-active").checked}; const {error}=id?await supabaseClient.from("team_members").update(payload).eq("id",id):await supabaseClient.from("team_members").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,id?"Team member updated.":"Team member added."); resetTeam(); await loadTeam(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.teamSubmit,false);} }
+async function saveTeam(e){ e.preventDefault(); if(refs.teamSubmit.disabled) return; const id=$("team-id").value; busy(refs.teamSubmit,true,id?"Updating...":"Saving..."); try{ const tagsArray=(($("t-tags").value)||"").split(",").map(t=>t.trim()).filter(Boolean); const uploaded=await uploadTeamImageIfSelected(); const newImageUrl = uploaded || $("t-image").value; const payload={name:$("t-name").value,designation:$("t-designation").value,bio:$("t-bio").value,profile_description:$("t-profile-description").value,image_url:newImageUrl,tags:tagsArray,display_order:Number($("t-order").value||0),is_active:$("t-active").checked}; const {error}=id?await supabaseClient.from("team_members").update(payload).eq("id",id):await supabaseClient.from("team_members").insert([payload]); if(error) throw error; if(id){ const oldPath = getTeamStoragePath(previousTeamImageUrl); const newPath = getTeamStoragePath(newImageUrl); if(oldPath && newPath && oldPath !== newPath){ const { error: removeErr } = await supabaseClient.storage.from("team-images").remove([oldPath]); if(removeErr) setMsg(refs.adminMsg, "Team updated. Old image cleanup warning: " + removeErr.message, true); } } setMsg(refs.adminMsg,id?"Team member updated.":"Team member added."); previousTeamImageUrl = ""; resetTeam(); await loadTeam(); renderOverviewMetrics(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.teamSubmit,false);} }
 
-async function saveCareer(e){ e.preventDefault(); if(refs.careerSubmit.disabled) return; const id=$("career-id").value; busy(refs.careerSubmit,true,id?"Updating...":"Saving..."); try{ const payload={title:$("j-title").value,employment_type:$("j-type").value,experience_level:$("j-exp").value,location:$("j-location").value,description:$("j-description").value,requirements:$("j-requirements").value,is_internship:$("j-intern").checked,is_active:$("j-active").checked}; const {error}=id?await supabaseClient.from("career_openings").update(payload).eq("id",id):await supabaseClient.from("career_openings").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,id?"Career updated.":"Career added."); resetCareer(); await loadCareers(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.careerSubmit,false);} }
+async function saveCareer(e){ e.preventDefault(); if(refs.careerSubmit.disabled) return; const id=$("career-id").value; busy(refs.careerSubmit,true,id?"Updating...":"Saving..."); try{ const payload={title:$("j-title").value,employment_type:$("j-type").value,experience_level:$("j-exp").value,location:$("j-location").value,description:$("j-description").value,requirements:$("j-requirements").value,is_internship:$("j-intern").checked,is_active:$("j-active").checked}; const {error}=id?await supabaseClient.from("career_openings").update(payload).eq("id",id):await supabaseClient.from("career_openings").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,id?"Career updated.":"Career added."); resetCareer(); await loadCareers(); renderOverviewMetrics(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.careerSubmit,false);} }
 
 async function saveSettings(e){ e.preventDefault(); const btn=refs.settingsForm?.querySelector("button[type='submit']"); busy(btn,true,"Saving..."); try{ const id=$("s-id").value; const payload={phone:$("s-phone").value,email:$("s-email").value,whatsapp:$("s-whatsapp").value,address:$("s-address").value,map_link:$("s-map").value,footer_text:$("s-footer").value}; const {error}=id?await supabaseClient.from("site_settings").update(payload).eq("id",id):await supabaseClient.from("site_settings").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,"Site settings saved."); await loadSettings(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(btn,false);} }
 
@@ -383,6 +485,27 @@ refs.qaAddCompliance?.addEventListener("click", ()=>{ switchTab("compliance"); r
 refs.qaAddTeam?.addEventListener("click", ()=>{ switchTab("team"); refs.teamForm?.scrollIntoView({behavior:"smooth", block:"start"}); $("t-name")?.focus(); });
 refs.qaViewSubmissions?.addEventListener("click", ()=>{ switchTab("submissions"); refs.submissionSearch?.focus(); });
 refs.qaUpdateSettings?.addEventListener("click", ()=>{ switchTab("settings"); refs.settingsForm?.scrollIntoView({behavior:"smooth", block:"start"}); $("s-phone")?.focus(); });
+refs.themeToggle?.addEventListener("click", ()=>{ const dark = document.body.classList.contains("admin-dark"); setTheme(dark ? "light" : "dark"); });
+refs.exportComplianceCsv?.addEventListener("click", ()=>{
+  const rows = [["Title","Category","State","Due Date","Frequency","Applicable To","Status","Is Active","Created At"]];
+  complianceData.forEach((r)=>rows.push([r.title,r.category,stateLabels[r.state]||r.state,r.due_date,r.frequency,r.applicable_to,r.status,r.is_active!==false?"Yes":"No",r.created_at]));
+  downloadCsv("compliance-calendar.csv", rows);
+});
+refs.exportCareersCsv?.addEventListener("click", ()=>{
+  const rows = [["Title","Type","Experience","Location","Internship","Active","Created At"]];
+  careersData.forEach((r)=>rows.push([r.title,r.employment_type,r.experience_level,r.location,r.is_internship?"Yes":"No",r.is_active!==false?"Yes":"No",r.created_at]));
+  downloadCsv("career-openings.csv", rows);
+});
+refs.exportContactCsv?.addEventListener("click", ()=>{
+  const rows = [["Name","Email","Phone","Service","Message","Status","Created At"]];
+  contactSubmissionsData.forEach((r)=>rows.push([r.name,r.email,r.phone,r.service,r.message,r.status,r.created_at]));
+  downloadCsv("contact-submissions.csv", rows);
+});
+refs.exportCareerSubmissionsCsv?.addEventListener("click", ()=>{
+  const rows = [["Name","Email","Phone","Position","Experience","Resume Link","Message","Status","Created At"]];
+  careerSubmissionsData.forEach((r)=>rows.push([r.name,r.email,r.phone,r.position,r.experience,r.resume_link,r.message,r.status,r.created_at]));
+  downloadCsv("career-applications.csv", rows);
+});
 
 $("c-state")?.addEventListener("change",(e)=>{$("c-national").checked=e.target.value==="all-india"; previewCompliance();});
 $("j-type")?.addEventListener("change",(e)=>{$("j-intern").checked=["Internship","Articleship"].includes(e.target.value); previewCareer();});
@@ -407,4 +530,5 @@ refs.tImageFile?.addEventListener("change", async ()=>{
 document.querySelectorAll(".tab-btn").forEach((b)=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
 
 previewCompliance(); previewTeam(); previewCareer(); previewSettings();
+initTheme();
 ensureSession();

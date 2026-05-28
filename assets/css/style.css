@@ -284,6 +284,99 @@ footer a {
   backdrop-filter: blur(8px);
 }
 
+.admin-console .admin-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 .45rem;
+  border-radius: 999px;
+  font-size: .68rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  background: #0f2747;
+  margin-left: .35rem;
+  vertical-align: middle;
+}
+
+.admin-console .admin-badge.secondary {
+  background: #64748b;
+}
+
+.admin-console .admin-badge.warn {
+  background: #b45309;
+}
+
+.admin-console .admin-badge.danger {
+  background: #b91c1c;
+}
+
+.admin-console.admin-dark {
+  --line: rgba(148, 163, 184, 0.24);
+  --text: #d7e3f3;
+  --muted: #9eb2cc;
+  --bg-soft: #0d1a2d;
+  background:
+    radial-gradient(900px 420px at 10% -18%, #1a2f4f 0%, transparent 55%),
+    radial-gradient(900px 420px at 100% -22%, #162a46 0%, transparent 55%),
+    #0d1a2d;
+}
+
+.admin-console.admin-dark .card,
+.admin-console.admin-dark .stat-card,
+.admin-console.admin-dark .form-card,
+.admin-console.admin-dark .service-card,
+.admin-console.admin-dark .team-card,
+.admin-console.admin-dark .calendar-card {
+  background: #12233c;
+  border-color: rgba(148,163,184,.24);
+  color: #d7e3f3;
+}
+
+.admin-console.admin-dark .heading-lg,
+.admin-console.admin-dark .text-navy,
+.admin-console.admin-dark h1,
+.admin-console.admin-dark h2,
+.admin-console.admin-dark h3,
+.admin-console.admin-dark h4,
+.admin-console.admin-dark strong {
+  color: #e6f0ff !important;
+}
+
+.admin-console.admin-dark .subtitle,
+.admin-console.admin-dark p,
+.admin-console.admin-dark .text-slate-500,
+.admin-console.admin-dark .text-slate-600,
+.admin-console.admin-dark .text-slate-700 {
+  color: #9eb2cc !important;
+}
+
+.admin-console.admin-dark .contact-input,
+.admin-console.admin-dark .contact-textarea,
+.admin-console.admin-dark select {
+  background: #0f1f34;
+  border-color: rgba(148,163,184,.3);
+  color: #e4efff;
+}
+
+.admin-console.admin-dark .btn-secondary {
+  background: #0f1f34;
+  color: #dbe9ff;
+  border-color: rgba(148,163,184,.35);
+}
+
+.admin-console.admin-dark .btn-secondary:hover {
+  background: #162a46;
+  border-color: #c8a96b;
+}
+
+.admin-console.admin-dark #admin-tabs {
+  background: #101f35;
+  border-color: rgba(148,163,184,.28);
+}
+
 @media (max-width: 767px) {
   .admin-console #admin-tabs {
     display: grid;

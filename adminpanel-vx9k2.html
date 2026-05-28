@@ -43,16 +43,19 @@
                   <p class="text-xs font-semibold tracking-wide text-gold">Internal Admin Console</p>
                 </div>
               </div>
-              <button id="logout-btn" class="btn-secondary">Logout</button>
+              <div class="flex items-center gap-2">
+                <button id="theme-toggle" class="btn-secondary" type="button">Dark</button>
+                <button id="logout-btn" class="btn-secondary">Logout</button>
+              </div>
             </div>
 
             <div id="admin-tabs" class="mt-4 flex flex-wrap gap-2">
               <button class="btn-primary tab-btn" data-tab="overview">Overview</button>
               <button class="btn-secondary tab-btn" data-tab="compliance">Compliance Calendar</button>
               <button class="btn-secondary tab-btn" data-tab="team">Team Members</button>
-              <button class="btn-secondary tab-btn" data-tab="careers">Careers</button>
+              <button class="btn-secondary tab-btn" data-tab="careers">Careers <span id="badge-tab-careers-active" class="admin-badge hidden">0</span></button>
               <button class="btn-secondary tab-btn" data-tab="settings">Site Settings</button>
-              <button class="btn-secondary tab-btn" data-tab="submissions">Form Submissions</button>
+              <button class="btn-secondary tab-btn" data-tab="submissions">Form Submissions <span id="badge-tab-submissions-new" class="admin-badge hidden">0</span></button>
             </div>
 
             <p id="admin-message" class="subtitle text-sm mt-3"></p>
@@ -65,15 +68,21 @@
               <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                 <article class="stat-card lift"><p class="text-xs text-gold font-semibold">Compliance</p><p id="metric-compliance-total" class="stat-value mt-1">0</p><p class="subtitle text-xs">Total Compliance Items</p></article>
                 <article class="stat-card lift"><p class="text-xs text-gold font-semibold">Team</p><p id="metric-team-active" class="stat-value mt-1">0</p><p class="subtitle text-xs">Active Team Members</p></article>
-                <article class="stat-card lift"><p class="text-xs text-gold font-semibold">Careers</p><p id="metric-careers-active" class="stat-value mt-1">0</p><p class="subtitle text-xs">Active Career Openings</p></article>
-                <article class="stat-card lift"><p class="text-xs text-gold font-semibold">Inquiries</p><p id="metric-contact-new" class="stat-value mt-1">0</p><p class="subtitle text-xs">New Contact Inquiries</p></article>
-                <article class="stat-card lift"><p class="text-xs text-gold font-semibold">Applications</p><p id="metric-career-new" class="stat-value mt-1">0</p><p class="subtitle text-xs">New Career Applications</p></article>
+                <article class="stat-card lift"><p class="text-xs text-gold font-semibold">Careers <span id="badge-overview-careers-active" class="admin-badge hidden">0</span></p><p id="metric-careers-active" class="stat-value mt-1">0</p><p class="subtitle text-xs">Active Career Openings</p></article>
+                <article class="stat-card lift"><p class="text-xs text-gold font-semibold">Inquiries <span id="badge-overview-contact-new" class="admin-badge hidden">0</span></p><p id="metric-contact-new" class="stat-value mt-1">0</p><p class="subtitle text-xs">New Contact Inquiries</p></article>
+                <article class="stat-card lift"><p class="text-xs text-gold font-semibold">Applications <span id="badge-overview-career-new" class="admin-badge hidden">0</span></p><p id="metric-career-new" class="stat-value mt-1">0</p><p class="subtitle text-xs">New Career Applications</p></article>
               </div>
               <div class="mt-4 flex flex-wrap gap-2">
                 <button id="qa-add-compliance" class="btn-secondary" type="button">Add Compliance Item</button>
                 <button id="qa-add-team" class="btn-secondary" type="button">Add Team Member</button>
                 <button id="qa-view-submissions" class="btn-secondary" type="button">View Submissions</button>
                 <button id="qa-update-settings" class="btn-secondary" type="button">Update Settings</button>
+              </div>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <button id="export-compliance-csv" class="btn-secondary" type="button">Export Compliance Calendar CSV</button>
+                <button id="export-careers-csv" class="btn-secondary" type="button">Export Careers CSV</button>
+                <button id="export-contact-csv" class="btn-secondary" type="button">Export Contact Submissions CSV</button>
+                <button id="export-career-submissions-csv" class="btn-secondary" type="button">Export Career Applications CSV</button>
               </div>
             </div>
 
@@ -148,7 +157,7 @@
             </div>
 
             <div id="tab-careers" class="tab-panel mt-5 hidden">
-              <h3 class="font-bold text-navy text-lg">Careers</h3>
+              <h3 class="font-bold text-navy text-lg">Careers <span id="badge-careers-active" class="admin-badge hidden">0</span></h3>
               <form id="career-form" class="mt-3 grid gap-3 sm:grid-cols-2">
                 <input type="hidden" id="career-id" />
                 <input class="contact-input" id="j-title" placeholder="title" required />
@@ -170,7 +179,7 @@
             </div>
 
             <div id="tab-submissions" class="tab-panel mt-5 hidden">
-              <h3 class="font-bold text-navy text-lg">Form Submissions</h3>
+              <h3 class="font-bold text-navy text-lg">Form Submissions <span id="badge-submissions-new" class="admin-badge hidden">0</span> <span id="badge-submissions-reviewed" class="admin-badge secondary hidden">0 reviewed</span></h3>
               <div class="mt-3 grid gap-3 sm:grid-cols-2">
                 <input id="submission-search" class="contact-input" placeholder="Search name/email/phone/message" />
                 <select id="submission-status-filter" class="contact-input">
