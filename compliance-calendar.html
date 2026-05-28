@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Website designed and developed by Varada Nexus Private Limited | https://www.varadanexus.com -->
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compliance Calendar | K Srinu and Associates</title>
+    <meta
+      name="description"
+      content="Important statutory due dates for GST, Income Tax, TDS, ROC, Professional Tax, and business compliance."
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { theme: { extend: { colors: { navy: "#0f2747", gold: "#b99746" } } } };
+    </script>
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
+  <body>
+    <header id="site-header" class="fixed top-0 z-50 w-full bg-white/90 transition-all duration-300">
+      <nav class="container-premium flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8" aria-label="Main Navigation">
+        <a href="index.html" class="brand text-lg">K Srinu <span class="brand-accent">&</span> Associates</a>
+        <button id="menu-btn" class="rounded-md border border-slate-200 px-3 py-2 md:hidden" aria-expanded="false" aria-label="Toggle menu">☰</button>
+        <ul class="hidden gap-8 md:flex">
+          <li><a class="nav-link" href="index.html">Home</a></li>
+          <li><a class="nav-link" href="about.html">About</a></li>
+          <li><a class="nav-link" href="services.html">Services</a></li>
+          <li><a class="nav-link" href="team.html">Team</a></li>
+          <li><a class="nav-link" href="careers.html">Careers</a></li>
+          <li><a class="nav-link active" href="compliance-calendar.html">Compliance Calendar</a></li>
+          <li><a class="nav-link" href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+      <div id="mobile-menu" class="mx-4 mb-4 hidden rounded-xl border border-slate-200 bg-white p-4 md:hidden">
+        <a class="mobile-link" href="index.html">Home</a>
+        <a class="mobile-link" href="about.html">About</a>
+        <a class="mobile-link" href="services.html">Services</a>
+        <a class="mobile-link" href="team.html">Team</a>
+        <a class="mobile-link" href="careers.html">Careers</a>
+        <a class="mobile-link" href="compliance-calendar.html">Compliance Calendar</a>
+        <a class="mobile-link" href="contact.html">Contact</a>
+      </div>
+    </header>
+
+    <main class="pt-24">
+      <section class="section-tight px-4 sm:px-6 lg:px-8">
+        <div class="container-premium hero-shell p-6 sm:p-8 lg:p-10 reveal">
+          <p class="breadcrumb"><a href="index.html">Home</a> / Compliance Calendar</p>
+          <h1 class="heading-xl mt-3">Compliance Calendar</h1>
+          <p class="subtitle mt-4 max-w-4xl">
+            Important statutory due dates for GST, Income Tax, TDS, ROC, Professional Tax, and business compliance.
+          </p>
+        </div>
+      </section>
+
+      <section class="section-tight px-4 sm:px-6 lg:px-8">
+        <div class="container-premium">
+          <div class="reveal">
+            <label for="state-selector" class="block text-sm font-semibold text-navy mb-2">State Selector</label>
+            <select id="state-selector" class="contact-input max-w-sm">
+              <option value="all-india">All India</option>
+              <option value="andhra-pradesh">Andhra Pradesh</option>
+              <option value="telangana">Telangana</option>
+              <option value="tamil-nadu">Tamil Nadu</option>
+              <option value="karnataka">Karnataka</option>
+              <option value="maharashtra">Maharashtra</option>
+              <option value="delhi">Delhi</option>
+              <option value="kerala">Kerala</option>
+              <option value="other-states">Other States</option>
+            </select>
+          </div>
+
+          <div class="flex flex-wrap gap-2 mt-4 reveal" id="calendar-filters">
+            <button class="btn-primary filter-btn" data-filter="all">All</button>
+            <button class="btn-secondary filter-btn" data-filter="gst">GST</button>
+            <button class="btn-secondary filter-btn" data-filter="income-tax">Income Tax</button>
+            <button class="btn-secondary filter-btn" data-filter="tds">TDS</button>
+            <button class="btn-secondary filter-btn" data-filter="roc">ROC</button>
+            <button class="btn-secondary filter-btn" data-filter="professional-tax">Professional Tax</button>
+            <button class="btn-secondary filter-btn" data-filter="business-compliance">Business Compliance</button>
+          </div>
+
+          <p id="filter-result-count" class="subtitle text-sm mt-3 reveal">Showing 0 compliance items</p>
+
+          <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" id="compliance-cards">
+            <article class="calendar-card lift reveal" data-category="gst" data-state="all-india"><span class="calendar-date">10th / 11th of Every Month</span><span class="trust-chip ml-2">Upcoming</span><h3 class="mt-3 font-bold text-navy">GST Return Filing</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> GST</p><p class="subtitle text-sm"><strong>State applicability:</strong> All India (National)</p><p class="subtitle text-sm"><strong>Applicable to:</strong> Registered taxpayers (as applicable)</p><p class="subtitle text-sm"><strong>Description:</strong> Monthly GST return filing and reconciliation.</p><p class="subtitle text-sm"><strong>Source note:</strong> GST portal / notification reference placeholder.</p></article>
+            <article class="calendar-card lift reveal" data-category="gst" data-state="all-india"><span class="calendar-date">31 Dec (typically)</span><span class="trust-chip ml-2">Important</span><h3 class="mt-3 font-bold text-navy">GST Annual Return</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> GST</p><p class="subtitle text-sm"><strong>State applicability:</strong> All India (National)</p><p class="subtitle text-sm"><strong>Applicable to:</strong> Eligible GST entities</p><p class="subtitle text-sm"><strong>Description:</strong> Annual GST return and turnover-based applicability checks.</p><p class="subtitle text-sm"><strong>Source note:</strong> GST annual return circular placeholder.</p></article>
+            <article class="calendar-card lift reveal" data-category="tds" data-state="all-india"><span class="calendar-date">7th of Every Month</span><span class="trust-chip ml-2">Important</span><h3 class="mt-3 font-bold text-navy">TDS Payment</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> TDS</p><p class="subtitle text-sm"><strong>State applicability:</strong> All India (National)</p><p class="subtitle text-sm"><strong>Applicable to:</strong> TDS deductors</p><p class="subtitle text-sm"><strong>Description:</strong> Timely deposit of TDS deductions.</p><p class="subtitle text-sm"><strong>Source note:</strong> Income Tax portal due date placeholder.</p></article>
+            <article class="calendar-card lift reveal" data-category="tds" data-state="all-india"><span class="calendar-date">Quarterly</span><span class="trust-chip ml-2">Upcoming</span><h3 class="mt-3 font-bold text-navy">TDS Return Filing</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> TDS</p><p class="subtitle text-sm"><strong>State applicability:</strong> All India (National)</p><p class="subtitle text-sm"><strong>Applicable to:</strong> Employers / deductors</p><p class="subtitle text-sm"><strong>Description:</strong> Quarterly filing of TDS statements and validation.</p><p class="subtitle text-sm"><strong>Source note:</strong> Form-wise return schedule placeholder.</p></article>
+            <article class="calendar-card lift reveal" data-category="income-tax" data-state="all-india"><span class="calendar-date">31 Jul / 31 Oct</span><span class="trust-chip ml-2">Important</span><h3 class="mt-3 font-bold text-navy">Income Tax Return Filing</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> Income Tax</p><p class="subtitle text-sm"><strong>State applicability:</strong> All India (National)</p><p class="subtitle text-sm"><strong>Applicable to:</strong> Individuals, firms, companies</p><p class="subtitle text-sm"><strong>Description:</strong> Return filing by taxpayer class and audit applicability.</p><p class="subtitle text-sm"><strong>Source note:</strong> CBDT due date extension placeholder.</p></article>
+            <article class="calendar-card lift reveal" data-category="income-tax" data-state="all-india"><span class="calendar-date">15 Jun / 15 Sep / 15 Dec / 15 Mar</span><span class="trust-chip ml-2">Upcoming</span><h3 class="mt-3 font-bold text-navy">Advance Tax</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> Income Tax</p><p class="subtitle text-sm"><strong>State applicability:</strong> All India (National)</p><p class="subtitle text-sm"><strong>Applicable to:</strong> Eligible advance-tax assessees</p><p class="subtitle text-sm"><strong>Description:</strong> Quarterly installments as per mandated percentages.</p><p class="subtitle text-sm"><strong>Source note:</strong> Advance tax compliance reference placeholder.</p></article>
+            <article class="calendar-card lift reveal" data-category="income-tax" data-state="all-india"><span class="calendar-date">30 Sep / 31 Oct (as notified)</span><span class="trust-chip ml-2">Important</span><h3 class="mt-3 font-bold text-navy">Tax Audit Report</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> Income Tax</p><p class="subtitle text-sm"><strong>State applicability:</strong> All India (National)</p><p class="subtitle text-sm"><strong>Applicable to:</strong> Audit-eligible businesses/professionals</p><p class="subtitle text-sm"><strong>Description:</strong> Report upload before applicable return deadlines.</p><p class="subtitle text-sm"><strong>Source note:</strong> Section 44AB / utility release placeholder.</p></article>
+            <article class="calendar-card lift reveal" data-category="roc" data-state="all-india"><span class="calendar-date">As per MCA Schedule</span><span class="trust-chip ml-2">Indicative</span><h3 class="mt-3 font-bold text-navy">ROC Annual Filing</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> ROC</p><p class="subtitle text-sm"><strong>State applicability:</strong> All India (National)</p><p class="subtitle text-sm"><strong>Applicable to:</strong> Companies and LLPs</p><p class="subtitle text-sm"><strong>Description:</strong> Annual forms, statements and statutory records filing.</p><p class="subtitle text-sm"><strong>Source note:</strong> MCA filing calendar placeholder.</p></article>
+            <article class="calendar-card lift reveal" data-category="roc" data-state="all-india"><span class="calendar-date">30 Sep (typical)</span><span class="trust-chip ml-2">Important</span><h3 class="mt-3 font-bold text-navy">Director KYC</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> ROC</p><p class="subtitle text-sm"><strong>State applicability:</strong> All India (National)</p><p class="subtitle text-sm"><strong>Applicable to:</strong> Directors with DIN</p><p class="subtitle text-sm"><strong>Description:</strong> Annual DIR-3 KYC filing and status validation.</p><p class="subtitle text-sm"><strong>Source note:</strong> MCA KYC update placeholder.</p></article>
+            <article class="calendar-card lift reveal" data-category="business-compliance" data-state="all-india"><span class="calendar-date">Monthly / Quarterly / Annual</span><span class="trust-chip ml-2">Indicative</span><h3 class="mt-3 font-bold text-navy">MSME Compliance Reminders</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> Business Compliance</p><p class="subtitle text-sm"><strong>State applicability:</strong> All India (National)</p><p class="subtitle text-sm"><strong>Applicable to:</strong> MSMEs, startups, growing entities</p><p class="subtitle text-sm"><strong>Description:</strong> Monitor key registrations, returns and declaration timelines.</p><p class="subtitle text-sm"><strong>Source note:</strong> Industry checklist placeholder.</p></article>
+
+            <article class="calendar-card lift reveal" data-category="professional-tax" data-state="andhra-pradesh,telangana,tamil-nadu,karnataka,maharashtra,kerala,other-states"><span class="calendar-date">State-wise Monthly/Periodical</span><span class="trust-chip ml-2">Indicative</span><h3 class="mt-3 font-bold text-navy">Professional Tax Filing</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> Professional Tax</p><p class="subtitle text-sm"><strong>State applicability:</strong> AP, Telangana, Tamil Nadu, Karnataka, Maharashtra, Kerala, Other States</p><p class="subtitle text-sm"><strong>Applicable to:</strong> Employers / professionals under PT law</p><p class="subtitle text-sm"><strong>Description:</strong> State-wise PT payment and return compliance.</p><p class="subtitle text-sm"><strong>Source note:</strong> State PT portal reference placeholder.</p></article>
+            <article class="calendar-card lift reveal" data-category="business-compliance" data-state="andhra-pradesh,telangana,tamil-nadu,karnataka,maharashtra,delhi,kerala,other-states"><span class="calendar-date">Annual / As per license</span><span class="trust-chip ml-2">Upcoming</span><h3 class="mt-3 font-bold text-navy">Shops & Establishments Renewal</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> Business Compliance</p><p class="subtitle text-sm"><strong>State applicability:</strong> State-specific</p><p class="subtitle text-sm"><strong>Applicable to:</strong> Commercial establishments</p><p class="subtitle text-sm"><strong>Description:</strong> Renewal/registration obligations under local shops act.</p><p class="subtitle text-sm"><strong>Source note:</strong> Labour department notice placeholder.</p></article>
+            <article class="calendar-card lift reveal" data-category="business-compliance" data-state="karnataka,maharashtra,telangana,tamil-nadu,kerala,other-states"><span class="calendar-date">Half-yearly / Annual (state specific)</span><span class="trust-chip ml-2">Indicative</span><h3 class="mt-3 font-bold text-navy">Labour Welfare Fund</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> Business Compliance</p><p class="subtitle text-sm"><strong>State applicability:</strong> Selected states</p><p class="subtitle text-sm"><strong>Applicable to:</strong> Eligible employers and employees</p><p class="subtitle text-sm"><strong>Description:</strong> Welfare fund remittance and statutory deduction checks.</p><p class="subtitle text-sm"><strong>Source note:</strong> State LWF circular placeholder.</p></article>
+            <article class="calendar-card lift reveal" data-category="business-compliance" data-state="all-india"><span class="calendar-date">Half-yearly (commonly)</span><span class="trust-chip ml-2">Important</span><h3 class="mt-3 font-bold text-navy">ESI Return</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> Business Compliance</p><p class="subtitle text-sm"><strong>State applicability:</strong> All India (where ESI applicable)</p><p class="subtitle text-sm"><strong>Applicable to:</strong> ESI-registered employers</p><p class="subtitle text-sm"><strong>Description:</strong> Return filing and contribution reconciliation.</p><p class="subtitle text-sm"><strong>Source note:</strong> ESIC compliance note placeholder.</p></article>
+            <article class="calendar-card lift reveal" data-category="business-compliance" data-state="all-india"><span class="calendar-date">15th of Every Month</span><span class="trust-chip ml-2">Upcoming</span><h3 class="mt-3 font-bold text-navy">PF Payment</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> Business Compliance</p><p class="subtitle text-sm"><strong>State applicability:</strong> All India (where PF applicable)</p><p class="subtitle text-sm"><strong>Applicable to:</strong> EPF-covered establishments</p><p class="subtitle text-sm"><strong>Description:</strong> Monthly PF contribution payment and challan compliance.</p><p class="subtitle text-sm"><strong>Source note:</strong> EPFO due date placeholder.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-tight px-4 sm:px-6 lg:px-8">
+        <div class="container-premium card p-6 reveal">
+          <p class="subtitle text-sm">
+            Compliance dates are provided for general information and may change based on statutory notifications, taxpayer category, and government updates. Please confirm with K Srinu and Associates before filing.
+          </p>
+          <p class="subtitle text-sm mt-3">
+            State-specific compliance dates may vary based on local notifications and applicability. Please confirm with K Srinu and Associates before filing.
+          </p>
+        </div>
+      </section>
+
+      <section class="section-tight px-4 pb-10 sm:px-6 lg:px-8">
+        <div class="container-premium card lift p-6 sm:p-8 reveal">
+          <h2 class="heading-lg max-w-3xl">Need help tracking statutory deadlines?</h2>
+          <div class="mt-5 flex flex-wrap gap-3">
+            <a href="contact.html" class="btn-primary">Contact Team</a>
+            <a href="contact.html" class="btn-secondary">Schedule Consultation</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-[#0d1f3a] text-slate-200 px-4 py-12 sm:px-6 lg:px-8">
+      <div class="container-premium grid gap-5 md:grid-cols-4">
+        <div><h4 class="font-semibold text-white">K Srinu and Associates</h4><p class="text-sm mt-2 text-slate-300">Premium audit, tax and advisory services.</p></div>
+        <div><h4 class="font-semibold text-white">Quick Links</h4><ul class="mt-2 space-y-2 text-sm"><li><a class="footer-link" href="about.html">About</a></li><li><a class="footer-link" href="services.html">Services</a></li><li><a class="footer-link" href="careers.html">Careers</a></li><li><a class="footer-link" href="compliance-calendar.html">Compliance Calendar</a></li><li><a class="footer-link" href="contact.html">Contact</a></li></ul></div>
+        <div><h4 class="font-semibold text-white">Contact</h4><p class="text-sm mt-2 text-slate-300">Phone: <a class="footer-link" href="tel:+918897667910">+91 8897667910</a></p><p class="text-sm text-slate-300">Email: <a class="footer-link" href="mailto:kasofc4u@gmail.com">kasofc4u@gmail.com</a></p></div>
+        <div><h4 class="font-semibold text-white">Office Address</h4><p class="text-sm mt-2 text-slate-300">D.No:81-23-01/3, Sri Venkateswara Nagar, Rajamahendravaram, Andhra Pradesh, India - 533106</p><a class="btn-secondary mt-2" href="https://goo.gl/maps/EHRtCN9VAzb6CBBG6" target="_blank" rel="noopener">Open in Maps</a></div>
+      </div>
+      <p class="mt-8 text-center text-xs text-slate-400">© <span id="year"></span> K Srinu and Associates</p>
+      <p class="mt-2 text-right text-xs text-slate-400" style="opacity:.45;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.45'"><a href="https://www.varadanexus.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">@Varada Nexus</a></p>
+    </footer>
+
+    <a class="wa-float" href="https://wa.me/918897667910" target="_blank" rel="noopener" aria-label="WhatsApp">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M20.52 3.48A11.8 11.8 0 0 0 12.08 0C5.54 0 .2 5.34.2 11.9c0 2.1.55 4.16 1.59 5.97L0 24l6.31-1.74a11.86 11.86 0 0 0 5.77 1.47h.01c6.54 0 11.88-5.34 11.88-11.9 0-3.17-1.23-6.15-3.45-8.35z"/></svg>
+    </a>
+    <script src="assets/js/script.js"></script>
+    <script>
+      const categoryButtonsContainer = document.getElementById('calendar-filters');
+      const stateSelector = document.getElementById('state-selector');
+      const complianceCardsContainer = document.getElementById('compliance-cards');
+      const resultCount = document.getElementById('filter-result-count');
+      const filterButtons = categoryButtonsContainer ? categoryButtonsContainer.querySelectorAll('.filter-btn') : [];
+      const complianceCards = complianceCardsContainer ? complianceCardsContainer.querySelectorAll('[data-category][data-state]') : [];
+
+      let activeCategory = 'all';
+
+      function applyComplianceFilters() {
+        const selectedState = stateSelector ? stateSelector.value : 'all-india';
+
+        let visibleCount = 0;
+
+        complianceCards.forEach((card) => {
+          const cardCategory = card.dataset.category;
+          const cardStates = (card.dataset.state || '').split(',').map((s) => s.trim());
+
+          const categoryMatch = activeCategory === 'all' || cardCategory === activeCategory;
+          const stateMatch =
+            selectedState === 'all-india'
+              ? cardStates.includes('all-india')
+              : cardStates.includes('all-india') || cardStates.includes(selectedState);
+
+          const show = categoryMatch && stateMatch;
+          card.style.transition = 'opacity .22s ease';
+          card.style.opacity = show ? '1' : '0';
+          card.style.display = show ? '' : 'none';
+          if (show) visibleCount += 1;
+        });
+
+        if (resultCount) {
+          resultCount.textContent = `Showing ${visibleCount} compliance items`;
+        }
+      }
+
+      filterButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          activeCategory = btn.dataset.filter;
+          filterButtons.forEach((b) => b.classList.remove('btn-primary'));
+          filterButtons.forEach((b) => b.classList.add('btn-secondary'));
+          btn.classList.remove('btn-secondary');
+          btn.classList.add('btn-primary');
+          applyComplianceFilters();
+        });
+      });
+
+      if (stateSelector) {
+        stateSelector.addEventListener('change', applyComplianceFilters);
+      }
+
+      applyComplianceFilters();
+    </script>
+  </body>
+</html>
