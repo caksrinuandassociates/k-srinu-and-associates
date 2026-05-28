@@ -129,7 +129,7 @@ async function loadTeamMembers() {
   if (error) return setAdminMessage(`Team load error: ${error.message}`, true);
   (data || []).forEach((r) => renderRecord(container, `${r.image_url ? `<img src="${r.image_url}" alt="${r.name}" class="h-10 w-10 rounded-full object-cover inline-block mr-2"/>` : ""}<strong>${r.name || "-"}</strong><br/>${r.designation || "-"}<br/>${r.tags || ""}<br/>${activeBadge(r.is_active !== false)}`, () => {
     document.getElementById("team-id").value = r.id || ""; document.getElementById("t-name").value = r.name || ""; document.getElementById("t-designation").value = r.designation || "";
-    document.getElementById("t-bio").value = r.bio || ""; document.getElementById("t-image").value = r.image_url || ""; document.getElementById("t-tags").value = r.tags || "";
+    document.getElementById("t-bio").value = r.bio || ""; document.getElementById("t-image").value = r.image_url || ""; document.getElementById("t-tags").value = Array.isArray(r.tags) ? r.tags.join(", ") : (r.tags || "");
     document.getElementById("t-order").value = r.display_order || ""; document.getElementById("t-active").checked = r.is_active !== false;
     refs.tTagsPreview.textContent = (r.tags || "").split(",").map((t) => t.trim()).filter(Boolean).join(" | ");
     if (r.image_url && refs.tImagePreview) { refs.tImagePreview.src = r.image_url; refs.tImagePreview.style.display = "block"; }
@@ -144,12 +144,18 @@ async function loadTeamMembers() {
 async function saveTeamMember(e) {
   e.preventDefault();
   const id = document.getElementById("team-id").value;
+  const tagsArray = document
+    .getElementById("t-tags")
+    .value
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
   let imageUrl = "";
   try { imageUrl = await uploadTeamImageIfSelected(); }
   catch (err) { return setAdminMessage(err.message, true); }
   const payload = {
     name: document.getElementById("t-name").value, designation: document.getElementById("t-designation").value, bio: document.getElementById("t-bio").value,
-    image_url: imageUrl || document.getElementById("t-image").value, tags: document.getElementById("t-tags").value,
+    image_url: imageUrl || document.getElementById("t-image").value, tags: tagsArray,
     display_order: Number(document.getElementById("t-order").value || 0), is_active: document.getElementById("t-active").checked,
   };
   const { error } = id ? await supabaseClient.from("team_members").update(payload).eq("id", id) : await supabaseClient.from("team_members").insert([payload]);
