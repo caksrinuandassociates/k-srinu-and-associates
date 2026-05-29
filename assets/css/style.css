@@ -368,67 +368,130 @@ footer a {
 .admin-console {
   background:
     radial-gradient(860px 420px at 8% -10%, #e9eff8 0%, transparent 52%),
-    radial-gradient(980px 460px at 100% -18%, #eef3fb 0%, transparent 50%),
-    var(--bg-soft);
+    radial-gradient(980px 460px at 100% -18%, #f3ead8 0%, transparent 50%),
+    #f6f2ea;
+  color: #1b2f4c;
+}
+
+.admin-console .container-premium {
+  max-width: 1220px;
+}
+
+.admin-console .card,
+.admin-console .stat-card,
+.admin-console .service-card,
+.admin-console .team-card,
+.admin-console .calendar-card,
+.admin-console .faq-item,
+.admin-console details.card {
+  border: 1px solid #d7e3f3;
+  border-radius: 16px;
+  box-shadow: 0 16px 34px rgba(15, 39, 71, 0.08);
+}
+
+.admin-console #dashboard > .card {
+  border-radius: 20px;
+  padding: 1.25rem;
 }
 
 .admin-console #admin-tabs {
-  padding: .45rem;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #f8fbff;
+  padding: .55rem;
+  border: 1px solid #d4e1f2;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fbfdff 0%, #f4f8fe 100%);
 }
 
 .admin-console .tab-btn {
   border-radius: 10px;
+  min-height: 40px;
+  font-weight: 700;
 }
 
-.admin-console .card {
-  box-shadow: var(--shadow);
+.admin-console .tab-panel {
+  margin-top: 1.3rem;
+  padding-top: .2rem;
+}
+
+.admin-console .tab-panel > h3 {
+  margin-bottom: .9rem;
 }
 
 .admin-console .contact-input,
 .admin-console .contact-textarea,
 .admin-console select {
   background: #fff;
+  border: 1px solid #d3dfef;
+  border-radius: 11px;
+  min-height: 42px;
 }
 
-.admin-console .tab-panel .card {
-  border-color: #d9e5f6;
+.admin-console .contact-textarea {
+  min-height: 106px;
 }
 
-.admin-console #admin-toast {
-  border: 1px solid rgba(255,255,255,.25);
-  backdrop-filter: blur(8px);
+.admin-console .contact-input:focus,
+.admin-console .contact-textarea:focus,
+.admin-console select:focus {
+  border-color: #b99746;
+  box-shadow: 0 0 0 3px rgba(185, 151, 70, 0.2);
+}
+
+.admin-console .btn-primary {
+  box-shadow: 0 10px 22px rgba(15, 39, 71, 0.16);
+}
+
+.admin-console .btn-secondary {
+  border-color: #cddbeb;
+  background: #fff;
+}
+
+.admin-console .btn-secondary:hover {
+  border-color: #b99746;
+  background: #fffaf0;
+}
+
+.admin-console #compliance-list > .card,
+.admin-console #team-list > .card,
+.admin-console #careers-list > .card,
+.admin-console #contact-submissions-list > details,
+.admin-console #career-submissions-list > details {
+  background: linear-gradient(180deg, #ffffff 0%, #fdfefe 100%);
+}
+
+.admin-console .stat-card {
+  background: linear-gradient(170deg, #ffffff 0%, #f8fbff 72%, #f4ead7 100%);
+}
+
+.admin-console .stat-value {
+  color: #0f2747;
 }
 
 .admin-console .admin-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 1.4rem;
-  height: 1.4rem;
-  padding: 0 .45rem;
+  min-width: 1.45rem;
+  height: 1.45rem;
+  padding: 0 .46rem;
   border-radius: 999px;
   font-size: .68rem;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1;
   color: #fff;
   background: #0f2747;
   margin-left: .35rem;
   vertical-align: middle;
+  box-shadow: 0 4px 11px rgba(15, 39, 71, 0.25);
 }
 
-.admin-console .admin-badge.secondary {
-  background: #64748b;
-}
+.admin-console .admin-badge.secondary { background: #64748b; }
+.admin-console .admin-badge.warn { background: #b45309; }
+.admin-console .admin-badge.danger { background: #b91c1c; }
 
-.admin-console .admin-badge.warn {
-  background: #b45309;
-}
-
-.admin-console .admin-badge.danger {
-  background: #b91c1c;
+.admin-console #admin-toast {
+  border: 1px solid rgba(255,255,255,.28);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
 }
 
 .admin-console.admin-dark {
@@ -451,6 +514,7 @@ footer a {
   background: #12233c;
   border-color: rgba(148,163,184,.24);
   color: #d7e3f3;
+  box-shadow: 0 18px 34px rgba(2, 6, 13, 0.38);
 }
 
 .admin-console.admin-dark .heading-lg,
@@ -479,6 +543,13 @@ footer a {
   color: #e4efff;
 }
 
+.admin-console.admin-dark .contact-input:focus,
+.admin-console.admin-dark .contact-textarea:focus,
+.admin-console.admin-dark select:focus {
+  border-color: #c8a96b;
+  box-shadow: 0 0 0 3px rgba(200, 169, 107, 0.2);
+}
+
 .admin-console.admin-dark .btn-secondary {
   background: #0f1f34;
   color: #dbe9ff;
@@ -493,6 +564,17 @@ footer a {
 .admin-console.admin-dark #admin-tabs {
   background: #101f35;
   border-color: rgba(148,163,184,.28);
+}
+
+.admin-console.admin-dark .btn-secondary {
+  background: #0f1f34;
+  color: #dbe9ff;
+  border-color: rgba(148,163,184,.35);
+}
+
+.admin-console.admin-dark .btn-secondary:hover {
+  background: #162a46;
+  border-color: #c8a96b;
 }
 
 @media (max-width: 767px) {
