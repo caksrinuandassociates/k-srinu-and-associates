@@ -65,6 +65,13 @@ body {
   transform: translateY(0);
 }
 
+.services-dropdown:hover .more-dropdown-menu,
+.services-dropdown:focus-within .more-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
 .mobile-link { display: block; padding: .75rem .2rem; border-bottom: 1px solid var(--line); font-weight: 600; color: var(--navy); }
 .mobile-link:last-child { border-bottom: none; }
 
