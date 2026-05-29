@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ksrinuassociates.com/sitemap.xml
+Sitemap: https://caksrinuandassociates.com/sitemap.xml
