@@ -5,31 +5,150 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contact | K Srinu and Associates</title>
-    <link rel="icon" type="image/png" href="assets/images/favicon.png">
-    <meta property="og:title" content="K Srinu and Associates">
-    <meta property="og:description" content="Professional audit, taxation, compliance, and advisory services.">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="https://caksrinuandassociates.com/assets/images/logo.jpg">
+    <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+    <meta property="og:title" content="K Srinu and Associates" />
+    <meta property="og:description" content="Professional audit, taxation, compliance, and advisory services." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://caksrinuandassociates.com/assets/images/logo.jpg" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config={theme:{extend:{colors:{navy:'#0f2747',gold:'#b99746'}}}};</script>
+    <script>
+      tailwind.config = { theme: { extend: { colors: { navy: '#0f2747', gold: '#f2b233' } } } };
+    </script>
     <link rel="stylesheet" href="assets/css/style.css" />
   </head>
   <body>
-    <header id="site-header" class="fixed top-0 z-50 w-full bg-white/90 transition-all duration-300">
-      <nav class="container-premium flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <a href="index.html" class="brand text-lg inline-flex items-center gap-2 transition duration-200 hover:opacity-90 hover:scale-[1.01]"><img src="assets/images/logo.png" alt="K Srinu and Associates Logo" class="h-[34px] w-auto sm:h-[42px]" /><span class="whitespace-nowrap text-navy">K SRINU & ASSOCIATES</span></a>
-        <button id="menu-btn" class="rounded-md border border-slate-200 px-3 py-2 md:hidden" aria-expanded="false">â˜°</button>
-        <ul class="hidden gap-8 md:flex"><li><a class="nav-link" href="index.html">Home</a></li><li><a class="nav-link" href="about.html">About</a></li><li><a class="nav-link" href="services.html">Services</a></li><li><a class="nav-link" href="team.html">Team</a></li><li><a class="nav-link" href="careers.html">Careers</a></li><li><a class="nav-link" href="compliance-calendar.html">Compliance Calendar</a></li><li><a class="nav-link active" href="contact.html">Contact</a></li></ul>
+    <div class="bg-[#0b1d37] text-slate-100">
+      <div class="container-premium flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-[11px] sm:gap-3 sm:px-6 lg:px-8">
+        <p>Rajamahendravaram, Andhra Pradesh</p>
+        <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+          <a href="tel:+918897667910" class="hover:text-[#f6c65b]">+91 8897667910</a>
+          <a href="mailto:kasofc4u@gmail.com" class="hover:text-[#f6c65b]">kasofc4u@gmail.com</a>
+          <a href="contact.html" class="rounded-md border border-[#f6c65b]/70 px-3 py-1 font-semibold text-[#ffd67a]">Schedule Consultation</a>
+        </div>
+      </div>
+    </div>
+
+    <header id="site-header" class="sticky top-0 z-50 w-full bg-white/95 transition-all duration-300">
+      <nav class="container-premium flex items-center justify-between gap-6 xl:gap-10 px-4 py-3 sm:px-6 lg:px-8 xl:px-10" aria-label="Main Navigation">
+        <a href="index.html" class="inline-flex shrink-0 items-center gap-3">
+          <img src="assets/images/logo.png" alt="K Srinu and Associates Logo" class="h-[34px] w-auto sm:h-[42px]" />
+          <span>
+            <span class="block text-sm font-extrabold tracking-wide text-navy sm:text-base">K SRINU & ASSOCIATES</span>
+            <span class="block text-[10px] font-semibold tracking-[0.18em] text-[#e99b12] sm:text-xs">CHARTERED ACCOUNTANTS</span>
+          </span>
+        </a>
+        <button id="menu-btn" class="rounded-md border border-slate-200 px-3 py-2 xl:hidden" aria-expanded="false" aria-label="Toggle menu">☰</button>
+        <ul class="hidden items-center gap-6 xl:gap-7 xl:flex text-[15px]">
+          <li><a class="nav-link" href="index.html">Home</a></li>
+          <li><a class="nav-link" href="about.html">About Us</a></li>
+          <li><a class="nav-link" href="services.html">Services</a></li>
+          <li><a class="nav-link" href="industries.html">Industries</a></li>
+          <li><a class="nav-link" href="team.html">Team</a></li>
+          <li><a class="nav-link" href="compliance-calendar.html">Compliance Calendar</a></li>
+          <li><a class="nav-link" href="careers.html">Career</a></li>
+          <li><a class="nav-link active" href="contact.html">Contact Us</a></li>
+        </ul>
       </nav>
-      <div id="mobile-menu" class="mx-4 mb-4 hidden rounded-xl border border-slate-200 bg-white p-4 md:hidden"><a class="mobile-link" href="index.html">Home</a><a class="mobile-link" href="about.html">About</a><a class="mobile-link" href="services.html">Services</a><a class="mobile-link" href="team.html">Team</a><a class="mobile-link" href="careers.html">Careers</a><a class="mobile-link" href="compliance-calendar.html">Compliance Calendar</a><a class="mobile-link" href="contact.html">Contact</a></div>
+      <div id="mobile-menu" class="mx-4 mb-4 hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm xl:hidden">
+        <a class="mobile-link" href="index.html">Home</a>
+        <a class="mobile-link" href="about.html">About Us</a>
+        <a class="mobile-link" href="services.html">Services</a>
+        <a class="mobile-link" href="industries.html">Industries</a>
+        <a class="mobile-link" href="team.html">Team</a>
+        <a class="mobile-link" href="compliance-calendar.html">Compliance Calendar</a>
+        <a class="mobile-link" href="careers.html">Career</a>
+        <a class="mobile-link" href="contact.html">Contact Us</a>
+      </div>
     </header>
-    <main class="pt-24">
-      <section class="section-tight px-4 sm:px-6 lg:px-8"><div class="container-premium reveal"><p class="breadcrumb"><a href="index.html">Home</a> / Contact</p><h1 class="heading-lg mt-3">Contact Our Advisory Team</h1></div></section>
-      <section class="section-tight px-4 sm:px-6 lg:px-8"><div class="container-premium grid gap-5 lg:grid-cols-5"><article class="form-card lg:col-span-3 reveal"><h2 class="font-bold text-navy text-xl">Consultation Form</h2><form id="contact-web3-form" class="mt-4 grid gap-3" action="https://api.web3forms.com/submit" method="post"><input type="hidden" name="access_key" value="9b457d40-d5bc-497a-99bf-d934546e70bd" /><input type="hidden" name="subject" value="New Contact Inquiry - K Srinu and Associates" /><input type="hidden" name="from_name" value="K Srinu and Associates Website" /><input type="checkbox" name="botcheck" class="hidden" style="display:none;"><input class="contact-input" type="text" name="name" placeholder="Full Name" required /><div class="grid gap-3 sm:grid-cols-2"><input class="contact-input" type="email" name="email" placeholder="Email" required /><input class="contact-input" type="tel" name="phone" placeholder="Phone" required /></div><input class="contact-input" type="text" name="service" placeholder="Service Required" /><textarea class="contact-textarea" name="message" rows="5" placeholder="Your message"></textarea><button id="contact-submit-btn" class="btn-primary w-fit inline-flex items-center gap-2" type="submit"><span class="btn-label">Submit Inquiry</span><span class="hidden h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" data-spinner></span></button><p id="contact-form-status" class="subtitle text-sm opacity-0 transition-opacity duration-300"></p></form></article><aside class="form-card lg:col-span-2 reveal"><h3 class="font-bold text-navy">Contact Details</h3><p class="mt-3 text-sm subtitle">Phone: <a href="tel:+918897667910" class="text-navy hover:text-gold">+91 8897667910</a></p><p class="text-sm subtitle">Email: <a href="mailto:kasofc4u@gmail.com" class="text-navy hover:text-gold">kasofc4u@gmail.com</a></p><p class="text-sm subtitle">D.No:81-23-01/3,<br/>Sri Venkateswara Nagar,<br/>Rajamahendravaram,<br/>Andhra Pradesh,<br/>India - 533106</p><p class="text-sm subtitle mt-2">Mon-Sat: 9:30 AM - 7:00 PM</p><p class="text-sm subtitle mt-2"><a href="https://goo.gl/maps/EHRtCN9VAzb6CBBG6" target="_blank" rel="noopener" class="text-navy hover:text-gold">Open in Google Maps</a></p></aside></div></section>
-      <section class="section-tight px-4 sm:px-6 lg:px-8"><div class="container-premium reveal"><div class="card p-3 sm:p-4"><div class="mb-3 flex items-center justify-between"><h2 class="heading-lg">Office Location</h2><a href="https://goo.gl/maps/EHRtCN9VAzb6CBBG6" target="_blank" rel="noopener" class="btn-secondary">Open Map</a></div><div class="overflow-hidden rounded-xl border border-slate-200"><iframe title="Office location map" src="https://maps.google.com/maps?q=D.No%3A81-23-01%2F3%2C%20Sri%20Venkateswara%20Nagar%2C%20Rajamahendravaram%2C%20Andhra%20Pradesh%20533106&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="360" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div></div></div></section>
+
+    <main>
+      <section class="relative overflow-hidden bg-white px-4 pb-14 pt-12 sm:px-6 sm:pb-16 sm:pt-14 lg:px-8 lg:pb-16 lg:pt-16">
+        <div class="absolute inset-y-0 right-0 w-full bg-[url('assets/images/contact-hero.png')] bg-[length:124%_auto] bg-[80%_50%] bg-no-repeat lg:w-[57%] lg:bg-cover lg:bg-right"></div>
+        <div class="absolute inset-y-0 left-0 w-full bg-[linear-gradient(90deg,#ffffff_0%,#ffffff_43%,rgba(255,255,255,0.88)_57%,rgba(255,255,255,0.22)_72%,rgba(255,255,255,0)_84%)] lg:w-[68%]"></div>
+
+        <div class="container-premium relative grid items-center gap-8 lg:grid-cols-[1.04fr_.96fr] lg:gap-10">
+          <div class="reveal">
+            <span class="inline-flex items-center rounded-full border border-[#f6c65b]/60 bg-[#f6c65b1f] px-3 py-1 text-xs font-semibold tracking-[0.18em] text-[#e9a31a]">CONTACT US</span>
+            <h1 class="mt-4 text-[2.2rem] font-extrabold leading-[1.05] text-navy sm:text-5xl lg:text-[3.25rem]">Let's Start A<br /><span class="text-[#f2b233]">Conversation.</span></h1>
+            <p class="mt-5 max-w-xl text-[15px] leading-relaxed text-slate-700 sm:text-base">Whether you need audit, taxation, compliance, advisory, or business consulting support, our team is ready to assist you with practical and dependable solutions.</p>
+            <div class="mt-6 flex flex-wrap gap-3"><a class="btn-primary" href="#contact-form">Schedule Consultation</a><a class="btn-secondary" href="tel:+918897667910">Call Now</a></div>
+          </div>
+          <div class="hidden lg:block" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <section class="bg-white px-4 pb-9 sm:px-6 lg:px-8">
+        <div class="container-premium grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <article class="card lift reveal rounded-2xl p-5 text-center shadow-[0_12px_24px_rgba(15,39,71,0.08)]"><span class="mx-auto inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#f2b233] text-[#f2b233]">â˜Ž</span><p class="mt-3 text-xs font-semibold tracking-[0.16em] text-navy">PHONE</p><p class="mt-2 text-sm font-semibold text-slate-700">8897607910</p></article>
+          <article class="card lift reveal rounded-2xl p-5 text-center shadow-[0_12px_24px_rgba(15,39,71,0.08)]"><span class="mx-auto inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#f2b233] text-[#f2b233]">âœ‰</span><p class="mt-3 text-xs font-semibold tracking-[0.16em] text-navy">EMAIL</p><p class="mt-2 text-sm font-semibold text-slate-700 break-words">ksrinuassociates@gmail.com</p></article>
+          <article class="card lift reveal rounded-2xl p-5 text-center shadow-[0_12px_24px_rgba(15,39,71,0.08)]"><span class="mx-auto inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#f2b233] text-[#f2b233]">âŒ‚</span><p class="mt-3 text-xs font-semibold tracking-[0.16em] text-navy">LOCATION</p><p class="mt-2 text-sm font-semibold text-slate-700">Rajamahendravaram,<br/>Andhra Pradesh</p></article>
+          <article class="card lift reveal rounded-2xl p-5 text-center shadow-[0_12px_24px_rgba(15,39,71,0.08)]"><span class="mx-auto inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#f2b233] text-[#f2b233]">â±</span><p class="mt-3 text-xs font-semibold tracking-[0.16em] text-navy">OFFICE HOURS</p><p class="mt-2 text-sm font-semibold text-slate-700">Monâ€“Sat<br/>9:00 AM â€“ 6:00 PM</p></article>
+        </div>
+      </section>
+
+      <section class="px-4 pb-10 sm:px-6 lg:px-8">
+        <div class="container-premium grid gap-5 lg:grid-cols-5">
+          <article id="contact-form" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_14px_28px_rgba(15,39,71,0.08)] lg:col-span-3 reveal">
+            <h2 class="text-2xl font-bold text-navy sm:text-[2rem]">Consultation Form</h2>
+            <form id="contact-web3-form" class="mt-4 grid gap-3" action="https://api.web3forms.com/submit" method="post">
+              <input type="hidden" name="access_key" value="9b457d40-d5bc-497a-99bf-d934546e70bd" />
+              <input type="hidden" name="subject" value="New Contact Inquiry - K Srinu and Associates" />
+              <input type="hidden" name="from_name" value="K Srinu and Associates Website" />
+              <input type="checkbox" name="botcheck" class="hidden" style="display:none;" />
+              <input class="contact-input" type="text" name="name" placeholder="Full Name" required />
+              <div class="grid gap-3 sm:grid-cols-2">
+                <input class="contact-input" type="email" name="email" placeholder="Email" required />
+                <input class="contact-input" type="tel" name="phone" placeholder="Phone Number" required />
+              </div>
+              <input class="contact-input" type="text" name="service" placeholder="Service Required" />
+              <textarea class="contact-textarea" name="message" rows="5" placeholder="Message"></textarea>
+              <button id="contact-submit-btn" class="btn-primary w-fit inline-flex items-center gap-2 border-[#f2b233] bg-[#f2b233] !text-[#0f2747] hover:bg-[#ffd778]" type="submit"><span class="btn-label">Submit Inquiry</span><span class="hidden h-4 w-4 animate-spin rounded-full border-2 border-[#0f2747]/30 border-t-[#0f2747]" data-spinner></span></button>
+              <p id="contact-form-status" class="subtitle text-sm opacity-0 transition-opacity duration-300"></p>
+            </form>
+          </article>
+
+          <aside class="rounded-2xl bg-[#0d2342] p-5 text-white shadow-[0_18px_36px_rgba(13,31,58,0.26)] lg:col-span-2 reveal">
+            <h3 class="text-lg font-bold">Why Clients Contact Us</h3>
+            <div class="mt-4 grid gap-3">
+              <article class="flex items-start gap-3 border-white/12 pb-3 border-b"><span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#f6c65b] text-[#f6c65b]">âœ“</span><div><h4 class="text-sm font-semibold text-white">Audit & Assurance</h4><p class="text-xs text-slate-300">Independent, reliable audit guidance</p></div></article>
+              <article class="flex items-start gap-3 border-white/12 pb-3 border-b"><span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#f6c65b] text-[#f6c65b]">â‚¹</span><div><h4 class="text-sm font-semibold text-white">Tax Advisory</h4><p class="text-xs text-slate-300">Practical and compliant tax strategies</p></div></article>
+              <article class="flex items-start gap-3 border-white/12 pb-3 border-b"><span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#f6c65b] text-[#f6c65b]">â—Ž</span><div><h4 class="text-sm font-semibold text-white">Compliance Management</h4><p class="text-xs text-slate-300">On-time statutory support and tracking</p></div></article>
+              <article class="flex items-start gap-3"><span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#f6c65b] text-[#f6c65b]">â˜…</span><div><h4 class="text-sm font-semibold text-white">Business Consulting</h4><p class="text-xs text-slate-300">Advisory focused on sustainable growth</p></div></article>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="px-4 pb-10 sm:px-6 lg:px-8">
+        <div class="container-premium reveal">
+          <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_14px_28px_rgba(15,39,71,0.08)] sm:p-6">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 class="text-2xl font-bold text-navy sm:text-[2rem]">Visit Our Office</h2>
+                <p class="mt-2 text-sm text-slate-600">DOOR NO. 81-23-01/3,<br/>Sri Venkateswara Nagar,<br/>Prakash Nagar Block-II,<br/>Rajamahendravaram,<br/>Andhra Pradesh â€“ 533106</p>
+              </div>
+              <a href="https://goo.gl/maps/EHRtCN9VAzb6CBBG6" target="_blank" rel="noopener" class="btn-secondary">Open Map</a>
+            </div>
+            <div class="overflow-hidden rounded-xl border border-slate-200">
+              <iframe title="Office location map" src="https://maps.google.com/maps?q=D.No%3A81-23-01%2F3%2C%20Sri%20Venkateswara%20Nagar%2C%20Rajamahendravaram%2C%20Andhra%20Pradesh%20533106&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="360" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="px-4 pb-10 sm:px-6 lg:px-8">
+        <div class="container-premium reveal rounded-2xl border border-[#f2b233]/25 bg-white p-7 text-center shadow-[0_14px_28px_rgba(15,39,71,0.08)] sm:p-9">
+          <h2 class="text-2xl font-bold text-navy sm:text-[2rem]">Need Immediate Assistance?</h2>
+          <p class="mx-auto mt-3 max-w-2xl text-sm text-slate-600 sm:text-base">Speak directly with our team for professional guidance and compliance support.</p>
+          <div class="mt-5 flex flex-wrap items-center justify-center gap-3">
+            <a href="tel:+918897667910" class="btn-primary">Call Now</a>
+            <a href="mailto:ksrinuassociates@gmail.com" class="btn-secondary">Send Email</a>
+          </div>
+        </div>
+      </section>
     </main>
+
     <footer class="bg-[#0d1f3a] text-slate-200 px-4 py-10 sm:px-6 lg:px-8"><div class="container-premium grid gap-5 md:grid-cols-4"><div><h4 class="font-semibold text-white">K Srinu and Associates</h4><p class="text-sm mt-2 text-slate-300">audit, tax and advisory services.</p></div><div><h4 class="font-semibold text-white">Quick Links</h4><ul class="mt-2 space-y-2 text-sm"><li><a class="footer-link" href="about.html">About</a></li><li><a class="footer-link" href="services.html">Services</a></li><li><a class="footer-link" href="careers.html">Careers</a></li><li><a class="footer-link" href="compliance-calendar.html">Compliance Calendar</a></li><li><a class="footer-link" href="contact.html">Contact</a></li></ul></div><div><h4 class="font-semibold text-white">Contact</h4><p class="text-sm mt-2 text-slate-300">Phone: <a class="footer-link" href="tel:+918897667910">+91 8897667910</a></p><p class="text-sm text-slate-300">Email: <a class="footer-link" href="mailto:kasofc4u@gmail.com">kasofc4u@gmail.com</a></p></div><div><h4 class="font-semibold text-white">Office Address</h4><p class="text-sm mt-2 text-slate-300">D.No:81-23-01/3, Sri Venkateswara Nagar, Rajamahendravaram, Andhra Pradesh, India - 533106</p><a class="btn-secondary mt-2" href="https://goo.gl/maps/EHRtCN9VAzb6CBBG6" target="_blank" rel="noopener">Open in Maps</a></div></div><p class="mt-8 text-center text-xs text-slate-400">Â© <span id="year"></span> K Srinu and Associates</p><p class="mt-2 text-right text-xs text-slate-400" style="opacity:.45;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.45'"><a href="https://www.varadanexus.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">@Varada Nexus</a></p></footer>
-    <div class="consult-strip hidden lg:flex items-center justify-between gap-4"><p class="text-sm text-slate-700">Need immediate consultation support?</p><a href="tel:+918897667910" class="btn-primary">Call Now</a></div>
     <a class="wa-float" href="https://wa.me/918897667910" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M20.52 3.48A11.8 11.8 0 0 0 12.08 0C5.54 0 .2 5.34.2 11.9c0 2.1.55 4.16 1.59 5.97L0 24l6.31-1.74a11.86 11.86 0 0 0 5.77 1.47h.01c6.54 0 11.88-5.34 11.88-11.9 0-3.17-1.23-6.15-3.45-8.35z"/></svg></a>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="assets/js/script.js"></script>

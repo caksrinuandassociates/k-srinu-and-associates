@@ -16,50 +16,74 @@
     />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      tailwind.config = { theme: { extend: { colors: { navy: "#0f2747", gold: "#b99746" } } } };
+      tailwind.config = { theme: { extend: { colors: { navy: '#0f2747', gold: '#f2b233' } } } };
     </script>
     <link rel="stylesheet" href="assets/css/style.css" />
   </head>
   <body>
-    <header id="site-header" class="fixed top-0 z-50 w-full bg-white/90 transition-all duration-300">
-      <nav class="container-premium flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8" aria-label="Main Navigation">
-        <a href="index.html" class="brand text-lg inline-flex items-center gap-2 transition duration-200 hover:opacity-90 hover:scale-[1.01]"><img src="assets/images/logo.png" alt="K Srinu and Associates Logo" class="h-[34px] w-auto sm:h-[42px]" /><span class="whitespace-nowrap text-navy">K SRINU & ASSOCIATES</span></a>
-        <button id="menu-btn" class="rounded-md border border-slate-200 px-3 py-2 md:hidden" aria-expanded="false" aria-label="Toggle menu">â˜°</button>
-        <ul class="hidden gap-8 md:flex">
+    <div class="bg-[#0b1d37] text-slate-100">
+      <div class="container-premium flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-[11px] sm:gap-3 sm:px-6 lg:px-8">
+        <p>Rajamahendravaram, Andhra Pradesh</p>
+        <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+          <a href="tel:+918897667910" class="hover:text-[#f6c65b]">+91 8897667910</a>
+          <a href="mailto:kasofc4u@gmail.com" class="hover:text-[#f6c65b]">kasofc4u@gmail.com</a>
+          <a href="contact.html" class="rounded-md border border-[#f6c65b]/70 px-3 py-1 font-semibold text-[#ffd67a]">Schedule Consultation</a>
+        </div>
+      </div>
+    </div>
+
+    <header id="site-header" class="sticky top-0 z-50 w-full bg-white/95 transition-all duration-300">
+      <nav class="container-premium flex items-center justify-between gap-6 xl:gap-10 px-4 py-3 sm:px-6 lg:px-8 xl:px-10" aria-label="Main Navigation">
+        <a href="index.html" class="inline-flex shrink-0 items-center gap-3">
+          <img src="assets/images/logo.png" alt="K Srinu and Associates Logo" class="h-[34px] w-auto sm:h-[42px]" />
+          <span>
+            <span class="block text-sm font-extrabold tracking-wide text-navy sm:text-base">K SRINU & ASSOCIATES</span>
+            <span class="block text-[10px] font-semibold tracking-[0.18em] text-[#e99b12] sm:text-xs">CHARTERED ACCOUNTANTS</span>
+          </span>
+        </a>
+        <button id="menu-btn" class="rounded-md border border-slate-200 px-3 py-2 xl:hidden" aria-expanded="false" aria-label="Toggle menu">☰</button>
+        <ul class="hidden items-center gap-6 xl:gap-7 xl:flex text-[15px]">
           <li><a class="nav-link" href="index.html">Home</a></li>
-          <li><a class="nav-link" href="about.html">About</a></li>
+          <li><a class="nav-link" href="about.html">About Us</a></li>
           <li><a class="nav-link" href="services.html">Services</a></li>
+          <li><a class="nav-link" href="industries.html">Industries</a></li>
           <li><a class="nav-link" href="team.html">Team</a></li>
-          <li><a class="nav-link" href="careers.html">Careers</a></li>
           <li><a class="nav-link active" href="compliance-calendar.html">Compliance Calendar</a></li>
-          <li><a class="nav-link" href="contact.html">Contact</a></li>
+          <li><a class="nav-link" href="careers.html">Career</a></li>
+          <li><a class="nav-link" href="contact.html">Contact Us</a></li>
         </ul>
       </nav>
-      <div id="mobile-menu" class="mx-4 mb-4 hidden rounded-xl border border-slate-200 bg-white p-4 md:hidden">
+      <div id="mobile-menu" class="mx-4 mb-4 hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm xl:hidden">
         <a class="mobile-link" href="index.html">Home</a>
-        <a class="mobile-link" href="about.html">About</a>
+        <a class="mobile-link" href="about.html">About Us</a>
         <a class="mobile-link" href="services.html">Services</a>
+        <a class="mobile-link" href="industries.html">Industries</a>
         <a class="mobile-link" href="team.html">Team</a>
-        <a class="mobile-link" href="careers.html">Careers</a>
         <a class="mobile-link" href="compliance-calendar.html">Compliance Calendar</a>
-        <a class="mobile-link" href="contact.html">Contact</a>
+        <a class="mobile-link" href="careers.html">Career</a>
+        <a class="mobile-link" href="contact.html">Contact Us</a>
       </div>
     </header>
 
-    <main class="pt-24">
-      <section class="section-tight px-4 sm:px-6 lg:px-8">
-        <div class="container-premium hero-shell p-6 sm:p-8 lg:p-10 reveal">
-          <p class="breadcrumb"><a href="index.html">Home</a> / Compliance Calendar</p>
-          <h1 class="heading-xl mt-3">Compliance Calendar</h1>
-          <p class="subtitle mt-4 max-w-4xl">
-            Important statutory due dates for GST, Income Tax, TDS, ROC, Professional Tax, and business compliance.
-          </p>
+    <main>
+      <section class="relative overflow-hidden bg-white px-4 pb-14 pt-12 sm:px-6 sm:pb-16 sm:pt-14 lg:px-8 lg:pb-16 lg:pt-16">
+        <div class="absolute inset-y-0 right-0 w-full bg-[url('assets/images/compliance-hero.png')] bg-[length:122%_auto] bg-[80%_52%] bg-no-repeat lg:w-[57%] lg:bg-cover lg:bg-right"></div>
+        <div class="absolute inset-y-0 left-0 w-full bg-[linear-gradient(90deg,#ffffff_0%,#ffffff_43%,rgba(255,255,255,0.88)_57%,rgba(255,255,255,0.22)_72%,rgba(255,255,255,0)_84%)] lg:w-[68%]"></div>
+
+        <div class="container-premium relative grid items-center gap-8 lg:grid-cols-[1.04fr_.96fr] lg:gap-10">
+          <div class="reveal">
+            <span class="inline-flex items-center rounded-full border border-[#f6c65b]/60 bg-[#f6c65b1f] px-3 py-1 text-xs font-semibold tracking-[0.18em] text-[#e9a31a]">COMPLIANCE CALENDAR</span>
+            <h1 class="mt-4 text-[2.2rem] font-extrabold leading-[1.05] text-navy sm:text-5xl lg:text-[3.25rem]">Stay Compliant.<br /><span class="text-[#f2b233]">Stay A Step Ahead.</span></h1>
+            <p class="mt-5 max-w-xl text-[15px] leading-relaxed text-slate-700 sm:text-base">Never miss a deadline with our comprehensive compliance calendar. Plan ahead and keep your business compliant, every month.</p>
+          </div>
+          <div class="hidden lg:block" aria-hidden="true"></div>
         </div>
       </section>
 
-      <section class="section-tight px-4 sm:px-6 lg:px-8">
-        <div class="container-premium">
-          <div class="reveal">
+      <section class="bg-white px-4 pb-10 pt-4 sm:px-6 lg:px-8">
+        <div class="container-premium grid gap-5 lg:grid-cols-[1.35fr_.65fr]">
+          <div>
+            <div class="reveal rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_10px_24px_rgba(15,39,71,0.06)] sm:p-5">
             <label for="state-selector" class="block text-sm font-semibold text-navy mb-2">State Selector</label>
             <select id="state-selector" class="contact-input max-w-sm">
               <option value="all-india">All India</option>
@@ -72,23 +96,22 @@
               <option value="kerala">Kerala</option>
               <option value="other-states">Other States</option>
             </select>
-          </div>
+              <div class="flex flex-wrap gap-2 mt-4" id="calendar-filters">
+                <button class="btn-primary filter-btn" data-filter="all">All</button>
+                <button class="btn-secondary filter-btn" data-filter="gst">GST</button>
+                <button class="btn-secondary filter-btn" data-filter="income-tax">Income Tax</button>
+                <button class="btn-secondary filter-btn" data-filter="tds">TDS</button>
+                <button class="btn-secondary filter-btn" data-filter="roc">ROC</button>
+                <button class="btn-secondary filter-btn" data-filter="professional-tax">Professional Tax</button>
+                <button class="btn-secondary filter-btn" data-filter="business-compliance">Business Compliance</button>
+              </div>
 
-          <div class="flex flex-wrap gap-2 mt-4 reveal" id="calendar-filters">
-            <button class="btn-primary filter-btn" data-filter="all">All</button>
-            <button class="btn-secondary filter-btn" data-filter="gst">GST</button>
-            <button class="btn-secondary filter-btn" data-filter="income-tax">Income Tax</button>
-            <button class="btn-secondary filter-btn" data-filter="tds">TDS</button>
-            <button class="btn-secondary filter-btn" data-filter="roc">ROC</button>
-            <button class="btn-secondary filter-btn" data-filter="professional-tax">Professional Tax</button>
-            <button class="btn-secondary filter-btn" data-filter="business-compliance">Business Compliance</button>
-          </div>
+              <p id="compliance-loading" class="subtitle text-sm mt-3">Loading compliance items...</p>
+              <p id="compliance-empty" class="subtitle text-sm mt-2 hidden">No active compliance items found.</p>
+              <p id="filter-result-count" class="subtitle text-sm mt-3">Showing 0 compliance items</p>
+            </div>
 
-          <p id="compliance-loading" class="subtitle text-sm mt-3 reveal">Loading compliance items...</p>
-          <p id="compliance-empty" class="subtitle text-sm mt-2 reveal hidden">No active compliance items found.</p>
-          <p id="filter-result-count" class="subtitle text-sm mt-3 reveal">Showing 0 compliance items</p>
-
-          <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" id="compliance-cards">
+            <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-2" id="compliance-cards">
             <article class="calendar-card lift reveal" data-category="gst" data-state="all-india"><span class="calendar-date">10th / 11th of Every Month</span><span class="trust-chip ml-2">Upcoming</span><h3 class="mt-3 font-bold text-navy">GST Return Filing</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> GST</p><p class="subtitle text-sm"><strong>State applicability:</strong> All India (National)</p><p class="subtitle text-sm"><strong>Applicable to:</strong> Registered taxpayers (as applicable)</p><p class="subtitle text-sm"><strong>Description:</strong> Monthly GST return filing and reconciliation.</p><p class="subtitle text-sm"><strong>Source note:</strong> GST portal / notification reference placeholder.</p></article>
             <article class="calendar-card lift reveal" data-category="gst" data-state="all-india"><span class="calendar-date">31 Dec (typically)</span><span class="trust-chip ml-2">Important</span><h3 class="mt-3 font-bold text-navy">GST Annual Return</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> GST</p><p class="subtitle text-sm"><strong>State applicability:</strong> All India (National)</p><p class="subtitle text-sm"><strong>Applicable to:</strong> Eligible GST entities</p><p class="subtitle text-sm"><strong>Description:</strong> Annual GST return and turnover-based applicability checks.</p><p class="subtitle text-sm"><strong>Source note:</strong> GST annual return circular placeholder.</p></article>
             <article class="calendar-card lift reveal" data-category="tds" data-state="all-india"><span class="calendar-date">7th of Every Month</span><span class="trust-chip ml-2">Important</span><h3 class="mt-3 font-bold text-navy">TDS Payment</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> TDS</p><p class="subtitle text-sm"><strong>State applicability:</strong> All India (National)</p><p class="subtitle text-sm"><strong>Applicable to:</strong> TDS deductors</p><p class="subtitle text-sm"><strong>Description:</strong> Timely deposit of TDS deductions.</p><p class="subtitle text-sm"><strong>Source note:</strong> Income Tax portal due date placeholder.</p></article>
@@ -105,11 +128,28 @@
             <article class="calendar-card lift reveal" data-category="business-compliance" data-state="karnataka,maharashtra,telangana,tamil-nadu,kerala,other-states"><span class="calendar-date">Half-yearly / Annual (state specific)</span><span class="trust-chip ml-2">Indicative</span><h3 class="mt-3 font-bold text-navy">Labour Welfare Fund</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> Business Compliance</p><p class="subtitle text-sm"><strong>State applicability:</strong> Selected states</p><p class="subtitle text-sm"><strong>Applicable to:</strong> Eligible employers and employees</p><p class="subtitle text-sm"><strong>Description:</strong> Welfare fund remittance and statutory deduction checks.</p><p class="subtitle text-sm"><strong>Source note:</strong> State LWF circular placeholder.</p></article>
             <article class="calendar-card lift reveal" data-category="business-compliance" data-state="all-india"><span class="calendar-date">Half-yearly (commonly)</span><span class="trust-chip ml-2">Important</span><h3 class="mt-3 font-bold text-navy">ESI Return</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> Business Compliance</p><p class="subtitle text-sm"><strong>State applicability:</strong> All India (where ESI applicable)</p><p class="subtitle text-sm"><strong>Applicable to:</strong> ESI-registered employers</p><p class="subtitle text-sm"><strong>Description:</strong> Return filing and contribution reconciliation.</p><p class="subtitle text-sm"><strong>Source note:</strong> ESIC compliance note placeholder.</p></article>
             <article class="calendar-card lift reveal" data-category="business-compliance" data-state="all-india"><span class="calendar-date">15th of Every Month</span><span class="trust-chip ml-2">Upcoming</span><h3 class="mt-3 font-bold text-navy">PF Payment</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> Business Compliance</p><p class="subtitle text-sm"><strong>State applicability:</strong> All India (where PF applicable)</p><p class="subtitle text-sm"><strong>Applicable to:</strong> EPF-covered establishments</p><p class="subtitle text-sm"><strong>Description:</strong> Monthly PF contribution payment and challan compliance.</p><p class="subtitle text-sm"><strong>Source note:</strong> EPFO due date placeholder.</p></article>
+            </div>
           </div>
+
+          <aside class="reveal rounded-2xl bg-[#0d2342] p-5 text-white shadow-[0_18px_36px_rgba(13,31,58,0.26)] lg:sticky lg:top-24 lg:h-fit">
+            <h3 class="text-lg font-bold">Key Compliances</h3>
+            <ul class="mt-4 space-y-3 text-sm text-slate-200">
+              <li class="flex items-start gap-2"><span class="text-[#f6c65b]">•</span><span>GST Compliance</span></li>
+              <li class="flex items-start gap-2"><span class="text-[#f6c65b]">•</span><span>TDS Compliance</span></li>
+              <li class="flex items-start gap-2"><span class="text-[#f6c65b]">•</span><span>PF / ESIC Compliance</span></li>
+              <li class="flex items-start gap-2"><span class="text-[#f6c65b]">•</span><span>Income Tax Compliance</span></li>
+            </ul>
+            <div class="mt-5 rounded-xl border border-white/20 bg-white/5 p-4 text-xs text-slate-200">
+              <p class="font-semibold text-[#f6c65b]">Reminder</p>
+              <p class="mt-2">Plan compliance activities in advance.</p>
+              <p class="mt-1">Ensure timely filing to avoid penalties.</p>
+              <p class="mt-1">Contact us for seamless compliance management.</p>
+            </div>
+          </aside>
         </div>
       </section>
 
-      <section class="section-tight px-4 sm:px-6 lg:px-8">
+      <section class="px-4 pb-8 sm:px-6 lg:px-8">
         <div class="container-premium card p-6 reveal">
           <p class="subtitle text-sm">
             Compliance dates are provided for general information and may change based on statutory notifications, taxpayer category, and government updates. Please confirm with K Srinu and Associates before filing.
@@ -120,15 +160,6 @@
         </div>
       </section>
 
-      <section class="section-tight px-4 pb-10 sm:px-6 lg:px-8">
-        <div class="container-premium card lift p-6 sm:p-8 reveal">
-          <h2 class="heading-lg max-w-3xl">Need help tracking statutory deadlines?</h2>
-          <div class="mt-5 flex flex-wrap gap-3">
-            <a href="contact.html" class="btn-primary">Contact Team</a>
-            <a href="contact.html" class="btn-secondary">Schedule Consultation</a>
-          </div>
-        </div>
-      </section>
     </main>
 
     <footer class="bg-[#0d1f3a] text-slate-200 px-4 py-12 sm:px-6 lg:px-8">
@@ -154,3 +185,5 @@
     </script>
   </body>
 </html>
+
+

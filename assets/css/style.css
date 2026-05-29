@@ -51,6 +51,20 @@ body {
 }
 .nav-link:hover::after, .nav-link.active::after { transform: scaleX(1); }
 
+.more-dropdown-menu {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+}
+
+.more-dropdown:hover .more-dropdown-menu,
+.more-dropdown:focus-within .more-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
 .mobile-link { display: block; padding: .75rem .2rem; border-bottom: 1px solid var(--line); font-weight: 600; color: var(--navy); }
 .mobile-link:last-child { border-bottom: none; }
 

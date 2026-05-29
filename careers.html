@@ -5,109 +5,136 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Careers | K Srinu and Associates</title>
-    <link rel="icon" type="image/png" href="assets/images/favicon.png">
-    <meta property="og:title" content="K Srinu and Associates">
-    <meta property="og:description" content="Professional audit, taxation, compliance, and advisory services.">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="https://caksrinuandassociates.com/assets/images/logo.jpg">
+    <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+    <meta property="og:title" content="K Srinu and Associates" />
+    <meta property="og:description" content="Professional audit, taxation, compliance, and advisory services." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://caksrinuandassociates.com/assets/images/logo.jpg" />
     <meta name="description" content="Build your career with K Srinu and Associates. Explore full-time and internship opportunities in audit, taxation, compliance, and advisory." />
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config={theme:{extend:{colors:{navy:'#0f2747',gold:'#b99746'}}}};</script>
+    <script>
+      tailwind.config = { theme: { extend: { colors: { navy: '#0f2747', gold: '#f2b233' } } } };
+    </script>
     <link rel="stylesheet" href="assets/css/style.css" />
   </head>
   <body>
-    <header id="site-header" class="fixed top-0 z-50 w-full bg-white/90 transition-all duration-300">
-      <nav class="container-premium flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <a href="index.html" class="brand text-lg inline-flex items-center gap-2 transition duration-200 hover:opacity-90 hover:scale-[1.01]"><img src="assets/images/logo.png" alt="K Srinu and Associates Logo" class="h-[34px] w-auto sm:h-[42px]" /><span class="whitespace-nowrap text-navy">K SRINU & ASSOCIATES</span></a>
-        <button id="menu-btn" class="rounded-md border border-slate-200 px-3 py-2 md:hidden" aria-expanded="false">â˜°</button>
-        <ul class="hidden gap-8 md:flex">
+    <div class="bg-[#0b1d37] text-slate-100">
+      <div class="container-premium flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-[11px] sm:gap-3 sm:px-6 lg:px-8">
+        <p>Rajamahendravaram, Andhra Pradesh</p>
+        <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+          <a href="tel:+918897667910" class="hover:text-[#f6c65b]">+91 8897667910</a>
+          <a href="mailto:kasofc4u@gmail.com" class="hover:text-[#f6c65b]">kasofc4u@gmail.com</a>
+          <a href="contact.html" class="rounded-md border border-[#f6c65b]/70 px-3 py-1 font-semibold text-[#ffd67a]">Schedule Consultation</a>
+        </div>
+      </div>
+    </div>
+
+    <header id="site-header" class="sticky top-0 z-50 w-full bg-white/95 transition-all duration-300">
+      <nav class="container-premium flex items-center justify-between gap-6 xl:gap-10 px-4 py-3 sm:px-6 lg:px-8 xl:px-10" aria-label="Main Navigation">
+        <a href="index.html" class="inline-flex shrink-0 items-center gap-3">
+          <img src="assets/images/logo.png" alt="K Srinu and Associates Logo" class="h-[34px] w-auto sm:h-[42px]" />
+          <span>
+            <span class="block text-sm font-extrabold tracking-wide text-navy sm:text-base">K SRINU & ASSOCIATES</span>
+            <span class="block text-[10px] font-semibold tracking-[0.18em] text-[#e99b12] sm:text-xs">CHARTERED ACCOUNTANTS</span>
+          </span>
+        </a>
+        <button id="menu-btn" class="rounded-md border border-slate-200 px-3 py-2 xl:hidden" aria-expanded="false" aria-label="Toggle menu">☰</button>
+        <ul class="hidden items-center gap-6 xl:gap-7 xl:flex text-[15px]">
           <li><a class="nav-link" href="index.html">Home</a></li>
-          <li><a class="nav-link" href="about.html">About</a></li>
+          <li><a class="nav-link" href="about.html">About Us</a></li>
           <li><a class="nav-link" href="services.html">Services</a></li>
+          <li><a class="nav-link" href="industries.html">Industries</a></li>
           <li><a class="nav-link" href="team.html">Team</a></li>
-          <li><a class="nav-link active" href="careers.html">Careers</a></li>
           <li><a class="nav-link" href="compliance-calendar.html">Compliance Calendar</a></li>
-          <li><a class="nav-link" href="contact.html">Contact</a></li>
+          <li><a class="nav-link active" href="careers.html">Career</a></li>
+          <li><a class="nav-link" href="contact.html">Contact Us</a></li>
         </ul>
       </nav>
-      <div id="mobile-menu" class="mx-4 mb-4 hidden rounded-xl border border-slate-200 bg-white p-4 md:hidden"><a class="mobile-link" href="index.html">Home</a><a class="mobile-link" href="about.html">About</a><a class="mobile-link" href="services.html">Services</a><a class="mobile-link" href="team.html">Team</a><a class="mobile-link" href="careers.html">Careers</a><a class="mobile-link" href="compliance-calendar.html">Compliance Calendar</a><a class="mobile-link" href="contact.html">Contact</a></div>
+      <div id="mobile-menu" class="mx-4 mb-4 hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm xl:hidden">
+        <a class="mobile-link" href="index.html">Home</a>
+        <a class="mobile-link" href="about.html">About Us</a>
+        <a class="mobile-link" href="services.html">Services</a>
+        <a class="mobile-link" href="industries.html">Industries</a>
+        <a class="mobile-link" href="team.html">Team</a>
+        <a class="mobile-link" href="compliance-calendar.html">Compliance Calendar</a>
+        <a class="mobile-link" href="careers.html">Career</a>
+        <a class="mobile-link" href="contact.html">Contact Us</a>
+      </div>
     </header>
 
-    <main class="pt-24">
-      <section class="section-tight px-4 sm:px-6 lg:px-8">
-        <div class="container-premium hero-shell p-6 sm:p-8 lg:p-10 reveal">
-          <p class="breadcrumb"><a href="index.html">Home</a> / Careers</p>
-          <span class="eyebrow mt-3 inline-block">Work With Us</span>
-          <h1 class="heading-xl mt-4 max-w-4xl">Build Your Career With K Srinu and Associates</h1>
-          <p class="subtitle mt-4 max-w-3xl">Join a professional team focused on taxation, compliance, audit, and business advisory excellence.</p>
-          <div class="mt-6 flex flex-wrap gap-3"><a class="btn-primary" href="#application-form">Apply Now</a><a class="btn-secondary" href="#current-opportunities">Explore Opportunities</a></div>
+    <main>
+      <section class="relative overflow-hidden bg-white px-4 pb-14 pt-12 sm:px-6 sm:pb-16 sm:pt-14 lg:px-8 lg:pb-16 lg:pt-16">
+        <div class="absolute inset-y-0 right-0 w-full bg-[url('assets/images/career-hero.png')] bg-[length:124%_auto] bg-[80%_50%] bg-no-repeat lg:w-[57%] lg:bg-cover lg:bg-right"></div>
+        <div class="absolute inset-y-0 left-0 w-full bg-[linear-gradient(90deg,#ffffff_0%,#ffffff_43%,rgba(255,255,255,0.88)_57%,rgba(255,255,255,0.22)_72%,rgba(255,255,255,0)_84%)] lg:w-[68%]"></div>
+
+        <div class="container-premium relative grid items-center gap-8 lg:grid-cols-[1.04fr_.96fr] lg:gap-10">
+          <div class="reveal">
+            <span class="inline-flex items-center rounded-full border border-[#f6c65b]/60 bg-[#f6c65b1f] px-3 py-1 text-xs font-semibold tracking-[0.18em] text-[#e9a31a]">CAREERS</span>
+            <h1 class="mt-4 text-[2.2rem] font-extrabold leading-[1.05] text-navy sm:text-5xl lg:text-[3.25rem]">Build Your Career.<br /><span class="text-[#f2b233]">Shape Your Future.</span></h1>
+            <p class="mt-5 max-w-xl text-[15px] leading-relaxed text-slate-700 sm:text-base">At K Srinu & Associates, we believe our people are our greatest strength. We foster a culture of growth, learning, collaboration, and integrity where every individual can thrive and make a meaningful impact.</p>
+            <div class="mt-6 flex flex-wrap gap-3"><a class="btn-primary" href="#application-form">Apply Now</a><a class="btn-secondary" href="#current-opportunities">Explore Opportunities</a></div>
+          </div>
+          <div class="hidden lg:block" aria-hidden="true"></div>
         </div>
       </section>
 
-      <section class="section-tight px-4 sm:px-6 lg:px-8">
-        <div class="container-premium">
-          <h2 class="heading-lg reveal">Why Work With Us</h2>
-          <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <article class="card lift p-5 reveal"><div class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20V4"/><path d="M5 13l7-7 7 7"/></svg></div><h3 class="mt-3 font-bold text-navy">Professional Growth</h3><p class="subtitle text-sm mt-2">Work on meaningful assignments that strengthen technical and leadership capabilities.</p></article>
-            <article class="card lift p-5 reveal"><div class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="3"/><path d="M5 21c1.2-3 3.8-5 7-5s5.8 2 7 5"/></svg></div><h3 class="mt-3 font-bold text-navy">Mentorship</h3><p class="subtitle text-sm mt-2">Learn from experienced professionals with practical guidance and structured support.</p></article>
-            <article class="card lift p-5 reveal"><div class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-5"/></svg></div><h3 class="mt-3 font-bold text-navy">Industry Exposure</h3><p class="subtitle text-sm mt-2">Gain cross-sector exposure across audit, compliance, and taxation engagements.</p></article>
-            <article class="card lift p-5 reveal"><div class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 12h8"/><path d="M12 8v8"/><circle cx="12" cy="12" r="9"/></svg></div><h3 class="mt-3 font-bold text-navy">Collaborative Environment</h3><p class="subtitle text-sm mt-2">Contribute in a respectful, team-driven, and quality-oriented workplace.</p></article>
-            <article class="card lift p-5 reveal"><div class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3l8 4v5c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V7z"/></svg></div><h3 class="mt-3 font-bold text-navy">Compliance Expertise</h3><p class="subtitle text-sm mt-2">Develop deep expertise in statutory, tax, and governance frameworks.</p></article>
-            <article class="card lift p-5 reveal"><div class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/></svg></div><h3 class="mt-3 font-bold text-navy">Career Development</h3><p class="subtitle text-sm mt-2">Build a long-term professional path with measurable progression opportunities.</p></article>
+      <section class="px-4 pb-8 sm:px-6 lg:px-8">
+        <div class="container-premium reveal rounded-2xl bg-[#0d2342] px-5 py-5 shadow-[0_18px_36px_rgba(13,31,58,0.26)] sm:px-6">
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <article class="flex items-start gap-3 border-white/12 lg:border-r lg:pr-4"><span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#f6c65b] text-[#f6c65b]">â—Ž</span><div><h3 class="text-sm font-bold text-white">Grow With Us</h3><p class="mt-1 text-xs text-slate-300">Progress through meaningful opportunities</p></div></article>
+            <article class="flex items-start gap-3 border-white/12 lg:border-r lg:px-4"><span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#f6c65b] text-[#f6c65b]">â—‰</span><div><h3 class="text-sm font-bold text-white">Innovate</h3><p class="mt-1 text-xs text-slate-300">Bring fresh thinking to real client challenges</p></div></article>
+            <article class="flex items-start gap-3 border-white/12 lg:border-r lg:px-4"><span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#f6c65b] text-[#f6c65b]">âœ“</span><div><h3 class="text-sm font-bold text-white">Collaborate</h3><p class="mt-1 text-xs text-slate-300">Work with supportive, high-performing teams</p></div></article>
+            <article class="flex items-start gap-3 lg:pl-4"><span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#f6c65b] text-[#f6c65b]">â˜…</span><div><h3 class="text-sm font-bold text-white">Make an Impact</h3><p class="mt-1 text-xs text-slate-300">Contribute to trusted business outcomes</p></div></article>
           </div>
         </div>
       </section>
 
-      <section id="current-opportunities" class="section-tight px-4 sm:px-6 lg:px-8">
+      <section class="bg-white px-4 pb-10 sm:px-6 lg:px-8">
         <div class="container-premium">
-          <h2 class="heading-lg reveal">Current Opportunities</h2>
+          <h2 class="reveal text-2xl font-bold text-navy sm:text-[2rem]">Why Build Your Career With Us</h2>
+          <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <article class="card lift reveal rounded-2xl p-5 shadow-[0_12px_24px_rgba(15,39,71,0.08)]"><h3 class="text-base font-bold text-navy">Professional Growth</h3><p class="mt-2 text-sm text-slate-600">Structured roles with accountability and growth pathways.</p></article>
+            <article class="card lift reveal rounded-2xl p-5 shadow-[0_12px_24px_rgba(15,39,71,0.08)]"><h3 class="text-base font-bold text-navy">Learning & Development</h3><p class="mt-2 text-sm text-slate-600">Hands-on mentoring, reviews, and practical domain learning.</p></article>
+            <article class="card lift reveal rounded-2xl p-5 shadow-[0_12px_24px_rgba(15,39,71,0.08)]"><h3 class="text-base font-bold text-navy">Competitive Compensation</h3><p class="mt-2 text-sm text-slate-600">Performance-aligned rewards and long-term career value.</p></article>
+            <article class="card lift reveal rounded-2xl p-5 shadow-[0_12px_24px_rgba(15,39,71,0.08)]"><h3 class="text-base font-bold text-navy">Inclusive Culture</h3><p class="mt-2 text-sm text-slate-600">Respectful workplace rooted in integrity and collaboration.</p></article>
+          </div>
+        </div>
+      </section>
 
+      <section class="bg-white px-4 pb-10 sm:px-6 lg:px-8">
+        <div class="container-premium">
+          <h2 class="reveal text-2xl font-bold text-navy sm:text-[2rem]">Life at K Srinu & Associates</h2>
+          <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <article class="reveal rounded-2xl border border-slate-200 bg-gradient-to-br from-[#f8fbff] to-[#eef3fb] p-5 shadow-[0_10px_22px_rgba(15,39,71,0.08)]"><h3 class="text-base font-bold text-navy">Collaborative Environment</h3><p class="mt-2 text-sm text-slate-600">Open communication and team-driven execution culture.</p></article>
+            <article class="reveal rounded-2xl border border-slate-200 bg-gradient-to-br from-[#fffaf0] to-[#fef4dc] p-5 shadow-[0_10px_22px_rgba(15,39,71,0.08)]"><h3 class="text-base font-bold text-navy">Knowledge Sharing</h3><p class="mt-2 text-sm text-slate-600">Continuous exchange of practical insights and expertise.</p></article>
+            <article class="reveal rounded-2xl border border-slate-200 bg-gradient-to-br from-[#f8fbff] to-[#eef3fb] p-5 shadow-[0_10px_22px_rgba(15,39,71,0.08)]"><h3 class="text-base font-bold text-navy">Team Bonding</h3><p class="mt-2 text-sm text-slate-600">Strong interpersonal culture with shared professional goals.</p></article>
+            <article class="reveal rounded-2xl border border-slate-200 bg-gradient-to-br from-[#fffaf0] to-[#fef4dc] p-5 shadow-[0_10px_22px_rgba(15,39,71,0.08)]"><h3 class="text-base font-bold text-navy">Work-Life Balance</h3><p class="mt-2 text-sm text-slate-600">Balanced practices that support sustainable performance.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section id="current-opportunities" class="bg-white px-4 pb-10 sm:px-6 lg:px-8">
+        <div class="container-premium">
+          <h2 class="reveal text-2xl font-bold text-navy sm:text-[2rem]">Open Positions</h2>
           <p id="careers-loading" class="subtitle text-sm mt-4 reveal">Loading openings...</p>
           <p id="careers-empty" class="subtitle text-sm mt-2 reveal hidden">No active openings at the moment.</p>
 
-          <div class="mt-4 reveal"><span class="eyebrow">Full-Time Roles</span></div>
+          <div class="mt-4 reveal"><span class="inline-flex rounded-full border border-[#f2b233]/45 bg-[#fff7e8] px-3 py-1 text-xs font-semibold tracking-[0.16em] text-[#e9a31a]">FULL-TIME ROLES</span></div>
           <div id="careers-jobs-list" class="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"></div>
 
-          <div class="mt-8 reveal"><span class="eyebrow">Internship Roles</span></div>
+          <div class="mt-8 reveal"><span class="inline-flex rounded-full border border-[#f2b233]/45 bg-[#fff7e8] px-3 py-1 text-xs font-semibold tracking-[0.16em] text-[#e9a31a]">INTERNSHIP / ARTICLESHIP</span></div>
           <div id="careers-intern-list" class="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"></div>
         </div>
       </section>
 
-      <section class="section-tight px-4 sm:px-6 lg:px-8">
-        <div class="container-premium">
-          <h2 class="heading-lg reveal">What We Offer</h2>
-          <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <article class="card lift p-5 reveal"><h3 class="font-bold text-navy">Hands-on Experience</h3><p class="subtitle text-sm mt-2">Direct project exposure to practical compliance and advisory assignments.</p></article>
-            <article class="card lift p-5 reveal"><h3 class="font-bold text-navy">Real Client Exposure</h3><p class="subtitle text-sm mt-2">Opportunity to understand real business contexts and client needs.</p></article>
-            <article class="card lift p-5 reveal"><h3 class="font-bold text-navy">Learning Opportunities</h3><p class="subtitle text-sm mt-2">Continuous learning through reviews, mentoring, and guided execution.</p></article>
-            <article class="card lift p-5 reveal"><h3 class="font-bold text-navy">Professional Environment</h3><p class="subtitle text-sm mt-2">A high-trust culture built on discipline, quality, and collaboration.</p></article>
-            <article class="card lift p-5 reveal"><h3 class="font-bold text-navy">Career Growth</h3><p class="subtitle text-sm mt-2">Clear opportunities to progress with skill and performance.</p></article>
-            <article class="card lift p-5 reveal"><h3 class="font-bold text-navy">Flexible Learning</h3><p class="subtitle text-sm mt-2">Balanced exposure to technical work and practical business insight.</p></article>
-          </div>
-        </div>
-      </section>
-
-      <section class="section-tight px-4 sm:px-6 lg:px-8">
-        <div class="container-premium">
-          <h2 class="heading-lg reveal">Hiring Process</h2>
-          <div class="mt-4 grid gap-4 md:grid-cols-5">
-            <article class="card lift p-4 reveal"><p class="text-xs font-semibold text-gold">01</p><h3 class="mt-2 font-bold text-navy">Application Review</h3></article>
-            <article class="card lift p-4 reveal"><p class="text-xs font-semibold text-gold">02</p><h3 class="mt-2 font-bold text-navy">Initial Discussion</h3></article>
-            <article class="card lift p-4 reveal"><p class="text-xs font-semibold text-gold">03</p><h3 class="mt-2 font-bold text-navy">Assessment</h3></article>
-            <article class="card lift p-4 reveal"><p class="text-xs font-semibold text-gold">04</p><h3 class="mt-2 font-bold text-navy">Final Interview</h3></article>
-            <article class="card lift p-4 reveal"><p class="text-xs font-semibold text-gold">05</p><h3 class="mt-2 font-bold text-navy">Onboarding</h3></article>
-          </div>
-        </div>
-      </section>
-
-      <section id="application-form" class="section-tight px-4 sm:px-6 lg:px-8">
-        <div class="container-premium form-card reveal">
-          <h2 class="heading-lg">Application Form</h2>
+      <section id="application-form" class="px-4 pb-10 sm:px-6 lg:px-8">
+        <div class="container-premium rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_14px_28px_rgba(15,39,71,0.08)] sm:p-8 reveal">
+          <h2 class="text-2xl font-bold text-navy sm:text-[2rem]">Application Form</h2>
           <form id="career-web3-form" class="mt-4 grid gap-3" action="https://api.web3forms.com/submit" method="post">
             <input type="hidden" name="access_key" value="454440b3-7c32-4873-b99d-bc5113711d79" />
             <input type="hidden" name="subject" value="New Career Application - K Srinu and Associates" />
             <input type="hidden" name="from_name" value="K Srinu and Associates Careers Page" />
-            <input type="checkbox" name="botcheck" class="hidden" style="display:none;">
+            <input type="checkbox" name="botcheck" class="hidden" style="display:none;" />
             <input class="contact-input" type="text" name="full_name" placeholder="Full Name" required />
             <div class="grid gap-3 sm:grid-cols-2">
               <input class="contact-input" type="email" name="email" placeholder="Email" required />
@@ -131,13 +158,11 @@
         </div>
       </section>
 
-      <section class="section-tight px-4 pb-10 sm:px-6 lg:px-8">
-        <div class="container-premium card lift p-6 sm:p-8 reveal">
-          <h2 class="heading-lg max-w-3xl">Start your professional journey with a team committed to excellence.</h2>
-          <div class="mt-5 flex flex-wrap gap-3">
-            <a href="contact.html" class="btn-primary">Contact Team</a>
-            <a href="#application-form" class="btn-secondary">Apply Today</a>
-          </div>
+      <section class="px-4 pb-10 sm:px-6 lg:px-8">
+        <div class="container-premium reveal rounded-2xl border border-[#f2b233]/25 bg-white p-7 text-center shadow-[0_14px_28px_rgba(15,39,71,0.08)] sm:p-9">
+          <h2 class="text-2xl font-bold text-navy sm:text-[2rem]">Ready to take the next step?</h2>
+          <p class="mx-auto mt-3 max-w-2xl text-sm text-slate-600 sm:text-base">Send your resume to ksrinuassoicates@gmail.com or explore current openings.</p>
+          <a href="#application-form" class="btn-primary mt-5 inline-flex border-[#f2b233] bg-[#f2b233] !text-[#0f2747] hover:bg-[#ffd778]">Apply Now</a>
         </div>
       </section>
     </main>
@@ -223,3 +248,4 @@
     </script>
   </body>
 </html>
+

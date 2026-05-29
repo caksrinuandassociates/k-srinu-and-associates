@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <!-- Website designed and developed by Varada Nexus Private Limited | https://www.varadanexus.com -->
   <head>
@@ -17,7 +17,7 @@
     <div class="bg-[#0b1d37] text-slate-100">
       <div class="container-premium flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-[11px] sm:gap-3 sm:px-6 lg:px-8">
         <p>Rajamahendravaram, Andhra Pradesh</p>
-        <div class="flex flex-wrap items-center gap-4">
+        <div class="flex flex-wrap items-center gap-3 sm:gap-4">
           <a href="tel:+918897667910" class="hover:text-[#f6c65b]">+91 8897667910</a>
           <a href="mailto:kasofc4u@gmail.com" class="hover:text-[#f6c65b]">kasofc4u@gmail.com</a>
           <a href="contact.html" class="rounded-md border border-[#f6c65b]/70 px-3 py-1 font-semibold text-[#ffd67a]">Schedule Consultation</a>
@@ -26,30 +26,34 @@
     </div>
 
     <header id="site-header" class="sticky top-0 z-50 w-full bg-white/95 transition-all duration-300">
-      <nav class="container-premium flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8" aria-label="Main Navigation">
-        <a href="index.html" class="inline-flex items-center gap-3">
-          <img src="assets/images/logo.png" alt="K Srinu and Associates Logo" class="h-[34px] w-auto sm:h-[42px]" />
+      <nav class="container-premium mx-auto max-w-[1320px] flex items-center justify-between gap-6 px-4 py-3 sm:px-6 lg:px-8" aria-label="Main Navigation">
+        <a href="index.html" class="inline-flex shrink-0 items-center gap-3">
+          <img src="assets/images/logo.png" alt="K Srinu and Associates Logo" class="h-[42px] w-auto" />
           <span>
-            <span class="block text-sm font-extrabold tracking-wide text-navy sm:text-base">K SRINU & ASSOCIATES</span>
-            <span class="block text-[10px] font-semibold tracking-[0.18em] text-[#e99b12] sm:text-xs">CHARTERED ACCOUNTANTS</span>
+            <span class="block text-[15px] font-extrabold tracking-wide text-navy">K SRINU & ASSOCIATES</span>
+            <span class="block text-[11px] font-semibold tracking-[0.18em] text-[#e99b12]">CHARTERED ACCOUNTANTS</span>
           </span>
         </a>
-        <button id="menu-btn" class="rounded-md border border-slate-200 px-3 py-2 md:hidden" aria-expanded="false" aria-label="Toggle menu">☰</button>
-        <ul class="hidden items-center gap-6 lg:gap-7 md:flex">
-          <li><a class="nav-link" href="index.html">Home</a></li>
-          <li><a class="nav-link active" href="about.html">About Us</a></li>
-          <li><a class="nav-link" href="services.html">Services</a></li>
-          <li><a class="nav-link" href="team.html">Industries</a></li>
-          <li><a class="nav-link" href="compliance-calendar.html">Compliance Calendar</a></li>
-          <li><a class="nav-link" href="careers.html">Career</a></li>
-          <li><a class="nav-link" href="contact.html">Contact Us</a></li>
+        <ul class="hidden items-center gap-4 text-[14px] xl:flex 2xl:hidden">
+          <li><a class="nav-link whitespace-nowrap" href="index.html">Home</a></li>
+          <li><a class="nav-link whitespace-nowrap active" href="about.html">About Us</a></li>
+          <li><a class="nav-link whitespace-nowrap" href="services.html">Services</a></li>
+          <li><a class="nav-link whitespace-nowrap" href="industries.html">Industries</a></li>
+          <li><a class="nav-link whitespace-nowrap" href="contact.html">Contact Us</a></li>
+          <li class="more-dropdown relative"><button type="button" class="nav-link whitespace-nowrap inline-flex items-center gap-1">More <span class="text-[10px]">▾</span></button><div class="more-dropdown-menu absolute right-0 top-full mt-2 w-52 rounded-xl border border-slate-200 bg-white p-2 shadow-lg"><a class="mobile-link !py-2" href="team.html">Team</a><a class="mobile-link !py-2" href="compliance-calendar.html">Compliance Calendar</a><a class="mobile-link !py-2" href="careers.html">Career</a></div></li>
         </ul>
+        <ul class="hidden items-center gap-4 2xl:gap-6 text-[14px] 2xl:flex">
+          <li><a class="nav-link whitespace-nowrap" href="index.html">Home</a></li><li><a class="nav-link whitespace-nowrap active" href="about.html">About Us</a></li><li><a class="nav-link whitespace-nowrap" href="services.html">Services</a></li><li><a class="nav-link whitespace-nowrap" href="industries.html">Industries</a></li><li><a class="nav-link whitespace-nowrap" href="team.html">Team</a></li><li><a class="nav-link whitespace-nowrap" href="compliance-calendar.html">Compliance Calendar</a></li><li><a class="nav-link whitespace-nowrap" href="careers.html">Career</a></li><li><a class="nav-link whitespace-nowrap" href="contact.html">Contact Us</a></li>
+        </ul>
+        <a href="contact.html" class="hidden xl:inline-flex rounded-md border border-[#f6c65b]/70 px-3 py-1 font-semibold text-[#b8860b]">Schedule Consultation</a>
+        <button id="menu-btn" class="rounded-md border border-slate-200 px-3 py-2 xl:hidden" aria-expanded="false" aria-label="Toggle menu">☰</button>
       </nav>
-      <div id="mobile-menu" class="mx-4 mb-4 hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:hidden">
+      <div id="mobile-menu" class="mx-4 mb-4 hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm xl:hidden">
         <a class="mobile-link" href="index.html">Home</a>
         <a class="mobile-link" href="about.html">About Us</a>
         <a class="mobile-link" href="services.html">Services</a>
-        <a class="mobile-link" href="team.html">Industries</a>
+        <a class="mobile-link" href="industries.html">Industries</a>
+        <a class="mobile-link" href="team.html">Team</a>
         <a class="mobile-link" href="compliance-calendar.html">Compliance Calendar</a>
         <a class="mobile-link" href="careers.html">Career</a>
         <a class="mobile-link" href="contact.html">Contact Us</a>
@@ -77,19 +81,19 @@
         <div class="container-premium reveal rounded-2xl bg-[#0d2342] px-5 py-4 shadow-[0_18px_36px_rgba(13,31,58,0.26)] sm:px-6">
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <article class="flex items-center gap-3 border-white/12 lg:border-r lg:pr-4">
-              <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f6c65b]/18 text-[#f6c65b]">★</span>
+              <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f6c65b]/18 text-[#f6c65b]">â˜…</span>
               <div><p class="text-xl font-extrabold text-[#f6c65b]">12+</p><p class="text-xs text-slate-200">Years of Excellence</p></div>
             </article>
             <article class="flex items-center gap-3 border-white/12 lg:border-r lg:px-4">
-              <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f6c65b]/18 text-[#f6c65b]">✓</span>
+              <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f6c65b]/18 text-[#f6c65b]">âœ“</span>
               <div><p class="text-xl font-extrabold text-[#f6c65b]">500+</p><p class="text-xs text-slate-200">Happy Clients</p></div>
             </article>
             <article class="flex items-center gap-3 border-white/12 lg:border-r lg:px-4">
-              <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f6c65b]/18 text-[#f6c65b]">▣</span>
+              <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f6c65b]/18 text-[#f6c65b]">â–£</span>
               <div><p class="text-xl font-extrabold text-[#f6c65b]">2000+</p><p class="text-xs text-slate-200">Compliance Filings</p></div>
             </article>
             <article class="flex items-center gap-3 lg:pl-4">
-              <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f6c65b]/18 text-[#f6c65b]">◎</span>
+              <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f6c65b]/18 text-[#f6c65b]">â—Ž</span>
               <div><p class="text-xl font-extrabold text-[#f6c65b]">100%</p><p class="text-xs text-slate-200">Client Satisfaction</p></div>
             </article>
           </div>
@@ -99,27 +103,27 @@
       <section class="bg-white px-4 pb-10 pt-10 sm:px-6 sm:pb-12 sm:pt-12 lg:px-8">
         <div class="container-premium grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <article class="card reveal flex min-h-[260px] flex-col rounded-2xl p-6 shadow-[0_16px_30px_rgba(15,39,71,0.08)]">
-            <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#f6c65b1f] text-[#e9a31a]">◍</span>
+            <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#f6c65b1f] text-[#e9a31a]">â—</span>
             <h3 class="mt-4 text-lg font-bold text-navy">Our Approach</h3>
             <p class="subtitle mt-3 text-sm leading-relaxed">We begin with a clear understanding of your business model, compliance profile, and financial priorities to deliver practical and accountable solutions.</p>
           </article>
           <article class="card reveal flex min-h-[260px] flex-col rounded-2xl p-6 shadow-[0_16px_30px_rgba(15,39,71,0.08)]">
-            <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#f6c65b1f] text-[#e9a31a]">◎</span>
+            <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#f6c65b1f] text-[#e9a31a]">â—Ž</span>
             <h3 class="mt-4 text-lg font-bold text-navy">Our Mission</h3>
             <p class="subtitle mt-3 text-sm leading-relaxed">To provide dependable audit, tax, and advisory support that strengthens compliance confidence and long-term financial resilience.</p>
           </article>
           <article class="card reveal flex min-h-[260px] flex-col rounded-2xl p-6 shadow-[0_16px_30px_rgba(15,39,71,0.08)]">
-            <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#f6c65b1f] text-[#e9a31a]">◉</span>
+            <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#f6c65b1f] text-[#e9a31a]">â—‰</span>
             <h3 class="mt-4 text-lg font-bold text-navy">Our Vision</h3>
             <p class="subtitle mt-3 text-sm leading-relaxed">To be the preferred advisory partner for businesses seeking disciplined governance, transparent reporting, and strategic growth guidance.</p>
           </article>
           <article class="card reveal flex min-h-[260px] flex-col rounded-2xl p-6 shadow-[0_16px_30px_rgba(15,39,71,0.08)]">
-            <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#f6c65b1f] text-[#e9a31a]">✓</span>
+            <span class="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#f6c65b1f] text-[#e9a31a]">âœ“</span>
             <h3 class="mt-4 text-lg font-bold text-navy">Core Values</h3>
             <ul class="mt-3 space-y-2 text-sm text-slate-600">
-              <li class="flex items-start gap-2"><span class="mt-0.5 text-[#e9a31a]">•</span><span>Integrity and transparency in every engagement</span></li>
-              <li class="flex items-start gap-2"><span class="mt-0.5 text-[#e9a31a]">•</span><span>Precision-driven compliance execution</span></li>
-              <li class="flex items-start gap-2"><span class="mt-0.5 text-[#e9a31a]">•</span><span>Client-first advisory with practical outcomes</span></li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-[#e9a31a]">â€¢</span><span>Integrity and transparency in every engagement</span></li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-[#e9a31a]">â€¢</span><span>Precision-driven compliance execution</span></li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-[#e9a31a]">â€¢</span><span>Client-first advisory with practical outcomes</span></li>
             </ul>
           </article>
         </div>
@@ -133,7 +137,7 @@
         <div><h4 class="font-semibold text-white">Contact</h4><p class="text-sm mt-2 text-slate-300">Phone: <a class="footer-link" href="tel:+918897667910">+91 8897667910</a></p><p class="text-sm text-slate-300">Email: <a class="footer-link" href="mailto:kasofc4u@gmail.com">kasofc4u@gmail.com</a></p></div>
         <div><h4 class="font-semibold text-white">Office Address</h4><p class="text-sm mt-2 text-slate-300">D.No:81-23-01/3, Sri Venkateswara Nagar, Rajamahendravaram, Andhra Pradesh, India - 533106</p><a class="btn-secondary mt-2" href="https://goo.gl/maps/EHRtCN9VAzb6CBBG6" target="_blank" rel="noopener">Open in Maps</a></div>
       </div>
-      <p class="mt-8 text-center text-xs text-slate-400">© <span id="year"></span> K Srinu and Associates</p>
+      <p class="mt-8 text-center text-xs text-slate-400">Â© <span id="year"></span> K Srinu and Associates</p>
       <p class="mt-2 text-right text-xs text-slate-400" style="opacity:.45;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.45'"><a href="https://www.varadanexus.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">@Varada Nexus</a></p>
     </footer>
 
@@ -144,3 +148,6 @@
     <script src="assets/js/script.js"></script>
   </body>
 </html>
+
+
+

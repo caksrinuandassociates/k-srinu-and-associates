@@ -19,7 +19,7 @@
     <div class="bg-[#0b1d37] text-slate-100">
       <div class="container-premium flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-[11px] sm:gap-3 sm:px-6 lg:px-8">
         <p>Rajamahendravaram, Andhra Pradesh</p>
-        <div class="flex flex-wrap items-center gap-4">
+        <div class="flex flex-wrap items-center gap-3 sm:gap-4">
           <a href="tel:+918897667910" class="hover:text-[#f6c65b]">+91 8897667910</a>
           <a href="mailto:kasofc4u@gmail.com" class="hover:text-[#f6c65b]">kasofc4u@gmail.com</a>
           <a href="contact.html" class="rounded-md border border-[#f6c65b]/70 px-3 py-1 font-semibold text-[#ffd67a]">Schedule Consultation</a>
@@ -28,30 +28,48 @@
     </div>
 
     <header id="site-header" class="sticky top-0 z-50 w-full bg-white/95 transition-all duration-300">
-      <nav class="container-premium flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8" aria-label="Main Navigation">
-        <a href="index.html" class="inline-flex items-center gap-3">
-          <img src="assets/images/logo.png" alt="K Srinu and Associates Logo" class="h-[34px] w-auto sm:h-[42px]" />
+      <nav class="container-premium mx-auto max-w-[1320px] flex items-center justify-between gap-6 px-4 py-3 sm:px-6 lg:px-8" aria-label="Main Navigation">
+        <a href="index.html" class="inline-flex shrink-0 items-center gap-3">
+          <img src="assets/images/logo.png" alt="K Srinu and Associates Logo" class="h-[42px] w-auto" />
           <span>
-            <span class="block text-sm font-extrabold tracking-wide text-navy sm:text-base">K SRINU & ASSOCIATES</span>
-            <span class="block text-[10px] font-semibold tracking-[0.18em] text-[#e99b12] sm:text-xs">CHARTERED ACCOUNTANTS</span>
+            <span class="block text-[15px] font-extrabold tracking-wide text-navy">K SRINU & ASSOCIATES</span>
+            <span class="block text-[11px] font-semibold tracking-[0.18em] text-[#e99b12]">CHARTERED ACCOUNTANTS</span>
           </span>
         </a>
-        <button id="menu-btn" class="rounded-md border border-slate-200 px-3 py-2 md:hidden" aria-expanded="false" aria-label="Toggle menu">☰</button>
-        <ul class="hidden items-center gap-6 lg:gap-7 md:flex">
-          <li><a class="nav-link active" href="index.html">Home</a></li>
-          <li><a class="nav-link" href="about.html">About Us</a></li>
-          <li><a class="nav-link" href="services.html">Services</a></li>
-          <li><a class="nav-link" href="team.html">Industries</a></li>
-          <li><a class="nav-link" href="compliance-calendar.html">Compliance Calendar</a></li>
-          <li><a class="nav-link" href="careers.html">Career</a></li>
-          <li><a class="nav-link" href="contact.html">Contact Us</a></li>
+        <ul class="hidden items-center gap-4 text-[14px] xl:flex 2xl:hidden">
+          <li><a class="nav-link whitespace-nowrap active" href="index.html">Home</a></li>
+          <li><a class="nav-link whitespace-nowrap" href="about.html">About Us</a></li>
+          <li><a class="nav-link whitespace-nowrap" href="services.html">Services</a></li>
+          <li><a class="nav-link whitespace-nowrap" href="industries.html">Industries</a></li>
+          <li><a class="nav-link whitespace-nowrap" href="contact.html">Contact Us</a></li>
+          <li class="more-dropdown relative">
+            <button type="button" class="nav-link whitespace-nowrap inline-flex items-center gap-1">More <span class="text-[10px]">▾</span></button>
+            <div class="more-dropdown-menu absolute right-0 top-full mt-2 w-52 rounded-xl border border-slate-200 bg-white p-2 shadow-lg">
+              <a class="mobile-link !py-2" href="team.html">Team</a>
+              <a class="mobile-link !py-2" href="compliance-calendar.html">Compliance Calendar</a>
+              <a class="mobile-link !py-2" href="careers.html">Career</a>
+            </div>
+          </li>
         </ul>
+        <ul class="hidden items-center gap-4 2xl:gap-6 text-[14px] 2xl:flex">
+          <li><a class="nav-link active whitespace-nowrap" href="index.html">Home</a></li>
+          <li><a class="nav-link whitespace-nowrap" href="about.html">About Us</a></li>
+          <li><a class="nav-link whitespace-nowrap" href="services.html">Services</a></li>
+          <li><a class="nav-link whitespace-nowrap" href="industries.html">Industries</a></li>
+          <li><a class="nav-link whitespace-nowrap" href="team.html">Team</a></li>
+          <li><a class="nav-link whitespace-nowrap" href="compliance-calendar.html">Compliance Calendar</a></li>
+          <li><a class="nav-link whitespace-nowrap" href="careers.html">Career</a></li>
+          <li><a class="nav-link whitespace-nowrap" href="contact.html">Contact Us</a></li>
+        </ul>
+        <a href="contact.html" class="hidden xl:inline-flex rounded-md border border-[#f6c65b]/70 px-3 py-1 font-semibold text-[#b8860b]">Schedule Consultation</a>
+        <button id="menu-btn" class="rounded-md border border-slate-200 px-3 py-2 xl:hidden" aria-expanded="false" aria-label="Toggle menu">☰</button>
       </nav>
-      <div id="mobile-menu" class="mx-4 mb-4 hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:hidden">
+      <div id="mobile-menu" class="mx-4 mb-4 hidden rounded-xl border border-slate-200 bg-white p-4 shadow-sm xl:hidden">
         <a class="mobile-link" href="index.html">Home</a>
         <a class="mobile-link" href="about.html">About Us</a>
         <a class="mobile-link" href="services.html">Services</a>
-        <a class="mobile-link" href="team.html">Industries</a>
+        <a class="mobile-link" href="industries.html">Industries</a>
+        <a class="mobile-link" href="team.html">Team</a>
         <a class="mobile-link" href="compliance-calendar.html">Compliance Calendar</a>
         <a class="mobile-link" href="careers.html">Career</a>
         <a class="mobile-link" href="contact.html">Contact Us</a>
@@ -161,6 +179,11 @@
     <script src="assets/js/script.js"></script>
   </body>
 </html>
+
+
+
+
+
 
 
 
