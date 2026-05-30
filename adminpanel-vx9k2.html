@@ -56,6 +56,7 @@
               <button class="btn-secondary tab-btn" data-tab="careers">Careers <span id="badge-tab-careers-active" class="admin-badge hidden">0</span></button>
               <button class="btn-secondary tab-btn" data-tab="settings">Site Settings</button>
               <button class="btn-secondary tab-btn" data-tab="submissions">Form Submissions <span id="badge-tab-submissions-new" class="admin-badge hidden">0</span></button>
+              <button class="btn-secondary tab-btn" data-tab="backup">Backup & Restore</button>
             </div>
 
             <p id="admin-message" class="subtitle text-sm mt-3"></p>
@@ -246,6 +247,70 @@
                 <h4 class="font-semibold text-navy">Live Contact/Footer Preview</h4>
                 <div id="settings-live-preview" class="mt-3"></div>
               </div>
+            </div>
+
+            <div id="tab-backup" class="tab-panel mt-6 hidden">
+              <h3 class="font-bold text-navy text-lg">Backup & Restore</h3>
+
+              <section class="card p-4 mt-3 admin-backup-section">
+                <h4 class="font-semibold text-navy">1. Frontend Backup</h4>
+                <p class="subtitle text-sm mt-2">Current frontend is managed in GitHub repository. Browser admin cannot safely produce a complete source-of-truth backup for code history.</p>
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <a class="btn-secondary" href="https://github.com/caksrinuandassociates/k-srinu-and-associates" target="_blank" rel="noopener">Open GitHub Repository</a>
+                  <a class="btn-secondary" href="https://github.com/caksrinuandassociates/k-srinu-and-associates/archive/refs/heads/main.zip" target="_blank" rel="noopener">Download Repository ZIP</a>
+                </div>
+                <pre class="admin-code-block mt-3"><code>git clone https://github.com/caksrinuandassociates/k-srinu-and-associates.git
+git pull origin main
+git archive --format=zip --output=frontend-backup.zip main</code></pre>
+                <p class="subtitle text-xs mt-2">This backs up HTML, CSS, JS, images, partials, sitemap, robots, and admin panel code.</p>
+              </section>
+
+              <section class="card p-4 mt-4 admin-backup-section">
+                <h4 class="font-semibold text-navy">2. Backend Data Backup</h4>
+                <p class="subtitle text-sm mt-2">One-click export of CMS/backend tables to a JSON backup file.</p>
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <button id="backup-export-json" type="button" class="btn-primary">Export Backend Backup JSON</button>
+                </div>
+                <p id="backup-export-status" class="subtitle text-sm mt-2"></p>
+                <ul class="subtitle text-xs mt-2 list-disc pl-5">
+                  <li>site_settings</li>
+                  <li>compliance_calendar</li>
+                  <li>team_members</li>
+                  <li>career_openings</li>
+                  <li>contact_submissions</li>
+                  <li>career_applications</li>
+                </ul>
+              </section>
+
+              <section class="card p-4 mt-4 admin-backup-section">
+                <h4 class="font-semibold text-navy">3. Storage Backup Notice</h4>
+                <p class="subtitle text-sm mt-2">Team images are stored in Supabase Storage bucket: <strong>team-images</strong>.</p>
+                <p class="subtitle text-sm">JSON backup stores <code>image_url</code> references only, not physical image files.</p>
+                <p class="subtitle text-sm">For complete storage backup, download the bucket manually from Supabase dashboard.</p>
+              </section>
+
+              <section class="card p-4 mt-4 admin-backup-section">
+                <h4 class="font-semibold text-navy">4. Backend Restore</h4>
+                <p class="subtitle text-sm mt-2">Upload a backup JSON file, validate structure, then confirm restore using keyword.</p>
+                <div class="mt-3 grid gap-3 sm:grid-cols-2">
+                  <input id="backup-restore-file" type="file" accept="application/json,.json" class="contact-input sm:col-span-2" />
+                  <div id="backup-restore-summary" class="subtitle text-sm sm:col-span-2">No backup file selected.</div>
+                  <input id="backup-restore-confirm" class="contact-input" placeholder="Type RESTORE to confirm" />
+                  <button id="backup-restore-run" type="button" class="btn-primary">Run Restore (Upsert)</button>
+                </div>
+                <p id="backup-restore-status" class="subtitle text-sm mt-2"></p>
+                <p class="subtitle text-xs mt-2">Restore uses upsert by <code>id</code>. It does not delete/truncate existing data.</p>
+              </section>
+
+              <section class="card p-4 mt-4 admin-backup-section admin-warning-box">
+                <h4 class="font-semibold text-navy">5. Warnings</h4>
+                <ul class="subtitle text-sm mt-2 list-disc pl-5">
+                  <li>Always download frontend GitHub backup before major edits.</li>
+                  <li>Always export backend data before running restore.</li>
+                  <li>Restore does not restore Supabase Auth users.</li>
+                  <li>Restore does not restore Supabase Storage files.</li>
+                </ul>
+              </section>
             </div>
           </div>
         </section>

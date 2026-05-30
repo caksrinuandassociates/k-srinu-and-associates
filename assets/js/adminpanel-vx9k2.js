@@ -3,7 +3,8 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // Add/remove admin emails here
 const ALLOWED_ADMIN_EMAILS = [
   "prudhvi@varadanexus.com",
-  "secondadmin@email.com"
+  "secondadmin@email.com",
+  "caksrinuandassociates@gmail.com"
 ];
 const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -31,6 +32,8 @@ const refs = {
   badgeTabSubmissionsNew: $("badge-tab-submissions-new"), badgeTabCareersActive: $("badge-tab-careers-active"),
   badgeSubmissionsNew: $("badge-submissions-new"), badgeSubmissionsReviewed: $("badge-submissions-reviewed"), badgeCareersActive: $("badge-careers-active"),
   exportComplianceCsv: $("export-compliance-csv"), exportCareersCsv: $("export-careers-csv"), exportContactCsv: $("export-contact-csv"), exportCareerSubmissionsCsv: $("export-career-submissions-csv"),
+  backupExportJsonBtn: $("backup-export-json"), backupExportStatus: $("backup-export-status"),
+  backupRestoreFile: $("backup-restore-file"), backupRestoreSummary: $("backup-restore-summary"), backupRestoreConfirm: $("backup-restore-confirm"), backupRestoreRun: $("backup-restore-run"), backupRestoreStatus: $("backup-restore-status"),
   toast: $("admin-toast"),
 };
 
@@ -39,7 +42,10 @@ let teamCropSourceFile = null;
 let teamCropSourceUrl = "";
 let previousTeamImageUrl = "";
 let complianceData = [], teamData = [], careersData = [], contactSubmissionsData = [], careerSubmissionsData = [];
+let parsedRestoreBackup = null;
 const ADMIN_THEME_KEY = "admin_console_theme";
+const BACKUP_TABLES = ["site_settings", "compliance_calendar", "team_members", "career_openings", "contact_submissions", "career_applications"];
+const BACKUP_PROJECT = "k-srinu-and-associates";
 const stateLabels = {"all-india":"All India","andhra-pradesh":"Andhra Pradesh",telangana:"Telangana","tamil-nadu":"Tamil Nadu",karnataka:"Karnataka",maharashtra:"Maharashtra",delhi:"Delhi",kerala:"Kerala","other-states":"Other States"};
 const BASELINE_COMPLIANCE_ITEMS = [
   { title:"GST Return Filing", category:"GST", state:"all-india", due_date:"10th / 11th of Every Month", frequency:"Monthly", applicable_to:"Registered taxpayers (as applicable)", description:"Monthly GST return filing and reconciliation.", status:"Upcoming", source_url:"GST portal / notification reference placeholder.", is_national:true, is_active:true, display_order:1, unique_key:"gst-return-filing" },
@@ -213,6 +219,114 @@ function downloadCsv(filename, rows){
   URL.revokeObjectURL(url);
 }
 
+function downloadJson(filename, data){
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function isValidBackupPayload(payload){
+  if(!payload || typeof payload !== "object") return false;
+  if(!payload.tables || typeof payload.tables !== "object") return false;
+  return BACKUP_TABLES.every((name)=>Array.isArray(payload.tables[name]));
+}
+
+function renderBackupSummary(payload){
+  if(!refs.backupRestoreSummary) return;
+  if(!isValidBackupPayload(payload)){
+    refs.backupRestoreSummary.textContent = "Invalid backup format. Expected keys: version, project, exported_at, tables.";
+    return;
+  }
+  const lines = BACKUP_TABLES.map((name)=>`${name}: ${payload.tables[name].length} rows`);
+  refs.backupRestoreSummary.textContent = lines.join(" | ");
+}
+
+async function exportBackendBackup(){
+  if(!refs.backupExportJsonBtn) return;
+  busy(refs.backupExportJsonBtn, true, "Exporting...");
+  if(refs.backupExportStatus) refs.backupExportStatus.textContent = "Collecting table data...";
+  try {
+    const tables = {};
+    for(const table of BACKUP_TABLES){
+      const { data, error } = await supabaseClient.from(table).select("*");
+      if(error) throw new Error(`${table}: ${error.message}`);
+      tables[table] = data || [];
+    }
+    const backup = {
+      version: "1.0",
+      project: BACKUP_PROJECT,
+      exported_at: new Date().toISOString(),
+      tables,
+    };
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+    downloadJson(`backend-backup-${stamp}.json`, backup);
+    if(refs.backupExportStatus) refs.backupExportStatus.textContent = "Backend backup exported successfully.";
+    setMsg(refs.adminMsg, "Changes published successfully");
+  } catch (err) {
+    if(refs.backupExportStatus) refs.backupExportStatus.textContent = `Export failed: ${err.message || err}`;
+    setMsg(refs.adminMsg, err.message || "Export failed", true);
+  } finally {
+    busy(refs.backupExportJsonBtn, false);
+  }
+}
+
+async function onBackupRestoreFileSelected(){
+  const file = refs.backupRestoreFile?.files?.[0];
+  parsedRestoreBackup = null;
+  if(refs.backupRestoreStatus) refs.backupRestoreStatus.textContent = "";
+  if(!file){
+    if(refs.backupRestoreSummary) refs.backupRestoreSummary.textContent = "No backup file selected.";
+    return;
+  }
+  try {
+    const text = await file.text();
+    const payload = JSON.parse(text);
+    if(!isValidBackupPayload(payload)) throw new Error("Invalid backup JSON structure");
+    parsedRestoreBackup = payload;
+    renderBackupSummary(payload);
+  } catch (err) {
+    if(refs.backupRestoreSummary) refs.backupRestoreSummary.textContent = `Invalid file: ${err.message || err}`;
+  }
+}
+
+async function runBackendRestore(){
+  const confirmText = String(refs.backupRestoreConfirm?.value || "").trim();
+  if(confirmText !== "RESTORE"){
+    if(refs.backupRestoreStatus) refs.backupRestoreStatus.textContent = "Type RESTORE exactly to continue.";
+    return;
+  }
+  if(!parsedRestoreBackup || !isValidBackupPayload(parsedRestoreBackup)){
+    if(refs.backupRestoreStatus) refs.backupRestoreStatus.textContent = "Please upload a valid backup JSON first.";
+    return;
+  }
+  busy(refs.backupRestoreRun, true, "Restoring...");
+  if(refs.backupRestoreStatus) refs.backupRestoreStatus.textContent = "Running safe upsert restore...";
+  try {
+    for(const table of BACKUP_TABLES){
+      const rows = parsedRestoreBackup.tables?.[table] || [];
+      if(!rows.length) continue;
+      const rowsWithId = rows.filter((r)=>r && typeof r === "object" && r.id !== undefined && r.id !== null);
+      if(!rowsWithId.length) continue;
+      const { error } = await supabaseClient.from(table).upsert(rowsWithId, { onConflict: "id" });
+      if(error) throw new Error(`${table}: ${error.message}`);
+    }
+    if(refs.backupRestoreStatus) refs.backupRestoreStatus.textContent = "Restore completed. Existing rows were preserved; matching IDs were upserted.";
+    setMsg(refs.adminMsg, "Changes published successfully");
+    await loadAll();
+  } catch (err) {
+    if(refs.backupRestoreStatus) refs.backupRestoreStatus.textContent = `Restore failed: ${err.message || err}`;
+    setMsg(refs.adminMsg, err.message || "Restore failed", true);
+  } finally {
+    busy(refs.backupRestoreRun, false);
+  }
+}
+
 function getTeamStoragePath(url){
   if(!url) return null;
   try {
@@ -356,7 +470,7 @@ function editRow(type,r,scrollToForm=false){
 async function deleteRow(type,id,btn){
   const table = type==="team"?"team_members":type==="careers"?"career_openings":"compliance_calendar";
   busy(btn,true,"Deleting...");
-  try{ const {error}=await supabaseClient.from(table).delete().eq("id",id); if(error) throw error; await loadAll(); setMsg(refs.adminMsg,"Deleted successfully."); }
+  try{ const {error}=await supabaseClient.from(table).delete().eq("id",id); if(error) throw error; const moduleName = type==="team"?"team":type==="careers"?"careers":"compliance"; await refreshModule(moduleName); setMsg(refs.adminMsg,"Changes published successfully"); }
   catch(e){ setMsg(refs.adminMsg,e.message,true); }
   finally{ busy(btn,false); }
 }
@@ -365,7 +479,7 @@ async function moveRow(type,id,dir,btn){
   const table = type==="team"?"team_members":type==="careers"?"career_openings":"compliance_calendar";
   const data = type==="team"?teamData:type==="careers"?careersData:complianceData;
   busy(btn,true,dir<0?"Moving Up...":"Moving Down...");
-  try{ await applyReorder(table,[...data].sort((a,b)=>(a.display_order??0)-(b.display_order??0)),id,dir); await loadAll(); }
+  try{ await applyReorder(table,[...data].sort((a,b)=>(a.display_order??0)-(b.display_order??0)),id,dir); const moduleName = type==="team"?"team":type==="careers"?"careers":"compliance"; await refreshModule(moduleName); setMsg(refs.adminMsg,"Changes published successfully"); }
   catch(e){ setMsg(refs.adminMsg,e.message,true); }
   finally{ busy(btn,false); }
 }
@@ -379,12 +493,8 @@ async function toggleComplianceActive(id, makeActive, btn){
       .eq("id", id);
     if (error) throw error;
 
-    complianceData = (complianceData || []).map((item) =>
-      item.id === id ? { ...item, is_active: !!makeActive } : item
-    );
-    renderRows("compliance", complianceData);
-    renderOverviewMetrics();
-    setMsg(refs.adminMsg, `Compliance item set to ${makeActive ? "active" : "inactive"}.`);
+    await refreshModule("compliance");
+    setMsg(refs.adminMsg, "Changes published successfully");
   } catch (err) {
     setMsg(refs.adminMsg, err.message || "Failed to update compliance status", true);
   } finally {
@@ -418,6 +528,30 @@ async function loadSubmissions(){
   contactSubmissionsData = contactRes.data || [];
   careerSubmissionsData = careerRes.data || [];
   renderSubmissions();
+}
+async function refreshModule(moduleName){
+  if(moduleName === "compliance"){
+    await loadCompliance();
+    renderRows("compliance", complianceData);
+    renderOverviewMetrics();
+    return;
+  }
+  if(moduleName === "team"){
+    await loadTeam();
+    renderRows("team", teamData);
+    renderOverviewMetrics();
+    return;
+  }
+  if(moduleName === "careers"){
+    await loadCareers();
+    renderRows("careers", careersData);
+    renderOverviewMetrics();
+    return;
+  }
+  if(moduleName === "settings"){
+    await loadSettings();
+    return;
+  }
 }
 async function loadAll(){ await Promise.all([loadCompliance(),loadTeam(),loadCareers(),loadSettings(),loadSubmissions()]); }
 
@@ -551,16 +685,16 @@ async function importBaselineComplianceItems(){
   }
 }
 
-async function saveCompliance(e){ e.preventDefault(); if(refs.complianceSubmit.disabled) return; const id=$("compliance-id").value; busy(refs.complianceSubmit,true,id?"Updating...":"Saving..."); try{ const payload={title:$("c-title").value,category:getDropdownValue("c-category","c-category-other"),state:getDropdownValue("c-state","c-state-other"),due_date:$("c-due-date").value,frequency:getDropdownValue("c-frequency","c-frequency-other"),applicable_to:getDropdownValue("c-applicable","c-applicable-other"),description:$("c-description").value,status:getDropdownValue("c-status","c-status-other"),source_url:$("c-source").value,is_national:$("c-national").checked,is_active:$("c-active").checked}; const {error}=id?await supabaseClient.from("compliance_calendar").update(payload).eq("id",id):await supabaseClient.from("compliance_calendar").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,id?"Compliance updated.":"Compliance added."); resetCompliance(); await loadCompliance(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.complianceSubmit,false);} }
+async function saveCompliance(e){ e.preventDefault(); if(refs.complianceSubmit.disabled) return; const id=$("compliance-id").value; busy(refs.complianceSubmit,true,id?"Updating...":"Saving..."); try{ const payload={title:$("c-title").value,category:getDropdownValue("c-category","c-category-other"),state:getDropdownValue("c-state","c-state-other"),due_date:$("c-due-date").value,frequency:getDropdownValue("c-frequency","c-frequency-other"),applicable_to:getDropdownValue("c-applicable","c-applicable-other"),description:$("c-description").value,status:getDropdownValue("c-status","c-status-other"),source_url:$("c-source").value,is_national:$("c-national").checked,is_active:$("c-active").checked}; const {error}=id?await supabaseClient.from("compliance_calendar").update(payload).eq("id",id):await supabaseClient.from("compliance_calendar").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,"Changes published successfully"); resetCompliance(); await refreshModule("compliance"); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.complianceSubmit,false);} }
 
-async function saveTeam(e){ e.preventDefault(); if(refs.teamSubmit.disabled) return; const id=$("team-id").value; busy(refs.teamSubmit,true,id?"Updating...":"Saving..."); try{ const tagsArray=(($("t-tags").value)||"").split(",").map(t=>t.trim()).filter(Boolean); const uploaded=await uploadTeamImageIfSelected(); const newImageUrl = uploaded || $("t-image").value; const payload={name:$("t-name").value,designation:$("t-designation").value,bio:$("t-bio").value,profile_description:$("t-profile-description").value,image_url:newImageUrl,tags:tagsArray,display_order:Number($("t-order").value||0),is_active:$("t-active").checked}; const {error}=id?await supabaseClient.from("team_members").update(payload).eq("id",id):await supabaseClient.from("team_members").insert([payload]); if(error) throw error; if(id){ const oldPath = getTeamStoragePath(previousTeamImageUrl); const newPath = getTeamStoragePath(newImageUrl); if(oldPath && newPath && oldPath !== newPath){ const { error: removeErr } = await supabaseClient.storage.from("team-images").remove([oldPath]); if(removeErr) setMsg(refs.adminMsg, "Team updated. Old image cleanup warning: " + removeErr.message, true); } } setMsg(refs.adminMsg,id?"Team member updated.":"Team member added."); previousTeamImageUrl = ""; resetTeam(); await loadTeam(); renderOverviewMetrics(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.teamSubmit,false);} }
+async function saveTeam(e){ e.preventDefault(); if(refs.teamSubmit.disabled) return; const id=$("team-id").value; busy(refs.teamSubmit,true,id?"Updating...":"Saving..."); try{ const tagsArray=(($("t-tags").value)||"").split(",").map(t=>t.trim()).filter(Boolean); const uploaded=await uploadTeamImageIfSelected(); const newImageUrl = uploaded || $("t-image").value; const payload={name:$("t-name").value,designation:$("t-designation").value,bio:$("t-bio").value,profile_description:$("t-profile-description").value,image_url:newImageUrl,tags:tagsArray,display_order:Number($("t-order").value||0),is_active:$("t-active").checked}; const {error}=id?await supabaseClient.from("team_members").update(payload).eq("id",id):await supabaseClient.from("team_members").insert([payload]); if(error) throw error; if(id){ const oldPath = getTeamStoragePath(previousTeamImageUrl); const newPath = getTeamStoragePath(newImageUrl); if(oldPath && newPath && oldPath !== newPath){ const { error: removeErr } = await supabaseClient.storage.from("team-images").remove([oldPath]); if(removeErr) setMsg(refs.adminMsg, "Team updated. Old image cleanup warning: " + removeErr.message, true); } } setMsg(refs.adminMsg,"Changes published successfully"); previousTeamImageUrl = ""; resetTeam(); await refreshModule("team"); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.teamSubmit,false);} }
 
-async function saveCareer(e){ e.preventDefault(); if(refs.careerSubmit.disabled) return; const id=$("career-id").value; busy(refs.careerSubmit,true,id?"Updating...":"Saving..."); try{ const activeByStatus = $("j-status")?.value === "inactive" ? false : true; const jobType = getDropdownValue("j-type","j-type-other"); const derivedIsInternship = deriveIsInternshipFromType(jobType); $("j-intern").checked = derivedIsInternship; const payload={title:$("j-title").value,employment_type:jobType,experience_level:$("j-exp").value,location:getDropdownValue("j-location","j-location-other"),description:$("j-description").value,requirements:$("j-requirements").value,is_internship:derivedIsInternship,is_active:activeByStatus && $("j-active").checked}; const {error}=id?await supabaseClient.from("career_openings").update(payload).eq("id",id):await supabaseClient.from("career_openings").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,id?"Career updated.":"Career added."); resetCareer(); await loadCareers(); renderOverviewMetrics(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.careerSubmit,false);} }
+async function saveCareer(e){ e.preventDefault(); if(refs.careerSubmit.disabled) return; const id=$("career-id").value; busy(refs.careerSubmit,true,id?"Updating...":"Saving..."); try{ const activeByStatus = $("j-status")?.value === "inactive" ? false : true; const jobType = getDropdownValue("j-type","j-type-other"); const derivedIsInternship = deriveIsInternshipFromType(jobType); $("j-intern").checked = derivedIsInternship; const payload={title:$("j-title").value,employment_type:jobType,experience_level:$("j-exp").value,location:getDropdownValue("j-location","j-location-other"),description:$("j-description").value,requirements:$("j-requirements").value,is_internship:derivedIsInternship,is_active:activeByStatus && $("j-active").checked}; const {error}=id?await supabaseClient.from("career_openings").update(payload).eq("id",id):await supabaseClient.from("career_openings").insert([payload]); if(error) throw error; setMsg(refs.adminMsg,"Changes published successfully"); resetCareer(); await refreshModule("careers"); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(refs.careerSubmit,false);} }
 
 async function saveSettings(e){ e.preventDefault(); const btn=refs.settingsForm?.querySelector("button[type='submit']"); busy(btn,true,"Saving..."); try{ const id=$("s-id").value; const mapEmbedInput = $("s-map-embed")?.value || ""; const mapEmbedSrc = extractIframeSrc(mapEmbedInput); const mapEmbedIsValid = isEmbeddableGoogleMapUrl(mapEmbedSrc); const payload={phone:$("s-phone").value,email:$("s-email").value,whatsapp:$("s-whatsapp").value,address:$("s-address").value,map_link:$("s-map").value,footer_text:$("s-footer").value}; if(mapEmbedSrc && mapEmbedIsValid){ payload.map_embed_link = mapEmbedSrc; } let savedRow=null; if(id){ const {data:updateData,error:updateError}=await supabaseClient.from("site_settings").update(payload).eq("id",id).select().single(); if(updateError && updateError.code !== "PGRST116" && updateError.code !== "42703") throw updateError; if(updateData) savedRow=updateData; }
 if(!savedRow){ const {data:insertData,error:insertError}=await supabaseClient.from("site_settings").insert([payload]).select().single(); if(insertError && insertError.code === "42703"){ delete payload.map_embed_link; if(id){ const {data:updateFallback,error:updateFallbackError}=await supabaseClient.from("site_settings").update(payload).eq("id",id).select().single(); if(updateFallbackError && updateFallbackError.code !== "PGRST116") throw updateFallbackError; if(updateFallback) savedRow=updateFallback; }
 if(!savedRow){ const {data:insertFallback,error:insertFallbackError}=await supabaseClient.from("site_settings").insert([payload]).select().single(); if(insertFallbackError) throw insertFallbackError; savedRow=insertFallback||null; } } else if(insertError) throw insertError; else savedRow=insertData||null; }
-if(!savedRow) throw new Error("Site settings save failed: no row returned."); if(mapEmbedInput && !mapEmbedIsValid){ setMsg(refs.adminMsg,"Site settings saved. Embed URL invalid/non-embeddable, so iframe source was not updated."); } else { setMsg(refs.adminMsg,"Site settings saved."); } await loadSettings(); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(btn,false);} }
+if(!savedRow) throw new Error("Site settings save failed: no row returned."); setMsg(refs.adminMsg,"Changes published successfully"); await refreshModule("settings"); }catch(err){ setMsg(refs.adminMsg,err.message,true);} finally{ busy(btn,false);} }
 
 async function ensureSession(){ const {data,error}=await supabaseClient.auth.getSession(); if(error) return setMsg(refs.authMsg,error.message,true); const s=data?.session; if(!s) return setAuth(false); const userEmail=(s.user?.email||"").toLowerCase(); const allowed=ALLOWED_ADMIN_EMAILS.map((e)=>String(e).toLowerCase()); if(!allowed.includes(userEmail)){ console.warn("Unauthorized admin attempt:", userEmail || "unknown"); await supabaseClient.auth.signOut(); setMsg(refs.authMsg,"Access denied. Unauthorized admin email.",true); return setAuth(false);} console.log("Admin login successful:", userEmail); setAuth(true); switchTab("overview"); await loadAll(); renderOverviewMetrics(); }
 async function login(e){ e.preventDefault(); const email=$("admin-email").value.trim().toLowerCase(); const allowed=ALLOWED_ADMIN_EMAILS.map((e)=>String(e).toLowerCase()); if(!allowed.includes(email)){ console.warn("Unauthorized admin attempt:", email || "unknown"); return setMsg(refs.authMsg,"Access denied. Unauthorized admin email.",true);} const {error}=await supabaseClient.auth.signInWithPassword({email,password:$("admin-password").value}); if(error) return setMsg(refs.authMsg,error.message,true); setMsg(refs.authMsg,"Login successful."); await ensureSession(); }
@@ -607,6 +741,9 @@ refs.exportCareerSubmissionsCsv?.addEventListener("click", ()=>{
   careerSubmissionsData.forEach((r)=>rows.push([r.name,r.email,r.phone,r.position,r.experience,r.resume_link,r.message,r.status,r.created_at]));
   downloadCsv("career-applications.csv", rows);
 });
+refs.backupExportJsonBtn?.addEventListener("click", exportBackendBackup);
+refs.backupRestoreFile?.addEventListener("change", onBackupRestoreFileSelected);
+refs.backupRestoreRun?.addEventListener("click", runBackendRestore);
 
 $("c-state")?.addEventListener("change",(e)=>{$("c-national").checked=e.target.value==="National"; toggleOtherInput("c-state","c-state-other"); previewCompliance();});
 $("c-category")?.addEventListener("change",()=>{ toggleOtherInput("c-category","c-category-other"); previewCompliance(); });

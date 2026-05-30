@@ -561,6 +561,30 @@ footer a {
   border-color: #c8a96b;
 }
 
+.admin-console .admin-backup-section {
+  border-color: rgba(15, 39, 71, 0.12);
+}
+
+.admin-console .admin-code-block {
+  background: #0f1f34;
+  color: #e4efff;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  overflow-x: auto;
+}
+
+.admin-console .admin-warning-box {
+  border: 1px solid rgba(185, 28, 28, 0.18);
+  background: #fff7f7;
+}
+
+.admin-console.admin-dark .admin-warning-box {
+  background: rgba(127, 29, 29, 0.14);
+  border-color: rgba(252, 165, 165, 0.35);
+}
+
 .admin-console.admin-dark #admin-tabs {
   background: #101f35;
   border-color: rgba(148,163,184,.28);
