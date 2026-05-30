@@ -42,9 +42,9 @@ const PublicData = (() => {
   }
 
   function chipList(tags = "") {
-    return String(tags)
-      .split(",")
-      .map((t) => t.trim())
+    const source = Array.isArray(tags) ? tags : String(tags || "").split(",");
+    return source
+      .map((t) => String(t || "").trim())
       .filter(Boolean)
       .map((tag) => `<span class="trust-chip">${tag}</span>`)
       .join("");
@@ -65,8 +65,13 @@ const PublicData = (() => {
     const modalBio = document.getElementById("team-modal-bio");
     const modalDescription = document.getElementById("team-modal-description");
 
-    if (!list) return;
+    if (!list) {
+      console.warn("[TeamPage] Missing #team-dynamic-list container");
+      return;
+    }
+    list.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
     if (!client) {
+      console.warn("[TeamPage] Supabase client unavailable");
       if (loading) loading.textContent = "Configure public Supabase keys in assets/js/public-data.js";
       if (fallback) fallback.classList.remove("hidden");
       if (fallbackExtra) fallbackExtra.classList.remove("hidden");
@@ -79,39 +84,55 @@ const PublicData = (() => {
       .eq("is_active", true)
       .order("display_order", { ascending: true });
 
+    console.log("[TeamPage] Query result", { hasError: !!error, rows: Array.isArray(data) ? data.length : 0 });
+
     if (loading) loading.classList.add("hidden");
     if (error || !data || data.length === 0) {
       if (empty) empty.classList.remove("hidden");
       if (fallback) fallback.classList.remove("hidden");
       if (fallbackExtra) fallbackExtra.classList.remove("hidden");
+      if (error) console.error("[TeamPage] team_members query error", error);
       return;
     }
-
-    if (fallback) fallback.classList.add("hidden");
-    if (fallbackExtra) fallbackExtra.classList.add("hidden");
 
     const esc = (v) => String(v ?? "").replace(/[&<>'"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[c]));
 
     list.innerHTML = data
       .map((m, i) => {
-        const initials = (m.name || "TM")
+        const safeName = m.name || "Team Member";
+        const safeDesignation = m.designation || "Professional";
+        const safeBio = m.bio || "";
+        const initials = safeName
           .split(" ")
           .map((x) => x[0])
           .slice(0, 2)
           .join("")
           .toUpperCase();
         const image = m.image_url
-          ? `<img src="${m.image_url}" alt="${esc(m.name)}" class="h-20 w-20 rounded-2xl border border-[#d9c48a]/40 object-cover shadow-sm" />`
+          ? `<img src="${m.image_url}" alt="${esc(safeName)}" class="h-20 w-20 rounded-2xl border border-[#d9c48a]/40 object-cover shadow-sm" onerror="this.outerHTML='<div class=\"profile-initial h-20 w-20 rounded-2xl\">${initials}</div>'" />`
           : `<div class="profile-initial h-20 w-20 rounded-2xl">${initials}</div>`;
 
-        return `<article class="team-card card lift reveal p-5 cursor-pointer border border-slate-200/80 hover:border-[#d9c48a]/60 transition" data-team-index="${i}">
-          <div class="flex items-start gap-4">${image}<div><h2 class="font-bold text-navy text-xl">${esc(m.name || "")}</h2><p class="text-sm font-semibold text-gold mt-1">${esc(m.designation || "")}</p></div></div>
-          <p class="subtitle text-sm mt-3 line-clamp-3">${esc(m.bio || "")}</p>
+        return `<article class="team-card card lift p-5 cursor-pointer border border-slate-200/80 hover:border-[#d9c48a]/60 transition" data-team-index="${i}">
+          <div class="flex items-start gap-4">${image}<div><h2 class="font-bold text-navy text-xl">${esc(safeName)}</h2><p class="text-sm font-semibold text-gold mt-1">${esc(safeDesignation)}</p></div></div>
+          <p class="subtitle text-sm mt-3 line-clamp-3">${esc(safeBio)}</p>
           <div class="mt-3 flex flex-wrap gap-2">${chipList(m.tags)}</div>
           <button class="btn-secondary mt-4 team-view-profile" type="button" data-team-index="${i}">View Profile</button>
         </article>`;
       })
       .join("");
+
+    const renderedCount = list.querySelectorAll("article.team-card").length;
+    console.log("[TeamPage] Rendered cards", renderedCount);
+    if (renderedCount > 0) {
+      if (fallback) fallback.classList.add("hidden");
+      if (fallbackExtra) fallbackExtra.classList.add("hidden");
+      if (empty) empty.classList.add("hidden");
+    } else {
+      if (fallback) fallback.classList.remove("hidden");
+      if (fallbackExtra) fallbackExtra.classList.remove("hidden");
+      if (empty) empty.classList.remove("hidden");
+      return;
+    }
 
     const openModal = (member) => {
       if (!modal || !member) return;
