@@ -297,12 +297,21 @@ function renderRows(type, rows){
       : type==="compliance"
       ? `<strong>${esc(r.title||"-")}</strong><br/>Category: ${esc(r.category||"-")} • State: ${esc(stateLabels[r.state]||r.state||"-")}<br/>Due: ${esc(r.due_date||"-")} • Frequency: ${esc(r.frequency||"-")}<br/>Status: ${esc(r.status||"-")} • ${statusBadge(complianceDueBadgeText(r.due_date))} • ${badge(r.is_active!==false)}`
       : `<strong>${esc(r.title||"-")}</strong><br/>${esc(r.employment_type||"-")} • ${esc(r.experience_level||"-")} • ${r.is_internship?"Internship":"Job"}<br/>${badge(r.is_active!==false)}`;
-    el.innerHTML=`<div class='text-sm subtitle'>${main}${rowMeta(r)}</div><div class='flex flex-col gap-2'><button class='btn-secondary' data-a='up'>↑</button><button class='btn-secondary' data-a='down'>↓</button><button class='btn-secondary' data-a='edit'>Edit</button><button class='btn-secondary' data-a='del'>Delete</button></div>`;
+    const toggleBtn = type === "compliance"
+      ? `<button class='${r.is_active!==false ? "admin-badge" : "admin-badge danger"}' data-a='toggle'>${r.is_active!==false ? "Set Inactive" : "Set Active"}</button>`
+      : "";
+    el.innerHTML=`<div class='text-sm subtitle'>${main}${rowMeta(r)}</div><div class='flex flex-col gap-2'><button class='btn-secondary' data-a='up'>↑</button><button class='btn-secondary' data-a='down'>↓</button>${toggleBtn}<button class='btn-secondary' data-a='edit'>Edit</button><button class='btn-secondary' data-a='del'>Delete</button></div>`;
     const btn=(a)=>el.querySelector(`[data-a='${a}']`);
     btn("edit").onclick=(e)=>{ e.stopPropagation(); editRow(type,r); };
     btn("del").onclick=(e)=>{ e.stopPropagation(); deleteRow(type,r.id,btn("del")); };
     btn("up").onclick=(e)=>{ e.stopPropagation(); moveRow(type,r.id,-1,btn("up")); };
     btn("down").onclick=(e)=>{ e.stopPropagation(); moveRow(type,r.id,1,btn("down")); };
+    if (type === "compliance") {
+      btn("toggle")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleComplianceActive(r.id, r.is_active === false, btn("toggle"));
+      });
+    }
     if (type === "compliance") {
       el.onclick = () => editRow("compliance", r, true);
     }
@@ -331,6 +340,28 @@ async function moveRow(type,id,dir,btn){
   try{ await applyReorder(table,[...data].sort((a,b)=>(a.display_order??0)-(b.display_order??0)),id,dir); await loadAll(); }
   catch(e){ setMsg(refs.adminMsg,e.message,true); }
   finally{ busy(btn,false); }
+}
+
+async function toggleComplianceActive(id, makeActive, btn){
+  busy(btn, true, makeActive ? "Activating..." : "Deactivating...");
+  try {
+    const { error } = await supabaseClient
+      .from("compliance_calendar")
+      .update({ is_active: !!makeActive })
+      .eq("id", id);
+    if (error) throw error;
+
+    complianceData = (complianceData || []).map((item) =>
+      item.id === id ? { ...item, is_active: !!makeActive } : item
+    );
+    renderRows("compliance", complianceData);
+    renderOverviewMetrics();
+    setMsg(refs.adminMsg, `Compliance item set to ${makeActive ? "active" : "inactive"}.`);
+  } catch (err) {
+    setMsg(refs.adminMsg, err.message || "Failed to update compliance status", true);
+  } finally {
+    busy(btn, false);
+  }
 }
 
 async function loadCompliance(){
