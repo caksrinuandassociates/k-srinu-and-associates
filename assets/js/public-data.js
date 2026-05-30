@@ -54,6 +54,8 @@ const PublicData = (() => {
     const list = document.getElementById("team-dynamic-list");
     const loading = document.getElementById("team-loading");
     const empty = document.getElementById("team-empty");
+    const fallback = document.getElementById("team-fallback-content");
+    const fallbackExtra = document.getElementById("team-fallback-extra");
     const modal = document.getElementById("team-profile-modal");
     const modalClose = document.getElementById("team-modal-close");
     const modalImage = document.getElementById("team-modal-image");
@@ -66,6 +68,8 @@ const PublicData = (() => {
     if (!list) return;
     if (!client) {
       if (loading) loading.textContent = "Configure public Supabase keys in assets/js/public-data.js";
+      if (fallback) fallback.classList.remove("hidden");
+      if (fallbackExtra) fallbackExtra.classList.remove("hidden");
       return;
     }
 
@@ -78,8 +82,13 @@ const PublicData = (() => {
     if (loading) loading.classList.add("hidden");
     if (error || !data || data.length === 0) {
       if (empty) empty.classList.remove("hidden");
+      if (fallback) fallback.classList.remove("hidden");
+      if (fallbackExtra) fallbackExtra.classList.remove("hidden");
       return;
     }
+
+    if (fallback) fallback.classList.add("hidden");
+    if (fallbackExtra) fallbackExtra.classList.add("hidden");
 
     const esc = (v) => String(v ?? "").replace(/[&<>'"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[c]));
 
