@@ -199,8 +199,8 @@ const PublicData = (() => {
   }
 
   async function renderCareersPage() {
-    const jobs = document.getElementById("careers-jobs-list");
-    const interns = document.getElementById("careers-intern-list");
+    const jobs = document.getElementById("careers-jobs-list") || document.getElementById("fulltime-openings");
+    const interns = document.getElementById("careers-intern-list") || document.getElementById("internship-openings");
     const loading = document.getElementById("careers-loading");
     const empty = document.getElementById("careers-empty");
     if (!jobs || !interns) return;
