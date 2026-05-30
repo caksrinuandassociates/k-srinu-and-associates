@@ -240,17 +240,61 @@ const PublicData = (() => {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "");
 
-    const normalizeCategory = (value = "") => slugify(value) || "business-compliance";
+    const slugifyComplianceValue = (value = "", kind = "generic") => {
+      const raw = String(value || "").trim();
+      if (!raw) return "";
+
+      const stateMap = {
+        "National": "all-india",
+        "Andhra Pradesh": "andhra-pradesh",
+        "Telangana": "telangana",
+        "Tamil Nadu": "tamil-nadu",
+        "Karnataka": "karnataka",
+        "Kerala": "kerala",
+        "Maharashtra": "maharashtra",
+        "Delhi": "delhi",
+        "Gujarat": "gujarat",
+        "Rajasthan": "rajasthan",
+        "Uttar Pradesh": "uttar-pradesh",
+        "West Bengal": "west-bengal",
+      };
+
+      const categoryMap = {
+        "GST": "gst",
+        "Income Tax": "income-tax",
+        "TDS": "tds",
+        "ROC / MCA": "roc",
+        "PF / ESI": "pf-esi",
+        "Labour Law": "labour-law",
+        "Professional Tax": "professional-tax",
+        "Audit": "audit",
+        "General Compliance": "business-compliance",
+      };
+
+      if (kind === "state") {
+        return stateMap[raw] || slugify(raw);
+      }
+      if (kind === "category") {
+        return categoryMap[raw] || slugify(raw);
+      }
+      return slugify(raw);
+    };
+
+    const normalizeCategory = (value = "") => slugifyComplianceValue(value, "category") || "business-compliance";
 
     const parseStaticCards = () => {
       return Array.from(cardsContainer.querySelectorAll("article.calendar-card")).map((card, index) => {
         const title = card.querySelector("h3")?.textContent?.trim() || "Compliance Item";
         const unique_key = card.dataset.uniqueKey || slugify(title) || `static-${index}`;
+        const categoryDisplay = card.querySelectorAll("p")[0]?.textContent?.replace("Category:", "").trim() || "Business Compliance";
+        const stateDisplay = card.querySelectorAll("p")[1]?.textContent?.replace("State applicability:", "").trim() || "All India";
         return {
           unique_key,
           title,
-          category: normalizeCategory(card.dataset.category || "business-compliance"),
-          state: card.dataset.state || "all-india",
+          category: normalizeCategory(card.dataset.category || categoryDisplay || "business-compliance"),
+          category_display: categoryDisplay,
+          state: slugifyComplianceValue(card.dataset.state || stateDisplay || "all-india", "state") || "all-india",
+          state_display: stateDisplay,
           due_date: card.querySelector(".calendar-date")?.textContent?.trim() || "As notified",
           status: card.querySelector(".trust-chip")?.textContent?.trim() || "Indicative",
           applicable_to: card.querySelectorAll("p")[2]?.textContent?.replace("Applicable to:", "").trim() || "N/A",
@@ -266,18 +310,23 @@ const PublicData = (() => {
     const renderCards = (items) => {
       cardsContainer.innerHTML = items
         .map((item) => {
-          const state = item.state || (item.is_national ? "all-india" : "other-states");
-          const category = normalizeCategory(item.category);
-          return `<article class="calendar-card lift reveal" data-unique-key="${item.unique_key || slugify(item.title)}" data-category="${category}" data-state="${state}"><span class="calendar-date">${item.due_date || item.frequency || "As notified"}</span><span class="trust-chip ml-2">${item.status || "Indicative"}</span><h3 class="mt-3 font-bold text-navy">${item.title || ""}</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> ${item.category || "N/A"}</p><p class="subtitle text-sm"><strong>State applicability:</strong> ${state}</p><p class="subtitle text-sm"><strong>Applicable to:</strong> ${item.applicable_to || "N/A"}</p><p class="subtitle text-sm"><strong>Description:</strong> ${item.description || "N/A"}</p><p class="subtitle text-sm"><strong>Source note:</strong> ${item.source_url || "Reference placeholder"}</p></article>`;
+          const stateSlug = slugifyComplianceValue(item.state || (item.is_national ? "all-india" : "other-states"), "state") || "all-india";
+          const stateDisplay = item.state_display || item.state || (item.is_national ? "National" : "Other");
+          const categorySlug = normalizeCategory(item.category || item.category_display);
+          const categoryDisplay = item.category_display || item.category || "N/A";
+          return `<article class="calendar-card lift reveal" data-unique-key="${item.unique_key || slugify(item.title)}" data-category="${categorySlug}" data-state="${stateSlug}"><span class="calendar-date">${item.due_date || item.frequency || "As notified"}</span><span class="trust-chip ml-2">${item.status || "Indicative"}</span><h3 class="mt-3 font-bold text-navy">${item.title || ""}</h3><p class="subtitle text-sm mt-2"><strong>Category:</strong> ${categoryDisplay}</p><p class="subtitle text-sm"><strong>State applicability:</strong> ${stateDisplay}</p><p class="subtitle text-sm"><strong>Applicable to:</strong> ${item.applicable_to || "N/A"}</p><p class="subtitle text-sm"><strong>Description:</strong> ${item.description || "N/A"}</p><p class="subtitle text-sm"><strong>Source note:</strong> ${item.source_url || "Reference placeholder"}</p></article>`;
         })
         .join("");
     };
 
     const staticItems = parseStaticCards();
-    let mergedItems = [...staticItems];
+    let itemsToRender = [...staticItems];
+    cardsContainer.style.visibility = "hidden";
 
-    try {
-      if (client) {
+    if (!client) {
+      itemsToRender = [...staticItems];
+    } else {
+      try {
         const { data, error } = await client
           .from("compliance_calendar")
           .select("*")
@@ -285,33 +334,35 @@ const PublicData = (() => {
           .order("display_order", { ascending: true, nullsFirst: false })
           .order("due_date", { ascending: true });
 
-        if (!error && Array.isArray(data)) {
-          const map = new Map(staticItems.map((item) => [item.unique_key, item]));
-          data.forEach((record, idx) => {
-            const unique_key = record.unique_key || slugify(record.title) || `supabase-${record.id || idx}`;
-            map.set(unique_key, {
+        if (!error && Array.isArray(data) && data.length > 0) {
+          itemsToRender = data
+            .map((record, idx) => ({
               ...record,
-              unique_key,
+              unique_key: record.unique_key || slugify(record.title) || `supabase-${record.id || idx}`,
               category: normalizeCategory(record.category),
-              state: record.state || (record.is_national ? "all-india" : "other-states"),
+              category_display: record.category,
+              state: slugifyComplianceValue(record.state || (record.is_national ? "all-india" : "other-states"), "state") || (record.is_national ? "all-india" : "other-states"),
+              state_display: record.state || (record.is_national ? "all-india" : "other-states"),
+            }))
+            .sort((a, b) => {
+              const ao = Number.isFinite(a.display_order) ? a.display_order : 99999;
+              const bo = Number.isFinite(b.display_order) ? b.display_order : 99999;
+              if (ao !== bo) return ao - bo;
+              return String(a.title || "").localeCompare(String(b.title || ""));
             });
-          });
-          mergedItems = Array.from(map.values()).sort((a, b) => {
-            const ao = Number.isFinite(a.display_order) ? a.display_order : 99999;
-            const bo = Number.isFinite(b.display_order) ? b.display_order : 99999;
-            if (ao !== bo) return ao - bo;
-            return String(a.title || "").localeCompare(String(b.title || ""));
-          });
+        } else {
+          itemsToRender = [...staticItems];
         }
+      } catch (_) {
+        // Graceful fallback: static cards remain the baseline.
+        itemsToRender = [...staticItems];
       }
-    } catch (_) {
-      // Graceful fallback: static cards remain the baseline.
-      mergedItems = [...staticItems];
     }
 
     if (loading) loading.classList.add("hidden");
     if (empty) empty.classList.add("hidden");
-    renderCards(mergedItems);
+    renderCards(itemsToRender);
+    cardsContainer.style.visibility = "";
 
     let activeCategory = "all";
     const cards = () => cardsContainer.querySelectorAll("[data-category][data-state]");
