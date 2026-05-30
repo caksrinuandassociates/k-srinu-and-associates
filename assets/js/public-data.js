@@ -36,11 +36,30 @@ const PublicData = (() => {
 
   function applySiteSettings(settings) {
     if (!settings) return;
+    const cleanedPhone = settings.phone ? settings.phone.replace(/\s+/g, "") : "";
+    const phoneHref = cleanedPhone ? `tel:${cleanedPhone}` : "";
+    const emailHref = settings.email ? `mailto:${settings.email}` : "";
+
+    const isEmbeddableGoogleMap = (url = "") => {
+      if (!url) return false;
+      try {
+        const parsed = new URL(url, window.location.origin);
+        const host = parsed.hostname.toLowerCase();
+        const path = parsed.pathname.toLowerCase();
+        const hasGoogleHost = host.includes("google.com") || host.includes("maps.app.goo.gl") || host.includes("goo.gl");
+        const isEmbedPath = path.includes("/maps/embed") || path.includes("/maps") || path.includes("/embed");
+        const hasEmbedQuery = parsed.searchParams.has("output") && parsed.searchParams.get("output") === "embed";
+        return hasGoogleHost && (isEmbedPath || hasEmbedQuery);
+      } catch (_) {
+        return false;
+      }
+    };
+
     setText("footer-phone-text", settings.phone);
     setText("footer-email-text", settings.email);
     setText("footer-address-text", settings.address);
-    setHref("footer-phone-link", settings.phone ? `tel:${settings.phone.replace(/\s+/g, "")}` : "");
-    setHref("footer-email-link", settings.email ? `mailto:${settings.email}` : "");
+    setHref("footer-phone-link", phoneHref);
+    setHref("footer-email-link", emailHref);
     setHref("footer-map-link", settings.map_link);
 
     document.querySelectorAll(".wa-float").forEach((el) => {
@@ -51,9 +70,16 @@ const PublicData = (() => {
     setText("contact-phone-text", settings.phone);
     setText("contact-email-text", settings.email);
     setText("contact-address-text", settings.address);
-    setHref("contact-phone-link", settings.phone ? `tel:${settings.phone.replace(/\s+/g, "")}` : "");
-    setHref("contact-email-link", settings.email ? `mailto:${settings.email}` : "");
+    setHref("contact-phone-link", phoneHref);
+    setHref("contact-cta-phone-link", phoneHref);
+    setHref("contact-email-link", emailHref);
+    setHref("contact-cta-email-link", emailHref);
     setHref("contact-map-link", settings.map_link);
+
+    const contactMapIframe = document.getElementById("contact-map-iframe");
+    if (contactMapIframe && isEmbeddableGoogleMap(settings.map_link)) {
+      contactMapIframe.setAttribute("src", settings.map_link);
+    }
   }
 
   async function loadSiteSettings() {
