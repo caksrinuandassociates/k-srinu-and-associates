@@ -374,7 +374,9 @@ const PublicData = (() => {
         const category = card.dataset.category;
         const states = (card.dataset.state || "").split(",").map((s) => s.trim());
         const categoryMatch = activeCategory === "all" || activeCategory === category;
-        const stateMatch = selectedState === "all-india" ? states.includes("all-india") : states.includes("all-india") || states.includes(selectedState);
+        const stateMatch = (selectedState === "all-india" || !selectedState)
+          ? true
+          : states.includes("all-india") || states.includes(selectedState);
         const show = categoryMatch && stateMatch;
         card.style.transition = "opacity .22s ease";
         card.style.opacity = show ? "1" : "0";
