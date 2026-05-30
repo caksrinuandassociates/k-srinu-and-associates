@@ -36,8 +36,9 @@ const PublicData = (() => {
 
   function applySiteSettings(settings) {
     if (!settings) return;
-    const cleanedPhone = settings.phone ? settings.phone.replace(/\s+/g, "") : "";
-    const phoneHref = cleanedPhone ? `tel:${cleanedPhone}` : "";
+    const displayPhone = settings.phone || "";
+    const telPhone = displayPhone ? displayPhone.replace(/\D+/g, "") : "";
+    const phoneHref = telPhone ? `tel:${telPhone}` : "";
     const emailHref = settings.email ? `mailto:${settings.email}` : "";
 
     const isEmbeddableGoogleMap = (url = "") => {
@@ -55,7 +56,7 @@ const PublicData = (() => {
       }
     };
 
-    setText("footer-phone-text", settings.phone);
+    setText("footer-phone-text", displayPhone);
     setText("footer-email-text", settings.email);
     setText("footer-address-text", settings.address);
     setHref("footer-phone-link", phoneHref);
@@ -67,7 +68,7 @@ const PublicData = (() => {
     });
 
     // Optional hooks for contact page/details if present
-    setText("contact-phone-text", settings.phone);
+    setText("contact-phone-text", displayPhone);
     setText("contact-email-text", settings.email);
     setText("contact-address-text", settings.address);
     setHref("contact-phone-link", phoneHref);
