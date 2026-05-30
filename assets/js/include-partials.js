@@ -128,6 +128,13 @@ async function loadFloatingButtonsPartial() {
   }
 }
 
-loadNavbarPartial();
-loadFooterPartial();
-loadFloatingButtonsPartial();
+async function initPartials() {
+  await Promise.all([
+    loadNavbarPartial(),
+    loadFooterPartial(),
+    loadFloatingButtonsPartial(),
+  ]);
+  window.dispatchEvent(new Event("partialsLoaded"));
+}
+
+initPartials();

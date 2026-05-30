@@ -2,6 +2,21 @@ const PUBLIC_SUPABASE_URL = "https://wenwseckngextivnulqy.supabase.co";
 const PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndlbndzZWNrbmdleHRpdm51bHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NDQwODIsImV4cCI6MjA5NTUyMDA4Mn0.vhH_AbPB0Hs9yehPUOWRR7XLn_ei--g4efy8u-X9aok";
 
 const PublicData = (() => {
+  let siteSettingsAppliedOnce = false;
+  let siteSettingsRetryBound = false;
+
+  function hasSiteSettingsTargets() {
+    return !!(
+      document.getElementById("footer-phone-text") ||
+      document.getElementById("footer-email-text") ||
+      document.getElementById("footer-address-text") ||
+      document.getElementById("footer-phone-link") ||
+      document.getElementById("footer-email-link") ||
+      document.getElementById("footer-map-link") ||
+      document.querySelector(".wa-float")
+    );
+  }
+
   const client =
     window.supabase &&
     PUBLIC_SUPABASE_URL !== "YOUR_SUPABASE_URL" &&
@@ -31,13 +46,36 @@ const PublicData = (() => {
     document.querySelectorAll(".wa-float").forEach((el) => {
       if (settings.whatsapp) el.setAttribute("href", `https://wa.me/${settings.whatsapp.replace(/\D+/g, "")}`);
     });
+
+    // Optional hooks for contact page/details if present
+    setText("contact-phone-text", settings.phone);
+    setText("contact-email-text", settings.email);
+    setText("contact-address-text", settings.address);
+    setHref("contact-phone-link", settings.phone ? `tel:${settings.phone.replace(/\s+/g, "")}` : "");
+    setHref("contact-email-link", settings.email ? `mailto:${settings.email}` : "");
+    setHref("contact-map-link", settings.map_link);
   }
 
   async function loadSiteSettings() {
     if (!client) return null;
     const { data, error } = await client.from("site_settings").select("*").limit(1).maybeSingle();
     if (error) return null;
-    applySiteSettings(data);
+    if (hasSiteSettingsTargets()) {
+      applySiteSettings(data);
+      siteSettingsAppliedOnce = true;
+    } else if (!siteSettingsRetryBound) {
+      siteSettingsRetryBound = true;
+      window.addEventListener(
+        "partialsLoaded",
+        () => {
+          if (!siteSettingsAppliedOnce) {
+            applySiteSettings(data);
+            siteSettingsAppliedOnce = true;
+          }
+        },
+        { once: true }
+      );
+    }
     return data;
   }
 
