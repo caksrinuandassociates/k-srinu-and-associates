@@ -50,6 +50,16 @@ const PublicData = (() => {
       .join("");
   }
 
+  function initialsFromName(name = "") {
+    return String(name || "Team Member")
+      .split(" ")
+      .map((x) => x[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "TM";
+  }
+
   async function renderTeamPage() {
     const list = document.getElementById("team-dynamic-list");
     const loading = document.getElementById("team-loading");
@@ -102,24 +112,33 @@ const PublicData = (() => {
         const safeName = m.name || "Team Member";
         const safeDesignation = m.designation || "Professional";
         const safeBio = m.bio || "";
-        const initials = safeName
-          .split(" ")
-          .map((x) => x[0])
-          .slice(0, 2)
-          .join("")
-          .toUpperCase();
+        const initials = initialsFromName(safeName);
         const image = m.image_url
-          ? `<img src="${m.image_url}" alt="${esc(safeName)}" class="h-20 w-20 rounded-2xl border border-[#d9c48a]/40 object-cover shadow-sm" onerror="this.outerHTML='<div class=\"profile-initial h-20 w-20 rounded-2xl\">${initials}</div>'" />`
-          : `<div class="profile-initial h-20 w-20 rounded-2xl">${initials}</div>`;
+          ? `<img src="${m.image_url}" alt="${esc(safeName)}" class="team-dynamic-avatar h-20 w-20 rounded-full border border-[#e2e8f3] object-cover" />`
+          : `<div class="team-dynamic-initial mx-auto inline-flex h-20 w-20 items-center justify-center rounded-full border border-[#e2e8f3] bg-[#f7f9fd] text-navy text-xl font-bold">${initials}</div>`;
 
-        return `<article class="team-card card lift p-5 cursor-pointer border border-slate-200/80 hover:border-[#d9c48a]/60 transition" data-team-index="${i}">
-          <div class="flex items-start gap-4">${image}<div><h2 class="font-bold text-navy text-xl">${esc(safeName)}</h2><p class="text-sm font-semibold text-gold mt-1">${esc(safeDesignation)}</p></div></div>
-          <p class="subtitle text-sm mt-3 line-clamp-3">${esc(safeBio)}</p>
-          <div class="mt-3 flex flex-wrap gap-2">${chipList(m.tags)}</div>
-          <button class="btn-secondary mt-4 team-view-profile" type="button" data-team-index="${i}">View Profile</button>
+        return `<article class="team-card card lift p-6 cursor-pointer border border-slate-200/80 shadow-[0_14px_28px_rgba(15,39,71,0.08)] transition hover:border-[#d9c48a]/60 min-h-[320px] flex flex-col items-center text-center max-w-[360px] w-full mx-auto" data-team-index="${i}">
+          ${image}
+          <h2 class="mt-4 text-center text-xl font-bold text-navy">${esc(safeName)}</h2>
+          <p class="mt-1 text-center text-sm font-semibold text-[#e9a31a]">${esc(safeDesignation)}</p>
+          <p class="subtitle text-sm mt-3 text-center leading-relaxed line-clamp-3">${esc(safeBio)}</p>
+          <div class="mt-3 flex flex-wrap justify-center gap-2">${chipList(m.tags)}</div>
+          <button class="btn-secondary mt-auto pt-4 team-view-profile" type="button" data-team-index="${i}">View Profile</button>
         </article>`;
       })
       .join("");
+
+    list.querySelectorAll("img.team-dynamic-avatar").forEach((img) => {
+      img.addEventListener("error", () => {
+        const card = img.closest("article.team-card");
+        const name = card?.querySelector("h2")?.textContent?.trim() || "Team Member";
+        const initials = initialsFromName(name);
+        const fallbackAvatar = document.createElement("div");
+        fallbackAvatar.className = "team-dynamic-initial mx-auto inline-flex h-20 w-20 items-center justify-center rounded-full border border-[#e2e8f3] bg-[#f7f9fd] text-navy text-xl font-bold";
+        fallbackAvatar.textContent = initials;
+        img.replaceWith(fallbackAvatar);
+      });
+    });
 
     const renderedCount = list.querySelectorAll("article.team-card").length;
     console.log("[TeamPage] Rendered cards", renderedCount);
@@ -141,6 +160,9 @@ const PublicData = (() => {
       if (modalImage) {
         modalImage.src = member.image_url || "assets/images/logo.png";
         modalImage.alt = member.name || "Team member";
+        modalImage.onerror = () => {
+          modalImage.src = "assets/images/logo.png";
+        };
       }
       if (modalName) modalName.textContent = member.name || "";
       if (modalDesignation) modalDesignation.textContent = member.designation || "";
