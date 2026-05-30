@@ -216,7 +216,14 @@ const PublicData = (() => {
       return;
     }
 
-    const renderCard = (j) => `<article class="service-card lift reveal"><h3 class="font-bold text-navy">${j.title || ""}</h3><p class="subtitle text-sm mt-2">${j.description || ""}</p><p class="text-xs mt-3 text-navy font-semibold">Experience: ${j.experience_level || "N/A"}</p><p class="text-xs text-gold font-semibold">Type: ${j.employment_type || (j.is_internship ? "Internship" : "Full-Time")}</p></article>`;
+    const renderCard = (j) => {
+      const typeText = j.employment_type || (j.is_internship ? "Internship" : "Full-time");
+      const experienceText = j.experience_level || "N/A";
+      const locationText = j.location || "Not specified";
+      const descriptionText = j.description || "No description provided.";
+      const requirementsText = j.requirements || "No specific requirements listed.";
+      return `<article class="card lift rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_12px_24px_rgba(15,39,71,0.08)]" style="opacity:1;visibility:visible;transform:none;"><h3 class="font-bold text-navy text-lg">${j.title || "Career Opening"}</h3><p class="text-xs mt-2 text-gold font-semibold">Type: ${typeText}</p><p class="text-xs mt-1 text-navy font-semibold">Experience: ${experienceText}</p><p class="text-xs mt-1 subtitle"><strong>Location:</strong> ${locationText}</p><p class="subtitle text-sm mt-3">${descriptionText}</p><p class="subtitle text-sm mt-2"><strong>Requirements:</strong> ${requirementsText}</p><a href="#application-form" class="btn-secondary mt-4 inline-flex">Apply Now</a></article>`;
+    };
     const jobItems = data.filter((d) => !d.is_internship);
     const internItems = data.filter((d) => !!d.is_internship);
 
