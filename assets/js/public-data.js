@@ -323,9 +323,7 @@ const PublicData = (() => {
     let itemsToRender = [...staticItems];
     cardsContainer.style.visibility = "hidden";
 
-    if (!client) {
-      itemsToRender = [...staticItems];
-    } else {
+    if (client) {
       try {
         const { data, error } = await client
           .from("compliance_calendar")
@@ -335,6 +333,7 @@ const PublicData = (() => {
           .order("due_date", { ascending: true });
 
         if (!error && Array.isArray(data) && data.length > 0) {
+          // Supabase-first path: render ONLY Supabase records, no static merge/append.
           itemsToRender = data
             .map((record, idx) => ({
               ...record,
@@ -351,10 +350,11 @@ const PublicData = (() => {
               return String(a.title || "").localeCompare(String(b.title || ""));
             });
         } else {
+          // Empty result fallback: static baseline.
           itemsToRender = [...staticItems];
         }
       } catch (_) {
-        // Graceful fallback: static cards remain the baseline.
+        // Query error fallback: static baseline.
         itemsToRender = [...staticItems];
       }
     }
