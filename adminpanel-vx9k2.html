@@ -93,19 +93,37 @@
                 <input class="contact-input" id="c-title" placeholder="title" required />
                 <select class="contact-input" id="c-category" required>
                   <option value="">Select category</option>
-                  <option>GST</option><option>Income Tax</option><option>TDS</option><option>ROC</option>
-                  <option>Professional Tax</option><option>Business Compliance</option><option>Labour Compliance</option><option>Other</option>
+                  <option>GST</option><option>Income Tax</option><option>TDS</option><option>ROC / MCA</option>
+                  <option>PF / ESI</option><option>Labour Law</option><option>Professional Tax</option><option>Audit</option>
+                  <option>General Compliance</option><option>Other</option>
                 </select>
+                <input class="contact-input hidden" id="c-category-other" placeholder="Enter custom category" />
                 <select class="contact-input" id="c-state" required>
                   <option value="">Select state</option>
-                  <option value="all-india">All India</option><option value="andhra-pradesh">Andhra Pradesh</option><option value="telangana">Telangana</option>
-                  <option value="tamil-nadu">Tamil Nadu</option><option value="karnataka">Karnataka</option><option value="maharashtra">Maharashtra</option>
-                  <option value="delhi">Delhi</option><option value="kerala">Kerala</option><option value="other-states">Other States</option>
+                  <option>National</option><option>Andhra Pradesh</option><option>Telangana</option><option>Tamil Nadu</option>
+                  <option>Karnataka</option><option>Kerala</option><option>Maharashtra</option><option>Delhi</option>
+                  <option>Gujarat</option><option>Rajasthan</option><option>Uttar Pradesh</option><option>West Bengal</option>
+                  <option>Other</option>
                 </select>
-                <input class="contact-input" id="c-due-date" placeholder="due_date" />
-                <input class="contact-input" id="c-frequency" placeholder="frequency" />
-                <input class="contact-input" id="c-applicable" placeholder="applicable_to" />
-                <select class="contact-input" id="c-status"><option>Indicative</option><option>Upcoming</option><option>Important</option><option>Updated</option></select>
+                <input class="contact-input hidden" id="c-state-other" placeholder="Enter custom state" />
+                <input class="contact-input" id="c-due-date" type="date" placeholder="due_date" />
+                <select class="contact-input" id="c-frequency">
+                  <option value="">Select frequency</option>
+                  <option>One-time</option><option>Monthly</option><option>Quarterly</option><option>Half-yearly</option>
+                  <option>Annual</option><option>Event-based</option><option>As notified</option><option>Other</option>
+                </select>
+                <input class="contact-input hidden" id="c-frequency-other" placeholder="Enter custom frequency" />
+                <select class="contact-input" id="c-applicable">
+                  <option value="">Select applicable to</option>
+                  <option>Individuals</option><option>Proprietorships</option><option>Partnership Firms</option><option>LLPs</option>
+                  <option>Private Limited Companies</option><option>Public Limited Companies</option><option>GST Registered Businesses</option>
+                  <option>Employers</option><option>Startups</option><option>Professionals</option><option>All Businesses</option><option>Other</option>
+                </select>
+                <input class="contact-input hidden" id="c-applicable-other" placeholder="Enter custom applicable type" />
+                <select class="contact-input" id="c-status">
+                  <option>Mandatory</option><option>Indicative</option><option>Informational</option><option>High Priority</option><option>Other</option>
+                </select>
+                <input class="contact-input hidden" id="c-status-other" placeholder="Enter custom compliance type/priority" />
                 <input class="contact-input sm:col-span-2" id="c-source" placeholder="source_url" />
                 <textarea class="contact-textarea sm:col-span-2" id="c-description" rows="3" placeholder="description"></textarea>
                 <label class="text-sm"><input type="checkbox" id="c-national" /> is_national</label>
@@ -161,11 +179,18 @@
               <form id="career-form" class="mt-3 grid gap-3 sm:grid-cols-2">
                 <input type="hidden" id="career-id" />
                 <input class="contact-input" id="j-title" placeholder="title" required />
-                <select class="contact-input" id="j-type"><option>Full-time</option><option>Part-time</option><option>Internship</option><option>Articleship</option><option>Contract</option></select>
+                <select class="contact-input" id="j-type"><option>Full-time</option><option>Part-time</option><option>Internship</option><option>Articleship</option><option>Contract</option><option>Other</option></select>
+                <input class="contact-input hidden" id="j-type-other" placeholder="Enter custom job type" />
                 <select class="contact-input" id="j-exp"><option>Fresher</option><option>0-1 Years</option><option>1-3 Years</option><option>3-5 Years</option><option>5+ Years</option></select>
-                <input class="contact-input" id="j-location" placeholder="location" />
+                <select class="contact-input" id="j-location">
+                  <option value="">Select location</option><option>Remote</option><option>Onsite</option><option>Hybrid</option>
+                  <option>Rajamahendravaram</option><option>Andhra Pradesh</option><option>Hyderabad</option><option>Bengaluru</option>
+                  <option>Chennai</option><option>Mumbai</option><option>Delhi NCR</option><option>Other</option>
+                </select>
+                <input class="contact-input hidden" id="j-location-other" placeholder="Enter custom location" />
                 <textarea class="contact-textarea sm:col-span-2" id="j-description" rows="3" placeholder="description"></textarea>
                 <textarea class="contact-textarea sm:col-span-2" id="j-requirements" rows="3" placeholder="requirements"></textarea>
+                <select class="contact-input" id="j-status"><option value="active">Active</option><option value="inactive">Inactive</option></select>
                 <label class="text-sm"><input type="checkbox" id="j-intern" /> is_internship</label>
                 <label class="text-sm"><input type="checkbox" id="j-active" checked /> is_active</label>
                 <div class="sm:col-span-2 flex gap-2"><button id="career-submit" class="btn-primary" type="submit">Save Career Opening</button><button id="career-clear" class="btn-secondary" type="button">Clear</button></div>
