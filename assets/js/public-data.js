@@ -58,7 +58,13 @@ const PublicData = (() => {
 
   async function loadSiteSettings() {
     if (!client) return null;
-    const { data, error } = await client.from("site_settings").select("*").limit(1).maybeSingle();
+    const { data, error } = await client
+      .from("site_settings")
+      .select("*")
+      .order("updated_at", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false, nullsFirst: false })
+      .limit(1)
+      .maybeSingle();
     if (error) return null;
     if (hasSiteSettingsTargets()) {
       applySiteSettings(data);
