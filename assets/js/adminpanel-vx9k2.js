@@ -3,7 +3,6 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // Add/remove admin emails here
 const ALLOWED_ADMIN_EMAILS = [
   "prudhvi@varadanexus.com",
-  "secondadmin@email.com",
   "caksrinuandassociates@gmail.com"
 ];
 const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
