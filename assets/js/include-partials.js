@@ -96,6 +96,27 @@ async function loadFooterPartial() {
   } catch {
     return;
   }
+
+  const yearEl = document.querySelector('#site-footer #year');
+  if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
+  const adminTrigger = document.querySelector('#site-footer #footer-admin-trigger');
+  if (adminTrigger) {
+    let clickCount = 0;
+    let lastClickAt = 0;
+    const RESET_GAP_MS = 1500;
+    const REQUIRED_CLICKS = 5;
+    adminTrigger.addEventListener('click', () => {
+      const now = Date.now();
+      if (now - lastClickAt > RESET_GAP_MS) clickCount = 0;
+      clickCount += 1;
+      lastClickAt = now;
+      if (clickCount >= REQUIRED_CLICKS) {
+        clickCount = 0;
+        window.location.href = 'adminpanel-vx9k2.html';
+      }
+    });
+  }
 }
 
 async function loadFloatingButtonsPartial() {
