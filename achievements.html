@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Website designed and developed by Varada Nexus Private Limited | https://www.varadanexus.com -->
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Achievements | K Srinu & Associates</title>
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+    <meta property="og:title" content="Achievements | K Srinu & Associates">
+    <meta property="og:description" content="Milestones, recognitions, and key achievements of K Srinu & Associates over the years.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://caksrinuandassociates.com/achievements.html">
+    <meta property="og:image" content="https://caksrinuandassociates.com/assets/images/logo.jpg">
+    <meta
+      name="description"
+      content="Milestones, recognitions, and key achievements of K Srinu & Associates over the years."
+    />
+    <link rel="canonical" href="https://caksrinuandassociates.com/achievements.html" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Achievements | K Srinu & Associates" />
+    <meta name="twitter:description" content="Milestones, recognitions, and key achievements of K Srinu & Associates over the years." />
+    <meta name="twitter:image" content="https://caksrinuandassociates.com/assets/images/logo.jpg" />
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"AccountingService","name":"K Srinu and Associates","url":"https://caksrinuandassociates.com/","telephone":"+91 8897667910","email":"kasofc4u@gmail.com","address":{"@type":"PostalAddress","streetAddress":"D.No:81-23-01/3, Sri Venkateswara Nagar","addressLocality":"Rajamahendravaram","addressRegion":"Andhra Pradesh","postalCode":"533106","addressCountry":"IN"}}</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { theme: { extend: { colors: { navy: '#0f2747', gold: '#f2b233' } } } };
+    </script>
+    <link rel="stylesheet" href="assets/css/style.css?v=20260717-ticker-fixes" />
+  </head>
+  <body>
+    <div id="site-navbar"></div>
+
+    <main>
+      <section class="relative overflow-hidden bg-white px-4 pb-14 pt-12 sm:px-6 sm:pb-16 sm:pt-14 lg:px-8 lg:pb-16 lg:pt-16">
+        <div class="absolute inset-y-0 left-0 w-full bg-[linear-gradient(90deg,#ffffff_0%,#ffffff_60%,rgba(255,255,255,0)_100%)]"></div>
+        <div class="container-premium relative">
+          <div class="reveal max-w-2xl">
+            <span class="inline-flex items-center rounded-full border border-[#f6c65b]/60 bg-[#f6c65b1f] px-3 py-1 text-xs font-semibold tracking-[0.18em] text-[#e9a31a]">ACHIEVEMENTS</span>
+            <h1 class="mt-4 text-[2.2rem] font-extrabold leading-[1.05] text-navy sm:text-5xl lg:text-[3.25rem]">Milestones That<br /><span class="text-[#f2b233]">Define Our Journey</span></h1>
+            <p class="mt-5 max-w-xl text-[15px] leading-relaxed text-slate-700 sm:text-base">A record of recognitions, milestones, and achievements earned through consistent client service and professional excellence.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-white px-4 pb-14 pt-4 sm:px-6 lg:px-8">
+        <div class="container-premium">
+          <p id="achievements-loading" class="subtitle text-sm mb-3">Loading achievements...</p>
+          <p id="achievements-empty" class="hidden subtitle text-sm mb-3">No achievements published yet. Please check back soon.</p>
+          <div id="achievements-list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"></div>
+        </div>
+      </section>
+    </main>
+
+    <div id="site-footer"></div>
+    <div id="floating-buttons"></div>
+    <script src="assets/js/include-partials.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/public-data.js?v=20260717-multiple-contacts"></script>
+    <script src="assets/js/script.js"></script>
+    <script>
+      PublicData.loadSiteSettings();
+      PublicData.renderAchievementsPage();
+    </script>
+  </body>
+</html>

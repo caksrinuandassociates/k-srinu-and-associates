@@ -538,10 +538,64 @@ const PublicData = (() => {
     applyFilters();
   }
 
+  async function renderAchievementsPage() {
+    const list = document.getElementById("achievements-list");
+    const loading = document.getElementById("achievements-loading");
+    const empty = document.getElementById("achievements-empty");
+    if (!list) return;
+
+    if (!client) {
+      if (loading) loading.textContent = "Configure public Supabase keys in assets/js/public-data.js";
+      return;
+    }
+
+    const { data, error } = await client
+      .from("achievements")
+      .select("id, title, description, achieved_on, year_label, image_url, display_order, is_active")
+      .eq("is_active", true)
+      .order("display_order", { ascending: true })
+      .order("achieved_on", { ascending: false });
+
+    if (loading) loading.classList.add("hidden");
+    if (error || !data || data.length === 0) {
+      if (empty) empty.classList.remove("hidden");
+      if (error) console.error("[AchievementsPage] achievements query error", error);
+      return;
+    }
+
+    const esc = (v) => String(v ?? "").replace(/[&<>'"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[c]));
+    const yearOf = (row) => {
+      if (row.year_label) return row.year_label;
+      if (row.achieved_on) {
+        const d = new Date(row.achieved_on);
+        if (!Number.isNaN(d.getTime())) return String(d.getFullYear());
+      }
+      return "";
+    };
+
+    list.innerHTML = data
+      .map((a) => {
+        const year = yearOf(a);
+        const image = a.image_url
+          ? `<img src="${esc(a.image_url)}" alt="${esc(a.title || "Achievement")}" class="h-44 w-full rounded-xl border border-[#e2e8f3] object-cover" />`
+          : "";
+        return `<article class="card lift reveal flex flex-col rounded-2xl p-5 shadow-[0_14px_28px_rgba(15,39,71,0.08)]">
+          ${image}
+          <div class="${image ? "mt-4" : ""} flex items-center gap-2">
+            ${year ? `<span class="trust-chip">${esc(year)}</span>` : ""}
+          </div>
+          <h3 class="mt-2 text-lg font-bold text-navy">${esc(a.title || "Achievement")}</h3>
+          <p class="subtitle text-sm mt-2 leading-relaxed">${esc(a.description || "")}</p>
+        </article>`;
+      })
+      .join("");
+  }
+
   return {
     loadSiteSettings,
     renderTeamPage,
     renderCareersPage,
     renderComplianceCalendarPage,
+    renderAchievementsPage,
   };
 })();

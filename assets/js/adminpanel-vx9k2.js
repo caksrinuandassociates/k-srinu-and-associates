@@ -11,15 +11,16 @@ const $ = (id) => document.getElementById(id);
 const refs = {
   loginForm: $("login-form"), logoutBtn: $("logout-btn"), authMsg: $("auth-message"), adminMsg: $("admin-message"),
   loginPanel: $("login-panel"), dashboard: $("dashboard"),
-  complianceForm: $("compliance-form"), teamForm: $("team-form"), careerForm: $("career-form"), notificationForm: $("notification-form"), settingsForm: $("settings-form"), homepageStatsForm: $("homepage-stats-form"),
-  complianceList: $("compliance-list"), teamList: $("team-list"), careersList: $("careers-list"), notificationsList: $("notifications-list"),
-  complianceSearch: $("compliance-search"), teamSearch: $("team-search"), careersSearch: $("careers-search"), notificationsSearch: $("notifications-search"),
-  complianceSubmit: $("compliance-submit"), teamSubmit: $("team-submit"), careerSubmit: $("career-submit"), notificationSubmit: $("notification-submit"),
-  complianceClear: $("compliance-clear"), teamClear: $("team-clear"), careerClear: $("career-clear"), notificationClear: $("notification-clear"),
+  complianceForm: $("compliance-form"), teamForm: $("team-form"), careerForm: $("career-form"), notificationForm: $("notification-form"), settingsForm: $("settings-form"), homepageStatsForm: $("homepage-stats-form"), achievementForm: $("achievement-form"),
+  complianceList: $("compliance-list"), teamList: $("team-list"), careersList: $("careers-list"), notificationsList: $("notifications-list"), achievementsList: $("achievements-list"),
+  complianceSearch: $("compliance-search"), teamSearch: $("team-search"), careersSearch: $("careers-search"), notificationsSearch: $("notifications-search"), achievementsSearch: $("achievements-search"),
+  complianceSubmit: $("compliance-submit"), teamSubmit: $("team-submit"), careerSubmit: $("career-submit"), notificationSubmit: $("notification-submit"), achievementSubmit: $("achievement-submit"),
+  complianceClear: $("compliance-clear"), teamClear: $("team-clear"), careerClear: $("career-clear"), notificationClear: $("notification-clear"), achievementClear: $("achievement-clear"),
   complianceImportBaseline: $("compliance-import-baseline"),
   tImageFile: $("t-image-file"), tImage: $("t-image"), tImagePreview: $("t-image-preview"),
   tCropPreview: $("t-crop-preview"), tCropX: $("t-crop-x"), tCropY: $("t-crop-y"), tCropZoom: $("t-crop-zoom"),
-  compliancePreview: $("compliance-live-preview"), teamPreview: $("team-live-preview"), careerPreview: $("career-live-preview"), notificationPreview: $("notification-live-preview"), settingsPreview: $("settings-live-preview"), homepageStatsPreview: $("homepage-stats-preview"),
+  aImageFile: $("a-image-file"), aImage: $("a-image"), aImagePreview: $("a-image-preview"),
+  compliancePreview: $("compliance-live-preview"), teamPreview: $("team-live-preview"), careerPreview: $("career-live-preview"), notificationPreview: $("notification-live-preview"), settingsPreview: $("settings-live-preview"), homepageStatsPreview: $("homepage-stats-preview"), achievementPreview: $("achievement-live-preview"),
   submissionSearch: $("submission-search"), submissionStatusFilter: $("submission-status-filter"),
   contactSubmissionsList: $("contact-submissions-list"), careerSubmissionsList: $("career-submissions-list"),
   contactSubmissionsLoading: $("contact-submissions-loading"), careerSubmissionsLoading: $("career-submissions-loading"),
@@ -40,8 +41,10 @@ let teamImageObjectUrl = "";
 let teamCropSourceFile = null;
 let teamCropSourceUrl = "";
 let previousTeamImageUrl = "";
-let complianceData = [], teamData = [], careersData = [], notificationsData = [], contactSubmissionsData = [], careerSubmissionsData = [];
+let complianceData = [], teamData = [], careersData = [], notificationsData = [], contactSubmissionsData = [], careerSubmissionsData = [], achievementsData = [];
 let parsedRestoreBackup = null;
+let achievementImageObjectUrl = "";
+let previousAchievementImageUrl = "";
 const ADMIN_THEME_KEY = "admin_console_theme";
 const DEFAULT_HOMEPAGE_STATS = [
   { value: "5+", label: "years of Excellence" },
@@ -49,7 +52,7 @@ const DEFAULT_HOMEPAGE_STATS = [
   { value: "1000+", label: "Compliance Filings" },
   { value: "100%", label: "Client Satisfaction" },
 ];
-const BACKUP_TABLES = ["site_settings", "compliance_calendar", "team_members", "career_openings", "notifications", "contact_submissions", "career_applications"];
+const BACKUP_TABLES = ["site_settings", "compliance_calendar", "team_members", "career_openings", "notifications", "contact_submissions", "career_applications", "achievements"];
 const BACKUP_PROJECT = "k-srinu-and-associates";
 const stateLabels = {"all-india":"All India","andhra-pradesh":"Andhra Pradesh",telangana:"Telangana","tamil-nadu":"Tamil Nadu",karnataka:"Karnataka",maharashtra:"Maharashtra",delhi:"Delhi",kerala:"Kerala","other-states":"Other States"};
 const BASELINE_COMPLIANCE_ITEMS = [
@@ -345,6 +348,33 @@ function getTeamStoragePath(url){
   } catch { return null; }
 }
 
+function getAchievementStoragePath(url){
+  if(!url) return null;
+  try {
+    const u = new URL(url);
+    const marker = "/storage/v1/object/public/achievement-images/";
+    const idx = u.pathname.indexOf(marker);
+    if(idx === -1) return null;
+    const raw = u.pathname.slice(idx + marker.length);
+    if(!raw) return null;
+    return decodeURIComponent(raw);
+  } catch { return null; }
+}
+
+async function uploadAchievementImageIfSelected(){
+  const file = refs.aImageFile?.files?.[0];
+  if(!file) return refs.aImage?.value?.trim() || "";
+  busy(refs.achievementSubmit, true, "Uploading...");
+  try {
+    const safeName = file.name.replace(/[^a-z0-9._-]+/gi,"-").replace(/^-+|-+$/g,"") || "achievement.jpg";
+    const path = `${Date.now()}-${Math.random().toString(36).slice(2,8)}-${safeName}`;
+    const { error } = await supabaseClient.storage.from("achievement-images").upload(path, file, { upsert: true });
+    if(error) throw new Error("Image upload failed. Check Supabase Storage bucket and policies.");
+    const { data } = supabaseClient.storage.from("achievement-images").getPublicUrl(path);
+    return data?.publicUrl || "";
+  } finally { busy(refs.achievementSubmit, false); }
+}
+
 function setAuth(on){ refs.loginPanel?.classList.toggle("hidden", on); refs.dashboard?.classList.toggle("hidden", !on); }
 
 function switchTab(tab){ document.querySelectorAll(".tab-panel").forEach(p=>p.classList.add("hidden")); document.querySelectorAll(".tab-btn").forEach(b=>{b.classList.remove("btn-primary");b.classList.add("btn-secondary");}); $(`tab-${tab}`)?.classList.remove("hidden"); const b=document.querySelector(`.tab-btn[data-tab='${tab}']`); if(b){b.classList.add("btn-primary");b.classList.remove("btn-secondary");}}
@@ -417,6 +447,14 @@ async function uploadTeamImageIfSelected(){
 function previewCompliance(){ if(!refs.compliancePreview) return; refs.compliancePreview.innerHTML = `<article class='calendar-card'><span class='calendar-date'>${esc($("c-due-date")?.value||"As notified")}</span><span class='trust-chip ml-2'>${esc(getDropdownValue("c-status","c-status-other")||"Indicative")}</span><h3 class='mt-3 font-bold text-navy'>${esc($("c-title")?.value||"Untitled")}</h3><p class='subtitle text-sm mt-2'><strong>Category:</strong> ${esc(getDropdownValue("c-category","c-category-other")||"-")}</p><p class='subtitle text-sm'><strong>State:</strong> ${esc(getDropdownValue("c-state","c-state-other")||"-")}</p><p class='subtitle text-sm'><strong>Frequency:</strong> ${esc(getDropdownValue("c-frequency","c-frequency-other")||"-")}</p><p class='subtitle text-sm'><strong>Applicable to:</strong> ${esc(getDropdownValue("c-applicable","c-applicable-other")||"-")}</p><p class='subtitle text-sm'><strong>Description:</strong> ${esc($("c-description")?.value||"-")}</p><div class='mt-2'>${badge($("c-active")?.checked ?? true)}</div></article>`; }
 function previewTeam(){ if(!refs.teamPreview) return; const n=$("t-name")?.value||"Team Member"; const initials=esc(n.split(" ").map(x=>x[0]).slice(0,2).join("").toUpperCase()||"TM"); const src = teamImageObjectUrl || teamCropSourceUrl || refs.tImage?.value || ""; const tags=(($("t-tags")?.value)||"").split(",").map(t=>t.trim()).filter(Boolean).map(t=>`<span class='trust-chip'>${esc(t)}</span>`).join(" "); refs.teamPreview.innerHTML=`<article class='team-card'>${src?`<img src='${esc(src)}' class='h-14 w-14 rounded-full border border-slate-200 object-cover'/>`:`<div class='profile-initial'>${initials}</div>`}<h3 class='mt-4 font-bold text-navy text-xl'>${esc(n)}</h3><p class='text-sm font-semibold text-gold mt-1'>${esc($("t-designation")?.value||"Designation")}</p><p class='subtitle text-sm mt-2'>${esc($("t-bio")?.value||"-")}</p><p class='subtitle text-sm mt-2'><strong>Profile:</strong> ${esc($("t-profile-description")?.value||"-")}</p><div class='mt-3 flex flex-wrap gap-2'>${tags || "<span class='trust-chip'>Tag</span>"}</div><div class='mt-2'>${badge($("t-active")?.checked ?? true)}</div></article>`; }
 function previewCareer(){ if(!refs.careerPreview) return; const intern=$("j-intern")?.checked; refs.careerPreview.innerHTML=`<article class='service-card'><h3 class='font-bold text-navy'>${esc($("j-title")?.value||"Career opening")}</h3><p class='subtitle text-sm mt-2'>${esc($("j-description")?.value||"-")}</p><p class='subtitle text-sm mt-2'><strong>Requirements:</strong> ${esc($("j-requirements")?.value||"-")}</p><p class='text-xs mt-3 text-navy font-semibold'>Experience: ${esc($("j-exp")?.value||"-")}</p><p class='text-xs text-gold font-semibold'>Type: ${esc(getDropdownValue("j-type","j-type-other")||"-")}</p><p class='text-xs text-navy font-semibold'>Location: ${esc(getDropdownValue("j-location","j-location-other")||"-")}</p><div class='mt-2 flex gap-2'><span class='trust-chip'>${intern?"Internship":"Job"}</span>${badge($("j-active")?.checked ?? true)}</div></article>`; }
+function previewAchievement(){
+  if(!refs.achievementPreview) return;
+  const title = $("a-title")?.value || "Achievement title";
+  const year = $("a-year")?.value || ($("a-date")?.value ? String(new Date($("a-date").value).getFullYear()) : "");
+  const description = $("a-description")?.value || "-";
+  const src = achievementImageObjectUrl || refs.aImage?.value || "";
+  refs.achievementPreview.innerHTML = `<article class='card p-4'>${src?`<img src='${esc(src)}' class='h-32 w-full rounded-lg object-cover'/>`:""}<div class='mt-2 flex items-center gap-2'>${year?`<span class='trust-chip'>${esc(year)}</span>`:""}${badge($("a-active")?.checked ?? true)}</div><h3 class='mt-2 font-bold text-navy text-lg'>${esc(title)}</h3><p class='subtitle text-sm mt-2'>${esc(description)}</p></article>`;
+}
 function previewNotification(){ if(!refs.notificationPreview) return; const summary=$("n-summary")?.value||"Short ticker summary"; const content=esc($("n-content")?.value||"Full notification content will appear here.").replace(/\n/g,"<br/>"); const link=$("n-link-url")?.value||""; const pdf=$("n-pdf-url")?.value||$("n-pdf-file")?.files?.[0]?.name||""; refs.notificationPreview.innerHTML=`<article class='service-card'><div class='flex flex-wrap items-center gap-2'><span class='trust-chip'>${esc($("n-category")?.value||"General")}</span>${badge($("n-active")?.checked ?? true)}</div><h3 class='font-bold text-navy text-lg mt-3'>${esc($("n-title")?.value||"Notification title")}</h3><p class='subtitle text-sm mt-2 font-semibold'>${esc(summary)}</p><p class='subtitle text-sm mt-3'>${content}</p><div class='mt-3 flex flex-wrap gap-2'>${pdf?"<span class='trust-chip'>PDF attached</span>":""}${link?"<span class='trust-chip'>Related link</span>":""}</div></article>`; }
 function normalizeContactValues(values,fallback=""){ const source=Array.isArray(values)?values:[]; const cleaned=source.map(value=>String(value||"").trim()).filter(Boolean); if(!cleaned.length&&String(fallback||"").trim()) cleaned.push(String(fallback).trim()); return [...new Set(cleaned)]; }
 function contactEditorConfig(type){ return type==="phone"?{containerId:"s-phones-list",inputType:"tel",placeholder:"+91 8897667910",label:"Phone number"}:{containerId:"s-emails-list",inputType:"email",placeholder:"name@example.com",label:"Email address"}; }
@@ -451,6 +489,18 @@ function resetCompliance(){ refs.complianceForm?.reset(); $("compliance-id").val
 function resetTeam(){ refs.teamForm?.reset(); $("team-id").value=""; refs.teamSubmit.textContent="Save Team Member"; teamImageObjectUrl=""; teamCropSourceFile = null; teamCropSourceUrl = ""; if(refs.tImagePreview) refs.tImagePreview.style.display="none"; if(refs.tCropPreview) refs.tCropPreview.src=""; if(refs.tCropX) refs.tCropX.value=50; if(refs.tCropY) refs.tCropY.value=50; if(refs.tCropZoom) refs.tCropZoom.value=1; previewTeam(); }
 function resetCareer(){ refs.careerForm?.reset(); $("career-id").value=""; refs.careerSubmit.textContent="Save Career Opening"; toggleOtherInput("j-type","j-type-other"); toggleOtherInput("j-location","j-location-other"); $("j-status").value = "active"; $("j-active").checked = true; previewCareer(); }
 function resetNotification(){ refs.notificationForm?.reset(); $("notification-id").value=""; if(refs.notificationSubmit) refs.notificationSubmit.textContent="Publish Notification"; if($("n-category")) $("n-category").value="General"; if($("n-order")) $("n-order").value="0"; if($("n-active")) $("n-active").checked=true; if($("n-starts-at")) $("n-starts-at").value=toDatetimeLocal(new Date().toISOString()); if($("n-pdf-url")) $("n-pdf-url").value=""; const currentPdf=$("n-current-pdf"); if(currentPdf){currentPdf.href="#";currentPdf.classList.add("hidden");} previewNotification(); }
+
+function resetAchievement(){
+  refs.achievementForm?.reset();
+  $("a-id").value = "";
+  if(refs.achievementSubmit) refs.achievementSubmit.textContent = "Save Achievement";
+  achievementImageObjectUrl = "";
+  previousAchievementImageUrl = "";
+  if(refs.aImagePreview) refs.aImagePreview.style.display = "none";
+  if($("a-order")) $("a-order").value = "0";
+  if($("a-active")) $("a-active").checked = true;
+  previewAchievement();
+}
 
 function toDatetimeLocal(value){ if(!value) return ""; const date=new Date(value); if(Number.isNaN(date.getTime())) return ""; const offset=date.getTimezoneOffset(); return new Date(date.getTime()-offset*60000).toISOString().slice(0,16); }
 
@@ -502,6 +552,126 @@ function renderRows(type, rows){
     }
     cfg.container.appendChild(el);
   });
+}
+
+function renderAchievementRows(rows){
+  const container = refs.achievementsList;
+  if(!container) return;
+  const search = (refs.achievementsSearch?.value || "").toLowerCase();
+  container.innerHTML = "";
+  if(!rows || rows.length === 0){
+    container.innerHTML = `<p class="subtitle text-sm">No achievements found.</p>`;
+    return;
+  }
+  rows
+    .filter((r)=>`${r.title||""} ${r.description||""} ${r.year_label||""}`.toLowerCase().includes(search))
+    .sort((a,b)=>(a.display_order??0)-(b.display_order??0))
+    .forEach((r)=>{
+      const el = document.createElement("div");
+      el.className = "card p-3 flex items-start justify-between gap-2";
+      const year = r.year_label || (r.achieved_on ? String(new Date(r.achieved_on).getFullYear()) : "-");
+      const main = `${r.image_url?`<img src='${esc(r.image_url)}' class='h-10 w-14 rounded object-cover inline-block mr-2'/>`:""}<strong>${esc(r.title||"-")}</strong><br/>Year: ${esc(year)}<br/>${esc(r.description||"")}<br/>${badge(r.is_active!==false)}`;
+      el.innerHTML = `<div class='text-sm subtitle'>${main}${rowMeta(r)}</div><div class='flex flex-col gap-2'><button class='btn-secondary' data-a='up'>↑</button><button class='btn-secondary' data-a='down'>↓</button><button class='btn-secondary' data-a='edit'>Edit</button><button class='btn-secondary' data-a='del'>Delete</button></div>`;
+      const btn = (a) => el.querySelector(`[data-a='${a}']`);
+      btn("edit").onclick = () => editAchievementRow(r);
+      btn("del").onclick = () => deleteAchievement(r.id, btn("del"));
+      btn("up").onclick = () => moveAchievement(r.id, -1, btn("up"));
+      btn("down").onclick = () => moveAchievement(r.id, 1, btn("down"));
+      container.appendChild(el);
+    });
+}
+
+function editAchievementRow(r){
+  $("a-id").value = r.id || "";
+  $("a-title").value = r.title || "";
+  $("a-year").value = r.year_label || "";
+  $("a-date").value = (r.achieved_on && /^\d{4}-\d{2}-\d{2}$/.test(r.achieved_on)) ? r.achieved_on : "";
+  $("a-order").value = r.display_order ?? 0;
+  $("a-description").value = r.description || "";
+  $("a-image").value = r.image_url || "";
+  $("a-active").checked = r.is_active !== false;
+  achievementImageObjectUrl = r.image_url || "";
+  previousAchievementImageUrl = r.image_url || "";
+  if(refs.aImagePreview){
+    if(r.image_url){ refs.aImagePreview.src = r.image_url; refs.aImagePreview.style.display = "block"; }
+    else refs.aImagePreview.style.display = "none";
+  }
+  if(refs.achievementSubmit) refs.achievementSubmit.textContent = "Update Achievement";
+  previewAchievement();
+  refs.achievementForm?.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+async function deleteAchievement(id, btn){
+  busy(btn, true, "Deleting...");
+  try {
+    const row = achievementsData.find((r)=>r.id===id);
+    const { error } = await supabaseClient.from("achievements").delete().eq("id", id);
+    if(error) throw error;
+    const path = getAchievementStoragePath(row?.image_url);
+    if(path) await supabaseClient.storage.from("achievement-images").remove([path]);
+    await refreshModule("achievements");
+    setMsg(refs.adminMsg, "Changes published successfully");
+  } catch(e){ setMsg(refs.adminMsg, e.message, true); }
+  finally { busy(btn, false); }
+}
+
+async function moveAchievement(id, dir, btn){
+  busy(btn, true, dir<0?"Moving Up...":"Moving Down...");
+  try {
+    await applyReorder("achievements", [...achievementsData].sort((a,b)=>(a.display_order??0)-(b.display_order??0)), id, dir);
+    await refreshModule("achievements");
+    setMsg(refs.adminMsg, "Changes published successfully");
+  } catch(e){ setMsg(refs.adminMsg, e.message, true); }
+  finally { busy(btn, false); }
+}
+
+async function loadAchievements(){
+  if(refs.achievementsList) refs.achievementsList.innerHTML = `<p class="subtitle text-sm">Loading achievements...</p>`;
+  const { data, error } = await supabaseClient.from("achievements").select("*");
+  if(error){
+    if(refs.achievementsList) refs.achievementsList.innerHTML = `<p class="subtitle text-sm">Unable to load achievements.</p>`;
+    setMsg(refs.adminMsg, `Achievements load failed: ${error.message}`, true);
+    throw error;
+  }
+  achievementsData = data || [];
+  renderAchievementRows(achievementsData);
+}
+
+async function saveAchievement(e){
+  e.preventDefault();
+  if(refs.achievementSubmit?.disabled) return;
+  const id = $("a-id").value;
+  busy(refs.achievementSubmit, true, id ? "Updating..." : "Saving...");
+  try {
+    const uploaded = await uploadAchievementImageIfSelected();
+    const newImageUrl = uploaded || $("a-image").value.trim() || null;
+    const payload = {
+      title: $("a-title").value.trim(),
+      year_label: $("a-year").value.trim() || null,
+      achieved_on: $("a-date").value || null,
+      description: $("a-description").value.trim(),
+      image_url: newImageUrl,
+      display_order: Number($("a-order").value || 0),
+      is_active: $("a-active").checked,
+    };
+    const { error } = id
+      ? await supabaseClient.from("achievements").update(payload).eq("id", id)
+      : await supabaseClient.from("achievements").insert([payload]);
+    if(error) throw error;
+    if(id){
+      const oldPath = getAchievementStoragePath(previousAchievementImageUrl);
+      const newPath = getAchievementStoragePath(newImageUrl);
+      if(oldPath && newPath && oldPath !== newPath){
+        const { error: removeErr } = await supabaseClient.storage.from("achievement-images").remove([oldPath]);
+        if(removeErr) setMsg(refs.adminMsg, "Achievement updated. Old image cleanup warning: " + removeErr.message, true);
+      }
+    }
+    setMsg(refs.adminMsg, "Changes published successfully");
+    previousAchievementImageUrl = "";
+    resetAchievement();
+    await refreshModule("achievements");
+  } catch(err){ setMsg(refs.adminMsg, err.message, true); }
+  finally { busy(refs.achievementSubmit, false); }
 }
 
 function editRow(type,r,scrollToForm=false){
@@ -624,8 +794,13 @@ async function refreshModule(moduleName){
     await loadSettings();
     return;
   }
+  if(moduleName === "achievements"){
+    await loadAchievements();
+    renderOverviewMetrics();
+    return;
+  }
 }
-async function loadAll(){ await Promise.all([loadCompliance(),loadTeam(),loadCareers(),loadNotifications(),loadSettings(),loadSubmissions()]); }
+async function loadAll(){ await Promise.all([loadCompliance(),loadTeam(),loadCareers(),loadNotifications(),loadSettings(),loadSubmissions(),loadAchievements()]); }
 
 function renderOverviewMetrics(){
   const complianceTotal = complianceData.length || 0;
@@ -882,6 +1057,7 @@ refs.complianceForm?.addEventListener("submit",saveCompliance);
 refs.teamForm?.addEventListener("submit",saveTeam);
 refs.careerForm?.addEventListener("submit",saveCareer);
 refs.notificationForm?.addEventListener("submit",saveNotification);
+refs.achievementForm?.addEventListener("submit",saveAchievement);
 refs.settingsForm?.addEventListener("submit",saveSettings);
 refs.homepageStatsForm?.addEventListener("submit",saveHomepageStats);
 refs.complianceClear?.addEventListener("click",resetCompliance);
@@ -889,11 +1065,13 @@ refs.complianceImportBaseline?.addEventListener("click",importBaselineCompliance
 refs.teamClear?.addEventListener("click",resetTeam);
 refs.careerClear?.addEventListener("click",resetCareer);
 refs.notificationClear?.addEventListener("click",resetNotification);
+refs.achievementClear?.addEventListener("click",resetAchievement);
 
 refs.complianceSearch?.addEventListener("input",()=>renderRows("compliance",complianceData));
 refs.teamSearch?.addEventListener("input",()=>renderRows("team",teamData));
 refs.careersSearch?.addEventListener("input",()=>renderRows("careers",careersData));
 refs.notificationsSearch?.addEventListener("input",()=>renderRows("notifications",notificationsData));
+refs.achievementsSearch?.addEventListener("input",()=>renderAchievementRows(achievementsData));
 refs.submissionSearch?.addEventListener("input",renderSubmissions);
 refs.submissionStatusFilter?.addEventListener("change",renderSubmissions);
 refs.qaAddCompliance?.addEventListener("click", ()=>{ switchTab("compliance"); refs.complianceForm?.scrollIntoView({behavior:"smooth", block:"start"}); $("c-title")?.focus(); });
@@ -940,6 +1118,14 @@ $("j-status")?.addEventListener("change",(e)=>{ $("j-active").checked = e.target
 ["j-title","j-exp","j-location","j-location-other","j-type","j-type-other","j-description","j-requirements","j-intern","j-active","j-status"].forEach(id=>$(id)?.addEventListener("input",previewCareer));
 ["n-title","n-category","n-summary","n-content","n-link-url","n-starts-at","n-expires-at","n-order","n-active"].forEach(id=>$(id)?.addEventListener("input",previewNotification));
 $("n-pdf-file")?.addEventListener("change",previewNotification);
+["a-title","a-year","a-date","a-description","a-image","a-order","a-active"].forEach(id=>$(id)?.addEventListener("input",previewAchievement));
+refs.aImageFile?.addEventListener("change", ()=>{
+  const f = refs.aImageFile.files?.[0];
+  if(!f) return;
+  achievementImageObjectUrl = URL.createObjectURL(f);
+  if(refs.aImagePreview){ refs.aImagePreview.src = achievementImageObjectUrl; refs.aImagePreview.style.display = "block"; }
+  previewAchievement();
+});
 ["s-whatsapp","s-address","s-map","s-map-embed","s-footer"].forEach(id=>$(id)?.addEventListener("input",previewSettings));
 $("s-add-phone")?.addEventListener("click",()=>{ addContactEditorRow("phone"); $("s-phones-list")?.lastElementChild?.querySelector("input")?.focus(); previewSettings(); });
 $("s-add-email")?.addEventListener("click",()=>{ addContactEditorRow("email"); $("s-emails-list")?.lastElementChild?.querySelector("input")?.focus(); previewSettings(); });
@@ -966,6 +1152,6 @@ toggleOtherInput("c-applicable","c-applicable-other");
 toggleOtherInput("c-status","c-status-other");
 toggleOtherInput("j-type","j-type-other");
 toggleOtherInput("j-location","j-location-other");
-previewCompliance(); previewTeam(); previewCareer(); resetNotification(); previewSettings(); setHomepageStatsForm(DEFAULT_HOMEPAGE_STATS);
+previewCompliance(); previewTeam(); previewCareer(); resetNotification(); previewSettings(); setHomepageStatsForm(DEFAULT_HOMEPAGE_STATS); previewAchievement();
 initTheme();
 ensureSession();

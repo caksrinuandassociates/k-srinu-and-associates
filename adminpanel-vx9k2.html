@@ -54,6 +54,10 @@
                   <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="14" height="13" rx="1.6"/><path d="M3 8h14M7 2.5v3M13 2.5v3"/></svg>
                   <span class="nav-label">Compliance Calendar</span>
                 </button>
+                <button class="btn-secondary tab-btn nav-link" data-tab="achievements" data-label="Achievements" type="button">
+                  <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2.5l1.8 3.7 4.1.6-3 2.9.7 4-3.6-1.9-3.6 1.9.7-4-3-2.9 4.1-.6z"/></svg>
+                  <span class="nav-label">Achievements</span>
+                </button>
                 <button class="btn-secondary tab-btn nav-link" data-tab="team" data-label="Team Members" type="button">
                   <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="6.5" r="2.5"/><path d="M2.5 17c0-2.8 2-4.5 4.5-4.5S11.5 14.2 11.5 17"/><circle cx="14" cy="7" r="2"/><path d="M13 12.7c2 .2 3.5 1.8 3.5 4.3"/></svg>
                   <span class="nav-label">Team Members</span>
@@ -187,6 +191,30 @@
               </div>
               <input id="compliance-search" class="contact-input mt-4" placeholder="Search compliance records" />
               <div id="compliance-list" class="mt-4 grid gap-3"></div>
+            </div>
+
+            <div id="tab-achievements" class="tab-panel mt-6 hidden">
+              <h3 class="font-bold text-navy text-lg">Achievements</h3>
+              <p class="subtitle mt-1 text-sm">Publish milestones and recognitions shown on the public Achievements page.</p>
+              <form id="achievement-form" class="mt-3 grid gap-3 sm:grid-cols-2">
+                <input type="hidden" id="a-id" />
+                <input class="contact-input" id="a-title" maxlength="180" placeholder="Achievement title" required />
+                <input class="contact-input" id="a-year" maxlength="20" placeholder="Year / label (for example: 2025)" />
+                <input class="contact-input" id="a-date" type="date" placeholder="achieved_on" />
+                <input class="contact-input" id="a-order" type="number" min="0" value="0" placeholder="Display order" />
+                <input class="contact-input" id="a-image-file" type="file" accept="image/*" />
+                <input class="contact-input" id="a-image" placeholder="image_url" />
+                <img id="a-image-preview" class="h-20 w-32 rounded-lg border border-slate-200 object-cover sm:col-span-2" alt="Preview" style="display:none" />
+                <textarea class="contact-textarea sm:col-span-2" id="a-description" rows="3" maxlength="2000" placeholder="description"></textarea>
+                <label class="text-sm"><input type="checkbox" id="a-active" checked /> is_active</label>
+                <div class="sm:col-span-2 flex flex-wrap gap-2"><button id="achievement-submit" class="btn-primary" type="submit">Save Achievement</button><button id="achievement-clear" class="btn-secondary" type="button">Clear</button></div>
+              </form>
+              <div class="card p-4 mt-4">
+                <h4 class="font-semibold text-navy">Live Achievement Preview</h4>
+                <div id="achievement-live-preview" class="mt-3"></div>
+              </div>
+              <input id="achievements-search" class="contact-input mt-4" placeholder="Search achievements" />
+              <div id="achievements-list" class="mt-4 grid gap-3"></div>
             </div>
 
             <div id="tab-team" class="tab-panel mt-6 hidden">
@@ -407,6 +435,7 @@ git archive --format=zip --output=frontend-backup.zip main</code></pre>
                   <li>notifications</li>
                   <li>contact_submissions</li>
                   <li>career_applications</li>
+                  <li>achievements</li>
                 </ul>
               </section>
 
