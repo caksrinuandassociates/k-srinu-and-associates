@@ -34,48 +34,98 @@
         </section>
 
         <section id="dashboard" class="hidden admin-dashboard-shell">
-          <div class="card p-4 sm:p-6">
-            <div class="flex items-center justify-between gap-3 flex-wrap">
-              <div class="flex items-center gap-3">
+          <div class="admin-shell">
+            <div id="admin-sidebar-backdrop" class="admin-sidebar-backdrop"></div>
+            <aside id="admin-sidebar" class="admin-sidebar">
+              <div class="admin-sidebar-brand">
                 <img src="assets/images/logo.png" alt="K SRINU & ASSOCIATES" class="h-10 w-auto rounded" />
                 <div>
-                  <h2 class="heading-lg">K SRINU & ASSOCIATES</h2>
+                  <h2 class="admin-brand-title">K SRINU &amp; ASSOCIATES</h2>
                   <p class="text-xs font-semibold tracking-wide text-gold">Internal Admin Console</p>
                 </div>
               </div>
-              <div class="flex items-center gap-2">
-                <button id="theme-toggle" class="btn-secondary" type="button">Dark</button>
-                <button id="logout-btn" class="btn-secondary">Logout</button>
+
+              <nav id="admin-tabs" class="admin-nav">
+                <button class="btn-primary tab-btn nav-link" data-tab="overview" data-label="Overview" type="button">
+                  <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="6" height="6" rx="1.2"/><rect x="11" y="3" width="6" height="6" rx="1.2"/><rect x="3" y="11" width="6" height="6" rx="1.2"/><rect x="11" y="11" width="6" height="6" rx="1.2"/></svg>
+                  <span class="nav-label">Overview</span>
+                </button>
+                <button class="btn-secondary tab-btn nav-link" data-tab="compliance" data-label="Compliance Calendar" type="button">
+                  <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="14" height="13" rx="1.6"/><path d="M3 8h14M7 2.5v3M13 2.5v3"/></svg>
+                  <span class="nav-label">Compliance Calendar</span>
+                </button>
+                <button class="btn-secondary tab-btn nav-link" data-tab="team" data-label="Team Members" type="button">
+                  <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="6.5" r="2.5"/><path d="M2.5 17c0-2.8 2-4.5 4.5-4.5S11.5 14.2 11.5 17"/><circle cx="14" cy="7" r="2"/><path d="M13 12.7c2 .2 3.5 1.8 3.5 4.3"/></svg>
+                  <span class="nav-label">Team Members</span>
+                </button>
+                <button class="btn-secondary tab-btn nav-link" data-tab="careers" data-label="Careers" type="button">
+                  <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="6.5" width="15" height="10" rx="1.6"/><path d="M7 6.5V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5M2.5 10.5h15"/></svg>
+                  <span class="nav-label">Careers</span>
+                  <span id="badge-tab-careers-active" class="admin-badge hidden">0</span>
+                </button>
+                <button class="btn-secondary tab-btn nav-link" data-tab="notifications" data-label="Notifications" type="button">
+                  <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 8a5 5 0 0 1 10 0c0 4 1.5 5 1.5 5h-13S5 12 5 8Z"/><path d="M8.2 15.5a1.8 1.8 0 0 0 3.6 0"/></svg>
+                  <span class="nav-label">Notifications</span>
+                  <span id="badge-tab-notifications-active" class="admin-badge hidden">0</span>
+                </button>
+                <button class="btn-secondary tab-btn nav-link" data-tab="homepage-stats" data-label="Homepage Stats" type="button">
+                  <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 17V9M9 17V3M15 17v-6"/></svg>
+                  <span class="nav-label">Homepage Stats</span>
+                </button>
+                <button class="btn-secondary tab-btn nav-link" data-tab="settings" data-label="Site Settings" type="button">
+                  <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="2.6"/><path d="M10 3v2M10 15v2M17 10h-2M5 10H3M14.9 5.1l-1.4 1.4M6.5 13.5l-1.4 1.4M14.9 14.9l-1.4-1.4M6.5 6.5 5.1 5.1"/></svg>
+                  <span class="nav-label">Site Settings</span>
+                </button>
+                <button class="btn-secondary tab-btn nav-link" data-tab="submissions" data-label="Form Submissions" type="button">
+                  <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11.5 5.6 4h8.8l2.6 7.5"/><path d="M3 11.5v3A1.5 1.5 0 0 0 4.5 16h11a1.5 1.5 0 0 0 1.5-1.5v-3M3 11.5h4l1 2h4l1-2h4"/></svg>
+                  <span class="nav-label">Form Submissions</span>
+                  <span id="badge-tab-submissions-new" class="admin-badge hidden">0</span>
+                </button>
+                <button class="btn-secondary tab-btn nav-link" data-tab="backup" data-label="Backup &amp; Restore" type="button">
+                  <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="10" cy="5" rx="6.5" ry="2.3"/><path d="M3.5 5v10c0 1.27 2.9 2.3 6.5 2.3s6.5-1.03 6.5-2.3V5"/><path d="M3.5 10c0 1.27 2.9 2.3 6.5 2.3s6.5-1.03 6.5-2.3"/></svg>
+                  <span class="nav-label">Backup &amp; Restore</span>
+                </button>
+              </nav>
+
+              <div class="admin-sidebar-footer">
+                <button id="theme-toggle" class="btn-secondary" type="button">Dark Mode</button>
+                <button id="logout-btn" class="btn-secondary" type="button">Logout</button>
+                <p class="admin-support-line">Support: <a href="mailto:connect@varadanexus.com">connect@varadanexus.com</a></p>
+                <a href="https://www.varadanexus.com" target="_blank" rel="noopener" class="admin-watermark">@varada nexus</a>
               </div>
-            </div>
+            </aside>
 
-            <div id="admin-tabs" class="mt-5 flex flex-wrap gap-2">
-              <button class="btn-primary tab-btn" data-tab="overview">Overview</button>
-              <button class="btn-secondary tab-btn" data-tab="compliance">Compliance Calendar</button>
-              <button class="btn-secondary tab-btn" data-tab="team">Team Members</button>
-              <button class="btn-secondary tab-btn" data-tab="careers">Careers <span id="badge-tab-careers-active" class="admin-badge hidden">0</span></button>
-              <button class="btn-secondary tab-btn" data-tab="settings">Site Settings</button>
-              <button class="btn-secondary tab-btn" data-tab="submissions">Form Submissions <span id="badge-tab-submissions-new" class="admin-badge hidden">0</span></button>
-              <button class="btn-secondary tab-btn" data-tab="backup">Backup & Restore</button>
-            </div>
+            <div class="admin-main">
+              <header class="admin-topbar">
+                <button id="sidebar-toggle" class="admin-burger" type="button" aria-label="Toggle menu">
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 5h14M3 10h14M3 15h14"/></svg>
+                </button>
+                <div>
+                  <h1 id="admin-page-title" class="admin-page-title">Overview</h1>
+                  <p class="text-xs subtitle">Manage your firm's digital presence</p>
+                </div>
+              </header>
 
-            <p id="admin-message" class="subtitle text-sm mt-3"></p>
+              <div class="admin-content-scroll">
+                <p id="admin-message" class="subtitle text-sm"></p>
 
             <div id="tab-overview" class="tab-panel mt-6">
               <div class="card p-4 sm:p-5">
                 <h3 class="font-bold text-navy text-lg">Welcome</h3>
                 <p class="subtitle text-sm mt-1">Manage compliance records, team content, careers, settings, and inbound form submissions from one dashboard.</p>
               </div>
-              <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
                 <article class="stat-card lift"><p class="text-xs text-gold font-semibold">Compliance</p><p id="metric-compliance-total" class="stat-value mt-1">0</p><p class="subtitle text-xs">Total Compliance Items</p></article>
                 <article class="stat-card lift"><p class="text-xs text-gold font-semibold">Team</p><p id="metric-team-active" class="stat-value mt-1">0</p><p class="subtitle text-xs">Active Team Members</p></article>
                 <article class="stat-card lift"><p class="text-xs text-gold font-semibold">Careers <span id="badge-overview-careers-active" class="admin-badge hidden">0</span></p><p id="metric-careers-active" class="stat-value mt-1">0</p><p class="subtitle text-xs">Active Career Openings</p></article>
+                <article class="stat-card lift"><p class="text-xs text-gold font-semibold">Notifications</p><p id="metric-notifications-active" class="stat-value mt-1">0</p><p class="subtitle text-xs">Published Updates</p></article>
                 <article class="stat-card lift"><p class="text-xs text-gold font-semibold">Inquiries <span id="badge-overview-contact-new" class="admin-badge hidden">0</span></p><p id="metric-contact-new" class="stat-value mt-1">0</p><p class="subtitle text-xs">New Contact Inquiries</p></article>
                 <article class="stat-card lift"><p class="text-xs text-gold font-semibold">Applications <span id="badge-overview-career-new" class="admin-badge hidden">0</span></p><p id="metric-career-new" class="stat-value mt-1">0</p><p class="subtitle text-xs">New Career Applications</p></article>
               </div>
               <div class="mt-4 flex flex-wrap gap-2">
                 <button id="qa-add-compliance" class="btn-secondary" type="button">Add Compliance Item</button>
                 <button id="qa-add-team" class="btn-secondary" type="button">Add Team Member</button>
+                <button id="qa-add-notification" class="btn-secondary" type="button">Publish Notification</button>
                 <button id="qa-view-submissions" class="btn-secondary" type="button">View Submissions</button>
                 <button id="qa-update-settings" class="btn-secondary" type="button">Update Settings</button>
               </div>
@@ -204,6 +254,39 @@
               <div id="careers-list" class="mt-4 grid gap-3"></div>
             </div>
 
+            <div id="tab-notifications" class="tab-panel mt-6 hidden">
+              <h3 class="font-bold text-navy text-lg">Notifications <span id="badge-notifications-active" class="admin-badge hidden">0</span></h3>
+              <p class="subtitle mt-1 text-sm">Publish updates to the scrolling ticker and News page. Visitors can click any ticker item to read the full notice.</p>
+              <form id="notification-form" class="mt-3 grid gap-3 sm:grid-cols-2">
+                <input type="hidden" id="notification-id" />
+                <input class="contact-input" id="n-title" maxlength="180" placeholder="Notification title" required />
+                <input class="contact-input" id="n-category" maxlength="80" placeholder="Category (for example: Tax Update)" value="General" />
+                <textarea class="contact-textarea sm:col-span-2" id="n-summary" maxlength="320" rows="2" placeholder="Short ticker summary (maximum 320 characters)"></textarea>
+                <textarea class="contact-textarea sm:col-span-2" id="n-content" maxlength="10000" rows="7" placeholder="Full notification" required></textarea>
+                <input class="contact-input sm:col-span-2" id="n-link-url" type="url" maxlength="2000" placeholder="Optional related webpage link (https://...)" />
+                <label class="text-sm font-semibold text-navy sm:col-span-2">Optional PDF attachment (maximum 10 MB)
+                  <input class="contact-input mt-1" id="n-pdf-file" type="file" accept="application/pdf,.pdf" />
+                  <input id="n-pdf-url" type="hidden" />
+                  <a id="n-current-pdf" class="mt-2 hidden text-sm font-semibold text-[#d48d08]" href="#" target="_blank" rel="noopener">View current PDF</a>
+                </label>
+                <label class="text-sm font-semibold text-navy">Display from
+                  <input class="contact-input mt-1" id="n-starts-at" type="datetime-local" />
+                </label>
+                <label class="text-sm font-semibold text-navy">Expires at (optional)
+                  <input class="contact-input mt-1" id="n-expires-at" type="datetime-local" />
+                </label>
+                <input class="contact-input" id="n-order" type="number" min="0" value="0" placeholder="Display order" />
+                <label class="text-sm"><input type="checkbox" id="n-active" checked /> Publish this notification</label>
+                <div class="sm:col-span-2 flex flex-wrap gap-2"><button id="notification-submit" class="btn-primary" type="submit">Publish Notification</button><button id="notification-clear" class="btn-secondary" type="button">Clear</button></div>
+              </form>
+              <div class="card p-4 mt-4">
+                <h4 class="font-semibold text-navy">Live Notification Preview</h4>
+                <div id="notification-live-preview" class="mt-3"></div>
+              </div>
+              <input id="notifications-search" class="contact-input mt-4" placeholder="Search notifications" />
+              <div id="notifications-list" class="mt-4 grid gap-3"></div>
+            </div>
+
             <div id="tab-submissions" class="tab-panel mt-6 hidden">
               <h3 class="font-bold text-navy text-lg">Form Submissions <span id="badge-submissions-new" class="admin-badge hidden">0</span> <span id="badge-submissions-reviewed" class="admin-badge secondary hidden">0 reviewed</span></h3>
               <div class="mt-3 grid gap-3 sm:grid-cols-2">
@@ -229,12 +312,56 @@
               </div>
             </div>
 
+            <div id="tab-homepage-stats" class="tab-panel mt-6 hidden">
+              <h3 class="font-bold text-navy text-lg">Homepage Stats</h3>
+              <p class="subtitle text-sm mt-1">Edit the four figures displayed below the homepage hero buttons.</p>
+              <form id="homepage-stats-form" class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div class="card p-4">
+                  <label class="text-sm font-semibold text-navy" for="hs-1-value">Stat 1</label>
+                  <input class="contact-input mt-2" id="hs-1-value" maxlength="20" placeholder="5+" required />
+                  <input class="contact-input mt-2" id="hs-1-label" maxlength="60" placeholder="years of Excellence" required />
+                </div>
+                <div class="card p-4">
+                  <label class="text-sm font-semibold text-navy" for="hs-2-value">Stat 2</label>
+                  <input class="contact-input mt-2" id="hs-2-value" maxlength="20" placeholder="200+" required />
+                  <input class="contact-input mt-2" id="hs-2-label" maxlength="60" placeholder="Happy Clients" required />
+                </div>
+                <div class="card p-4">
+                  <label class="text-sm font-semibold text-navy" for="hs-3-value">Stat 3</label>
+                  <input class="contact-input mt-2" id="hs-3-value" maxlength="20" placeholder="1000+" required />
+                  <input class="contact-input mt-2" id="hs-3-label" maxlength="60" placeholder="Compliance Filings" required />
+                </div>
+                <div class="card p-4">
+                  <label class="text-sm font-semibold text-navy" for="hs-4-value">Stat 4</label>
+                  <input class="contact-input mt-2" id="hs-4-value" maxlength="20" placeholder="100%" required />
+                  <input class="contact-input mt-2" id="hs-4-label" maxlength="60" placeholder="Client Satisfaction" required />
+                </div>
+                <button class="btn-primary sm:col-span-2" type="submit">Save Homepage Stats</button>
+              </form>
+              <div class="card p-4 mt-4">
+                <h4 class="font-semibold text-navy">Live Preview</h4>
+                <div id="homepage-stats-preview" class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"></div>
+              </div>
+            </div>
+
             <div id="tab-settings" class="tab-panel mt-6 hidden">
               <h3 class="font-bold text-navy text-lg">Site Settings</h3>
               <form id="settings-form" class="mt-3 grid gap-3 sm:grid-cols-2">
                 <input type="hidden" id="s-id" />
-                <input class="contact-input" id="s-phone" placeholder="phone" />
-                <input class="contact-input" id="s-email" placeholder="email" />
+                <section class="card p-4">
+                  <div class="flex items-center justify-between gap-3">
+                    <div><h4 class="font-semibold text-navy">Phone Numbers</h4><p class="subtitle text-xs">The first number is used for “Call Now”.</p></div>
+                    <button id="s-add-phone" class="btn-secondary !px-3 !py-2" type="button">+ Add</button>
+                  </div>
+                  <div id="s-phones-list" class="mt-3 grid gap-2"></div>
+                </section>
+                <section class="card p-4">
+                  <div class="flex items-center justify-between gap-3">
+                    <div><h4 class="font-semibold text-navy">Email Addresses</h4><p class="subtitle text-xs">The first email is used for “Send Email”.</p></div>
+                    <button id="s-add-email" class="btn-secondary !px-3 !py-2" type="button">+ Add</button>
+                  </div>
+                  <div id="s-emails-list" class="mt-3 grid gap-2"></div>
+                </section>
                 <input class="contact-input" id="s-whatsapp" placeholder="whatsapp" />
                 <input class="contact-input" id="s-map" placeholder="map link" />
                 <input class="contact-input sm:col-span-2" id="s-map-embed" placeholder="map embed iframe src (google.com/maps/embed...)" />
@@ -277,6 +404,7 @@ git archive --format=zip --output=frontend-backup.zip main</code></pre>
                   <li>compliance_calendar</li>
                   <li>team_members</li>
                   <li>career_openings</li>
+                  <li>notifications</li>
                   <li>contact_submissions</li>
                   <li>career_applications</li>
                 </ul>
@@ -311,7 +439,9 @@ git archive --format=zip --output=frontend-backup.zip main</code></pre>
                   <li>Restore does not restore Supabase Storage files.</li>
                 </ul>
               </section>
+              </div>
             </div>
+          </div>
           </div>
         </section>
       </div>
@@ -319,6 +449,34 @@ git archive --format=zip --output=frontend-backup.zip main</code></pre>
     <div id="admin-toast" class="hidden fixed bottom-4 right-4 z-[9999] rounded-lg px-4 py-3 text-sm font-medium shadow-lg"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="assets/js/adminpanel-vx9k2.js?v=20260530-admin-email"></script>
+    <script src="assets/js/adminpanel-vx9k2.js?v=20260717-multiple-contacts"></script>
+    <script>
+      (function () {
+        var sidebar = document.getElementById("admin-sidebar");
+        var backdrop = document.getElementById("admin-sidebar-backdrop");
+        var burger = document.getElementById("sidebar-toggle");
+        var pageTitle = document.getElementById("admin-page-title");
+
+        function openSidebar() {
+          sidebar && sidebar.classList.add("is-open");
+          backdrop && backdrop.classList.add("is-open");
+        }
+        function closeSidebar() {
+          sidebar && sidebar.classList.remove("is-open");
+          backdrop && backdrop.classList.remove("is-open");
+        }
+        burger && burger.addEventListener("click", function () {
+          if (sidebar && sidebar.classList.contains("is-open")) closeSidebar(); else openSidebar();
+        });
+        backdrop && backdrop.addEventListener("click", closeSidebar);
+
+        document.querySelectorAll(".nav-link").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            if (pageTitle) pageTitle.textContent = btn.dataset.label || btn.textContent.trim();
+            closeSidebar();
+          });
+        });
+      })();
+    </script>
   </body>
 </html>

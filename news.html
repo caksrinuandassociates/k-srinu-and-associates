@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- Website designed and developed by Varada Nexus Private Limited | https://www.varadanexus.com -->
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>News &amp; Updates | K Srinu &amp; Associates</title>
+    <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+    <meta name="description" content="Read the latest notices, regulatory updates, announcements, and professional updates from K Srinu & Associates." />
+    <link rel="canonical" href="https://caksrinuandassociates.com/news.html" />
+    <meta property="og:title" content="News & Updates | K Srinu & Associates" />
+    <meta property="og:description" content="Latest notices, regulatory updates, and announcements from K Srinu & Associates." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://caksrinuandassociates.com/news.html" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{colors:{navy:'#0f2747',gold:'#f2b233'}}}};</script>
+    <link rel="stylesheet" href="assets/css/style.css?v=20260717-ticker-fixes" />
+  </head>
+  <body>
+    <div id="site-navbar"></div>
+
+    <main>
+      <section class="px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+        <div class="container-premium">
+          <span class="inline-flex rounded-full border border-[#f2b233]/50 bg-[#fff7e8] px-3 py-1 text-xs font-semibold tracking-[0.16em] text-[#c98200]">NEWS &amp; UPDATES</span>
+          <div class="mt-4 max-w-3xl">
+            <h1 class="text-4xl font-extrabold leading-tight text-navy sm:text-5xl">Latest Notifications</h1>
+            <p class="subtitle mt-4 text-base leading-relaxed">Important announcements, compliance alerts, regulatory updates, and firm news—all in one place.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="px-4 pb-14 sm:px-6 lg:px-8">
+        <div class="container-premium">
+          <p id="news-loading" class="subtitle text-sm">Loading notifications...</p>
+          <div id="news-empty" class="card hidden rounded-2xl p-8 text-center">
+            <h2 class="text-xl font-bold text-navy">No current notifications</h2>
+            <p class="subtitle mt-2 text-sm">New announcements will appear here when they are published.</p>
+          </div>
+          <div id="news-list" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+        </div>
+      </section>
+    </main>
+
+    <div id="site-footer"></div>
+    <div id="floating-buttons"></div>
+    <script src="assets/js/include-partials.js?v=20260716-notifications"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/public-data.js?v=20260717-multiple-contacts"></script>
+    <script>PublicData.loadSiteSettings();</script>
+    <script src="assets/js/script.js?v=20260716-outline-icons"></script>
+  </body>
+</html>

@@ -19,6 +19,7 @@ async function loadNavbarPartial() {
   else if (page === 'team.html') activeKey = 'team';
   else if (page === 'compliance-calendar.html') activeKey = 'calendar';
   else if (page === 'careers.html') activeKey = 'career';
+  else if (page === 'news.html') activeKey = 'news';
   else if (page === 'services.html' || page.startsWith('service-')) activeKey = 'services';
 
   document.querySelectorAll('#site-navbar [data-nav]').forEach((el) => {
@@ -134,6 +135,16 @@ async function initPartials() {
     loadFooterPartial(),
     loadFloatingButtonsPartial(),
   ]);
+
+  if (!document.querySelector('script[data-notification-center]')) {
+    const script = document.createElement('script');
+    script.src = 'assets/js/notifications.js?v=20260717-ticker-fixes';
+    script.defer = true;
+    script.dataset.notificationCenter = 'true';
+    document.head.appendChild(script);
+  } else if (window.NotificationCenter) {
+    window.NotificationCenter.init();
+  }
   window.dispatchEvent(new Event("partialsLoaded"));
 }
 

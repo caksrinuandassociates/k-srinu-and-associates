@@ -20,7 +20,7 @@
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"AccountingService","name":"K Srinu and Associates","url":"https://caksrinuandassociates.com/","telephone":"+91 8897667910","email":"kasofc4u@gmail.com","address":{"@type":"PostalAddress","streetAddress":"D.No:81-23-01/3, Sri Venkateswara Nagar","addressLocality":"Rajamahendravaram","addressRegion":"Andhra Pradesh","postalCode":"533106","addressCountry":"IN"}}</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config={theme:{extend:{colors:{navy:'#0f2747',gold:'#f2b233'}}}};</script>
-    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/style.css?v=20260717-ticker-fixes" />
   </head>
   <body>
     <div id="site-navbar"></div>
@@ -34,18 +34,19 @@
         <div class="container-premium relative grid items-center gap-8 lg:grid-cols-[1.05fr_.95fr] lg:gap-10">
           <div class="reveal">
             <span class="inline-flex items-center rounded-full border border-[#f6c65b]/55 bg-[#f6c65b1f] px-3 py-1 text-xs font-semibold tracking-[0.18em] text-[#f6c65b]">TRUSTED FINANCIAL PARTNER</span>
-            <h1 class="mt-4 text-[2.1rem] font-extrabold leading-[1.08] sm:text-5xl lg:text-[3.2rem]">Strategic <span class="text-[#f6c65b]">Audit, Tax & Compliance</span> Solutions</h1>
-            <p class="mt-4 max-w-xl text-[15px] leading-relaxed text-slate-200 sm:text-base">We deliver enterprise-grade audit discipline, taxation strategy, and regulatory compliance support to founders, growth-stage companies, and established businesses.</p>
+            <h1 class="mt-4 text-[2.1rem] font-extrabold leading-[1.08] sm:text-5xl lg:text-[3.2rem]">You Build your Business. <span class="text-[#f6c65b]">We Secure Your Compliance</span></h1>
+            <p class="mt-4 max-w-xl text-[15px] leading-relaxed text-slate-200 sm:text-base">Audit and Taxation to GST, Accounting to ROC/MCA, and other regulatory Compliances we provide integrated professional solutions under one roof.</p>
+            <p class="mt-2 max-w-xl text-[15px] leading-relaxed text-slate-200 sm:text-base">With a commitment to professional excellence, practical guidance, and timely execution, we deliver solutions that strengthen compliance, financial discipline, and business confidence.</p>
             <div class="mt-6 flex flex-wrap items-center gap-3 sm:gap-4">
               <a href="contact.html" class="btn-primary min-w-[210px] border-[#f6c65b] bg-gradient-to-r from-[#f6c65b] to-[#e9a31a] !text-[#112948] !shadow-none shadow-[0_8px_18px_rgba(15,39,71,0.20)] hover:-translate-y-[2px] hover:from-[#ffd778] hover:to-[#f2b233]">Schedule Consultation</a>
               <a href="services.html" class="btn-secondary min-w-[185px] border-slate-300/35 bg-white/10 !text-white backdrop-blur-sm hover:-translate-y-[2px] hover:bg-white/18">Explore Services</a>
             </div>
 
             <div class="mt-6 grid max-w-2xl gap-2 rounded-xl border border-white/15 bg-white/5 p-3 backdrop-blur sm:grid-cols-2 lg:grid-cols-4 lg:p-4">
-              <div class="lg:border-r lg:border-white/10 lg:pr-3"><p class="text-xl font-extrabold text-[#f6c65b]">12+</p><p class="text-[11px] text-slate-200">Years of Excellence</p></div>
-              <div class="lg:border-r lg:border-white/10 lg:px-3"><p class="text-xl font-extrabold text-[#f6c65b]">500+</p><p class="text-[11px] text-slate-200">Happy Clients</p></div>
-              <div class="lg:border-r lg:border-white/10 lg:px-3"><p class="text-xl font-extrabold text-[#f6c65b]">2000+</p><p class="text-[11px] text-slate-200">Compliance Filings</p></div>
-              <div class="lg:pl-3"><p class="text-xl font-extrabold text-[#f6c65b]">100%</p><p class="text-[11px] text-slate-200">Client Satisfaction</p></div>
+              <div class="lg:border-r lg:border-white/10 lg:pr-3"><p id="home-stat-1-value" class="text-xl font-extrabold text-[#f6c65b]">5+</p><p id="home-stat-1-label" class="text-[11px] text-slate-200">years of Excellence</p></div>
+              <div class="lg:border-r lg:border-white/10 lg:px-3"><p id="home-stat-2-value" class="text-xl font-extrabold text-[#f6c65b]">200+</p><p id="home-stat-2-label" class="text-[11px] text-slate-200">Happy Clients</p></div>
+              <div class="lg:border-r lg:border-white/10 lg:px-3"><p id="home-stat-3-value" class="text-xl font-extrabold text-[#f6c65b]">1000+</p><p id="home-stat-3-label" class="text-[11px] text-slate-200">Compliance Filings</p></div>
+              <div class="lg:pl-3"><p id="home-stat-4-value" class="text-xl font-extrabold text-[#f6c65b]">100%</p><p id="home-stat-4-label" class="text-[11px] text-slate-200">Client Satisfaction</p></div>
             </div>
           </div>
           <div class="hidden lg:block" aria-hidden="true"></div>
@@ -56,19 +57,19 @@
         <div class="container-premium reveal rounded-2xl border border-slate-100 bg-white p-4 shadow-[0_20px_44px_rgba(13,31,58,0.14)] sm:p-6">
           <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <article class="flex items-start gap-3 rounded-xl p-2">
-              <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef3fb] text-[#0f2747]">✓</span>
-              <div><h3 class="text-sm font-bold text-navy">Experienced Professionals</h3><p class="mt-1 text-xs text-slate-600">Qualified experts in audit, tax, and advisory.</p></div>
+              <span class="site-icon" data-site-icon="professionals"></span>
+              <div><h3 class="text-sm font-bold text-navy">Experienced Professionals</h3><p class="mt-1 text-xs text-slate-600">Qualified experts in taxation, audit, GST, ROC Filings, and advisory.</p></div>
             </article>
             <article class="flex items-start gap-3 rounded-xl p-2">
-              <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef3fb] text-[#0f2747]">⏱</span>
+              <span class="site-icon" data-site-icon="compliance"></span>
               <div><h3 class="text-sm font-bold text-navy">Timely Compliance</h3><p class="mt-1 text-xs text-slate-600">Structured delivery for every statutory due date.</p></div>
             </article>
             <article class="flex items-start gap-3 rounded-xl p-2">
-              <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef3fb] text-[#0f2747]">₹</span>
+              <span class="site-icon" data-site-icon="rupee"></span>
               <div><h3 class="text-sm font-bold text-navy">Transparent Pricing</h3><p class="mt-1 text-xs text-slate-600">Clear scope and fee model with no hidden costs.</p></div>
             </article>
             <article class="flex items-start gap-3 rounded-xl p-2">
-              <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#eef3fb] text-[#0f2747]">★</span>
+              <span class="site-icon" data-site-icon="advisory"></span>
               <div><h3 class="text-sm font-bold text-navy">Personalized Advisory</h3><p class="mt-1 text-xs text-slate-600">Practical strategy aligned with your growth stage.</p></div>
             </article>
           </div>
@@ -84,13 +85,16 @@
             </div>
             <a href="services.html" class="text-sm font-semibold text-[#e9a31a] hover:text-[#cf8f14]">View All Services →</a>
           </div>
-          <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <a class="service-card lift reveal flex min-h-[220px] flex-col rounded-2xl p-6" href="service-audit-assurance.html"><div class="service-icon">◌</div><h3 class="mt-3 text-[1.02rem] font-bold text-navy">Audit & Assurance</h3><p class="subtitle text-sm mt-2 leading-relaxed">Independent audit support that strengthens financial reporting credibility.</p><p class="mt-auto pt-4 text-sm font-semibold text-[#e9a31a]">Explore →</p></a>
-            <a class="service-card lift reveal flex min-h-[220px] flex-col rounded-2xl p-6" href="service-gst-filing.html"><div class="service-icon">◌</div><h3 class="mt-3 text-[1.02rem] font-bold text-navy">GST Compliance</h3><p class="subtitle text-sm mt-2 leading-relaxed">Accurate GST return filing, reconciliation, and practical advisory.</p><p class="mt-auto pt-4 text-sm font-semibold text-[#e9a31a]">Explore →</p></a>
-            <a class="service-card lift reveal flex min-h-[220px] flex-col rounded-2xl p-6" href="service-income-tax-returns.html"><div class="service-icon">◌</div><h3 class="mt-3 text-[1.02rem] font-bold text-navy">Income Tax Services</h3><p class="subtitle text-sm mt-2 leading-relaxed">Tax return filing and planning for individuals, firms, and businesses.</p><p class="mt-auto pt-4 text-sm font-semibold text-[#e9a31a]">Explore →</p></a>
-            <a class="service-card lift reveal flex min-h-[220px] flex-col rounded-2xl p-6" href="service-roc-compliance.html"><div class="service-icon">◌</div><h3 class="mt-3 text-[1.02rem] font-bold text-navy">ROC & MCA Compliance</h3><p class="subtitle text-sm mt-2 leading-relaxed">End-to-end ROC, MCA and governance compliance management.</p><p class="mt-auto pt-4 text-sm font-semibold text-[#e9a31a]">Explore →</p></a>
-            <a class="service-card lift reveal flex min-h-[220px] flex-col rounded-2xl p-6" href="service-payroll-services.html"><div class="service-icon">◌</div><h3 class="mt-3 text-[1.02rem] font-bold text-navy">Payroll & PF/ESI</h3><p class="subtitle text-sm mt-2 leading-relaxed">Reliable payroll processing with statutory labour compliance support.</p><p class="mt-auto pt-4 text-sm font-semibold text-[#e9a31a]">Explore →</p></a>
-            <a class="service-card lift reveal flex min-h-[220px] flex-col rounded-2xl p-6" href="service-business-advisory.html"><div class="service-icon">◌</div><h3 class="mt-3 text-[1.02rem] font-bold text-navy">Business Advisory</h3><p class="subtitle text-sm mt-2 leading-relaxed">Strategic advisory to improve profitability, controls, and growth readiness.</p><p class="mt-auto pt-4 text-sm font-semibold text-[#e9a31a]">Explore →</p></a>
+          <div id="home-services-grid" class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <a class="service-card lift reveal flex min-h-[220px] flex-col rounded-2xl p-6" href="service-audit-assurance.html"><div class="service-icon" data-site-icon="audit"></div><h3 class="mt-3 text-[1.02rem] font-bold text-navy">Audit and Assurance</h3><p class="subtitle text-sm mt-2 leading-relaxed">Independent audit and assurance services that enhance financial credibility, strengthen internal controls, and ensure regulatory compliance.</p><p class="mt-auto pt-4 text-sm font-semibold text-[#e9a31a]">Explore →</p></a>
+            <a class="service-card lift reveal flex min-h-[220px] flex-col rounded-2xl p-6" href="service-income-tax-returns.html"><div class="service-icon" data-site-icon="rupee"></div><h3 class="mt-3 text-[1.02rem] font-bold text-navy">Income Tax Services</h3><p class="subtitle text-sm mt-2 leading-relaxed">Providing reliable Income Tax services through return filing, tax planning, assessments, representation, and compliance support.</p><p class="mt-auto pt-4 text-sm font-semibold text-[#e9a31a]">Explore →</p></a>
+            <a class="service-card lift reveal flex min-h-[220px] flex-col rounded-2xl p-6" href="service-gst-filing.html"><div class="service-icon" data-site-icon="gst"></div><h3 class="mt-3 text-[1.02rem] font-bold text-navy">GST Compliance</h3><p class="subtitle text-sm mt-2 leading-relaxed">Comprehensive GST compliance services including registrations, return filing, reconciliations, advisory, Handling Notices and Litigation support.</p><p class="mt-auto pt-4 text-sm font-semibold text-[#e9a31a]">Explore →</p></a>
+            <a class="service-card lift reveal flex min-h-[220px] flex-col rounded-2xl p-6" href="service-roc-compliance.html"><div class="service-icon" data-site-icon="company"></div><h3 class="mt-3 text-[1.02rem] font-bold text-navy">ROC & MCA Compliance</h3><p class="subtitle text-sm mt-2 leading-relaxed">Ensuring timely ROC filings, MCA compliance, corporate governance, and statutory reporting for LLPs and Companies.</p><p class="mt-auto pt-4 text-sm font-semibold text-[#e9a31a]">Explore →</p></a>
+            <a class="service-card lift reveal flex min-h-[220px] flex-col rounded-2xl p-6" href="service-company-registration.html"><div class="service-icon" data-site-icon="compliance"></div><h3 class="mt-3 text-[1.02rem] font-bold text-navy">Statutory Registrations</h3><p class="subtitle text-sm mt-2 leading-relaxed">Providing seamless registration services for Companies, LLPs, GST, PAN, TAN, PF, ESI, MSME and all other statutory Registration requirements.</p><p class="mt-auto pt-4 text-sm font-semibold text-[#e9a31a]">Explore →</p></a>
+            <a class="service-card lift reveal flex min-h-[220px] flex-col rounded-2xl p-6" href="service-accounting-bookkeeping.html"><div class="service-icon" data-site-icon="bookkeeping"></div><h3 class="mt-3 text-[1.02rem] font-bold text-navy">Accounting & Book keeping</h3><p class="subtitle text-sm mt-2 leading-relaxed">Keeping your books accurate, organized, and up-to-date through professional accounting and bookkeeping services.</p><p class="mt-auto pt-4 text-sm font-semibold text-[#e9a31a]">Explore →</p></a>
+            <a class="service-card lift reveal flex min-h-[220px] flex-col rounded-2xl p-6" href="service-rera.html"><div class="service-icon" data-site-icon="rera"></div><h3 class="mt-3 text-[1.02rem] font-bold text-navy">RERA- Real Estate Regulation and Development Act</h3><p class="subtitle text-sm mt-2 leading-relaxed">Assisting real estate developers with RERA registrations, certifications, periodic compliances, and regulatory reporting requirements.</p><p class="mt-auto pt-4 text-sm font-semibold text-[#e9a31a]">Explore →</p></a>
+            <a class="service-card lift reveal flex min-h-[220px] flex-col rounded-2xl p-6" href="service-payroll-services.html"><div class="service-icon" data-site-icon="payroll"></div><h3 class="mt-3 text-[1.02rem] font-bold text-navy">Payroll & PF/ESI, Professional Tax</h3><p class="subtitle text-sm mt-2 leading-relaxed">Simplifying payroll administration while ensuring timely compliance with PF, ESI, Professional Tax, and labour laws.</p><p class="mt-auto pt-4 text-sm font-semibold text-[#e9a31a]">Explore →</p></a>
+            <a class="service-card lift reveal flex min-h-[220px] flex-col rounded-2xl p-6" href="service-financial-consulting.html"><div class="service-icon" data-site-icon="advisory"></div><h3 class="mt-3 text-[1.02rem] font-bold text-navy">Financial Consultancy</h3><p class="subtitle text-sm mt-2 leading-relaxed">Supporting businesses with financial planning, project reports, business analysis, and growth-oriented advisory services.</p><p class="mt-auto pt-4 text-sm font-semibold text-[#e9a31a]">Explore →</p></a>
           </div>
         </div>
       </section>
@@ -116,9 +120,9 @@
     <div id="floating-buttons"></div>
     <script src="assets/js/include-partials.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="assets/js/public-data.js"></script>
+    <script src="assets/js/public-data.js?v=20260717-multiple-contacts"></script>
     <script>PublicData.loadSiteSettings();</script>
-    <script src="assets/js/script.js"></script>
+    <script src="assets/js/script.js?v=20260716-outline-icons"></script>
   </body>
 </html>
 

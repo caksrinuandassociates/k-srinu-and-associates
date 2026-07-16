@@ -1,5 +1,5 @@
 const PUBLIC_SUPABASE_URL = "https://wenwseckngextivnulqy.supabase.co";
-const PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndlbndzZWNrbmdleHRpdm51bHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NDQwODIsImV4cCI6MjA5NTUyMDA4Mn0.vhH_AbPB0Hs9yehPUOWRR7XLn_ei--g4efy8u-X9aok";
+const PUBLIC_SUPABASE_ANON_KEY = "sb_publishable_G_0-8rqFdUjIKvvvwuWbvA_jVANjCuJ";
 
 const PublicData = (() => {
   let siteSettingsAppliedOnce = false;
@@ -12,6 +12,10 @@ const PublicData = (() => {
       document.getElementById("footer-address-text") ||
       document.getElementById("footer-phone-link") ||
       document.getElementById("footer-email-link") ||
+      document.getElementById("footer-phones-list") ||
+      document.getElementById("footer-emails-list") ||
+      document.getElementById("contact-phones-list") ||
+      document.getElementById("contact-emails-list") ||
       document.getElementById("footer-map-link") ||
       document.querySelector(".wa-float")
     );
@@ -34,12 +38,54 @@ const PublicData = (() => {
     if (el && href) el.setAttribute("href", href);
   }
 
+  function normalizeContactValues(values, fallback = "") {
+    const source = Array.isArray(values) ? values : [];
+    const cleaned = source.map((value) => String(value || "").trim()).filter(Boolean);
+    if (!cleaned.length && String(fallback || "").trim()) cleaned.push(String(fallback).trim());
+    return [...new Set(cleaned)];
+  }
+
+  function contactHref(value, type) {
+    if (type === "phone") return `tel:${String(value).replace(/[^\d+]/g, "")}`;
+    return `mailto:${String(value).trim()}`;
+  }
+
+  function renderContactList(id, values, type, label = "") {
+    const container = document.getElementById(id);
+    if (!container || !values.length) return;
+    container.replaceChildren();
+    values.forEach((value) => {
+      const row = label ? document.createElement("p") : document.createElement("a");
+      const link = label ? document.createElement("a") : row;
+      link.href = contactHref(value, type);
+      link.textContent = value;
+      link.classList.add("footer-link");
+      if (label) {
+        row.append(`${label}: `, link);
+        container.appendChild(row);
+      } else {
+        container.appendChild(row);
+      }
+    });
+  }
+
   function applySiteSettings(settings) {
     if (!settings) return;
-    const displayPhone = settings.phone || "";
+    const phones = normalizeContactValues(settings.contact_phones, settings.phone);
+    const emails = normalizeContactValues(settings.contact_emails, settings.email);
+    const displayPhone = phones[0] || "";
+    const primaryEmail = emails[0] || "";
     const telPhone = displayPhone ? displayPhone.replace(/\D+/g, "") : "";
     const phoneHref = telPhone ? `tel:${telPhone}` : "";
-    const emailHref = settings.email ? `mailto:${settings.email}` : "";
+    const emailHref = primaryEmail ? `mailto:${primaryEmail}` : "";
+
+    if (Array.isArray(settings.homepage_stats)) {
+      settings.homepage_stats.slice(0, 4).forEach((stat, index) => {
+        const position = index + 1;
+        setText(`home-stat-${position}-value`, stat?.value);
+        setText(`home-stat-${position}-label`, stat?.label);
+      });
+    }
 
     const extractIframeSrc = (input = "") => {
       const text = String(input || "").trim();
@@ -64,11 +110,13 @@ const PublicData = (() => {
     };
 
     setText("footer-phone-text", displayPhone);
-    setText("footer-email-text", settings.email);
+    setText("footer-email-text", primaryEmail);
     setText("footer-address-text", settings.address);
     setHref("footer-phone-link", phoneHref);
     setHref("footer-email-link", emailHref);
     setHref("footer-map-link", settings.map_link);
+    renderContactList("footer-phones-list", phones, "phone", "Phone");
+    renderContactList("footer-emails-list", emails, "email", "Email");
 
     document.querySelectorAll(".wa-float").forEach((el) => {
       if (settings.whatsapp) el.setAttribute("href", `https://wa.me/${settings.whatsapp.replace(/\D+/g, "")}`);
@@ -76,13 +124,15 @@ const PublicData = (() => {
 
     // Optional hooks for contact page/details if present
     setText("contact-phone-text", displayPhone);
-    setText("contact-email-text", settings.email);
+    setText("contact-email-text", primaryEmail);
     setText("contact-address-text", settings.address);
     setHref("contact-phone-link", phoneHref);
     setHref("contact-cta-phone-link", phoneHref);
     setHref("contact-email-link", emailHref);
     setHref("contact-cta-email-link", emailHref);
     setHref("contact-map-link", settings.map_link);
+    renderContactList("contact-phones-list", phones, "phone");
+    renderContactList("contact-emails-list", emails, "email");
 
     const contactMapIframe = document.getElementById("contact-map-iframe");
     const embedCandidate = extractIframeSrc(settings.map_embed_link || "");
@@ -101,8 +151,8 @@ const PublicData = (() => {
       .limit(1)
       .maybeSingle();
     if (error) return null;
+    applySiteSettings(data);
     if (hasSiteSettingsTargets()) {
-      applySiteSettings(data);
       siteSettingsAppliedOnce = true;
     } else if (!siteSettingsRetryBound) {
       siteSettingsRetryBound = true;
