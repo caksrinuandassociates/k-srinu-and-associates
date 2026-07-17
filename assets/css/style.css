@@ -499,6 +499,19 @@ p {
 .footer-link { color: #d4e0ef; }
 .footer-link:hover { color: #fff1cf; }
 
+/* Contact page phone/email cards sit on a white background, not the dark
+   footer, so the pale .footer-link color is unreadable there. Override to a
+   dark, high-contrast color scoped to those two containers only. */
+#contact-phones-list .footer-link,
+#contact-emails-list .footer-link {
+  color: var(--navy);
+  font-weight: 700;
+}
+#contact-phones-list .footer-link:hover,
+#contact-emails-list .footer-link:hover {
+  color: var(--gold);
+}
+
 .footer-panel {
   border-top: 1px solid rgba(255,255,255,.14);
   margin-top: 1.3rem;
